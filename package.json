@@ -1,0 +1,63 @@
+{
+  "name": "web-components",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Accessible web components",
+  "author": "Samuel Adebayo <sambayo28@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "web components"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samuelkurdz/web-components.git"
+  },
+  "homepage": "",
+  "scripts": {
+    "dev": "storybook dev -p 6006",
+    "storybook:build": "storybook build",
+    "showcase:dev": "pnpm --filter showcase dev",
+    "showcase:build": "pnpm --filter showcase build",
+    "showcase:lint": "pnpm --filter showcase lint",
+    "accordion:build": "rollup --config --accordion",
+    "avatar:build": "rollup --config --avatar",
+    "tabs:build": "rollup --config --tabs",
+    "tooltip:build": "rollup --config --tooltip"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.6.3",
+    "@lit/context": "^1.1.0",
+    "@lit/react": "^1.0.4",
+    "lit": "^3.1.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.3",
+    "@babel/plugin-transform-class-properties": "^7.24.1",
+    "@babel/plugin-transform-runtime": "^7.24.3",
+    "@babel/preset-env": "^7.24.3",
+    "@babel/preset-typescript": "^7.24.1",
+    "@babel/runtime": "^7.24.1",
+    "@chromatic-com/storybook": "^1.2.25",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@storybook/addon-essentials": "^8.0.4",
+    "@storybook/addon-links": "^8.0.4",
+    "@storybook/blocks": "^8.0.4",
+    "@storybook/test": "^8.0.4",
+    "@storybook/web-components": "^8.0.4",
+    "@storybook/web-components-vite": "^8.0.4",
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.66",
+    "react": "^18.2.0",
+    "rollup": "^4.13.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-minify-html-literals": "^1.2.6",
+    "rollup-plugin-string": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "storybook": "^8.0.4",
+    "typescript": "^5.2.2"
+  }
+}
