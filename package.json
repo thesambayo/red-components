@@ -1,8 +1,9 @@
 {
   "name": "web-components",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
+  "private": true,
+  "packageManager": "pnpm@8.15.5",
   "description": "Accessible web components",
   "author": "Samuel Adebayo <sambayo28@gmail.com>",
   "license": "MIT",
