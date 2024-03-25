@@ -44,20 +44,22 @@ export class AccordionRoot extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.#configureAccordionChildren();
 
+    requestAnimationFrame(() => {
+      this.#configureAccordionChildren();
 
-    this._provider = {
-      ...this._provider,
-      type: this.type,
-      direction: this.direction,
-      orientation: this.orientation,
-      value: this.defaultValue,
-    };
+      this._provider = {
+        ...this._provider,
+        type: this.type,
+        direction: this.direction,
+        orientation: this.orientation,
+        value: this.defaultValue,
+      };
+    })
 
 
     this.addEventListener("keydown", this.#handleKeydownEvent);
-    this.addEventListener("pointerdown", this.#handlePointerdownEvent);
+    this.addEventListener("click", this.#handleClickEvent);
   }
 
   protected shouldUpdate(_changedProperties: PropertyValues<this>): boolean {
@@ -107,7 +109,7 @@ export class AccordionRoot extends LitElement {
     this.#activateAccordionItem(eventTarget);
   }
 
-  #handlePointerdownEvent(event: PointerEvent) {
+  #handleClickEvent(event: MouseEvent) {
     const eventTarget = event.target as HTMLElement;
     if (eventTarget?.localName !== "accordion-trigger") return;
     event.preventDefault();

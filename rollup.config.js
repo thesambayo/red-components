@@ -1,14 +1,19 @@
 import { defineConfig } from 'rollup';
+import fs from 'node:fs';
+import { exec } from "node:child_process"
+import { cwd, env, exit } from 'node:process';
+
+// import { dts } from "rollup-plugin-dts";
+// https://www.npmjs.com/package/rollup-plugin-esbuild?activeTab=readme
+// https://github.com/rollup/awesome?tab=readme-ov-file
+// https://github.com/wessberg/rollup-plugin-ts
+// import typescript2 from 'rollup-plugin-typescript2';
 import babel from '@rollup/plugin-babel';
 import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from "@rollup/plugin-typescript";
 import minifyHTML from 'rollup-plugin-minify-html-literals';
-// import { dts } from "rollup-plugin-dts";
-// import typescript2 from 'rollup-plugin-typescript2';
-import fs from 'node:fs';
-import { exec } from "node:child_process"
-import { cwd, env, exit } from 'node:process';
+
 
 const babelConfig = {
     babelrc: false,
@@ -50,7 +55,7 @@ export default commandLineArgs => {
     if (!packageName) {
         exit(0);
         return;
-    };
+    }
 
     // delete current package dist directory
     execute(`rm -rf ${PACKAGE_ROOT_PATH}/packages/${packageName}/dist`);

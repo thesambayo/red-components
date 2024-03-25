@@ -30,13 +30,17 @@ export class TabsRoot extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
-    const defaultSelected = this.configureChildrenAttributes();
-    this._provider = {
-      ...this._provider,
-      direction: this.direction ?? "ltr",
-      orientation: this.orientation ?? "horizontal",
-      value: this.defaultValue?.trim().length ? this.defaultValue : defaultSelected!
-    }
+    requestAnimationFrame(() => {
+      const defaultSelected = this.configureChildrenAttributes();
+      this._provider = {
+        ...this._provider,
+        direction: this.direction ?? "ltr",
+        orientation: this.orientation ?? "horizontal",
+        value: this.defaultValue?.trim().length ? this.defaultValue : defaultSelected!
+      };
+    });
+
+
     this.addEventListener("pointerdown", this.handlePointerDownEvent);
     this.addEventListener("keynavigation", this.handleKeyNavigationEvent);
   }
@@ -48,10 +52,7 @@ export class TabsRoot extends LitElement {
   }
 
   render() {
-    return html`
-      <slot></slot>
-      <p>${this.defaultValue}</p>
-    `;
+    return html`<slot></slot>`;
   }
 
   private configureChildrenAttributes() {
@@ -60,7 +61,7 @@ export class TabsRoot extends LitElement {
     const prefix = "3";
     const tabsTriggers = this.querySelectorAll(tabsTags.TRIGGER);
     const tabsContents = this.querySelectorAll(tabsTags.CONTENT);
-    let defaultSelected = tabsTriggers[0].getAttribute("value");
+    const defaultSelected = tabsTriggers[0].getAttribute("value");
 
     if (tabsTriggers.length !== tabsContents.length) {
       console.warn("Tab/TabPanel count mismatch");

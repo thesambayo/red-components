@@ -18,7 +18,7 @@ export class TabTrigger extends LitElement {
         {
             context: tabsContext,
             subscribe: true,
-            callback: (e) => this.contextValueUpdate(e)
+            callback: (e) => window.requestAnimationFrame(() => this.contextValueUpdate(e))
         }
     );
 
@@ -36,6 +36,7 @@ export class TabTrigger extends LitElement {
 
     contextValueUpdate(contextValue: TabContext) {
         const { value, shouldFocus } = contextValue
+        // console.log(this.value, value);
         // console.log(value, shouldFocus)
         if (this.value && this.value === value) {
             this.setAttribute("data-state", "active");

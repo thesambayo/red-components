@@ -27,7 +27,7 @@ export class TabsList extends LitElement {
         {
             context: tabsContext,
             subscribe: true,
-            callback: (e) => this.setAttribute("aria-orientation", e.orientation)
+            callback: (e) => window.requestAnimationFrame(() => this.setAttribute("aria-orientation", e.orientation))
         }
     );
 

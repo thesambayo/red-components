@@ -1,19 +1,10 @@
-import {css, html, LitElement} from "lit";
+import {html, LitElement} from "lit";
 import {ContextConsumer} from "@lit/context";
 import {customElement, property} from "lit/decorators.js";
 import {TabContext, tabsContext} from "./tabs-context";
 
 @customElement('tab-content')
 export class TabContent extends LitElement {
-    static styles = css`
-        :host {
-            contain: content;
-        }
-
-        :host([hidden]) {
-            display: none;
-        }
-    `;
 
     @property({ type: String, reflect: true })
     value?: string;
@@ -23,7 +14,7 @@ export class TabContent extends LitElement {
         {
             context: tabsContext,
             subscribe: true,
-            callback: (e) => this.contextValueUpdate(e)
+            callback: (e) => window.requestAnimationFrame(() => this.contextValueUpdate(e))
         }
     );
 
@@ -40,7 +31,7 @@ export class TabContent extends LitElement {
     }
 
     contextValueUpdate(contextValue: TabContext) {
-        const { value } = contextValue
+        const { value } = contextValue;
         if (this.value && this.value === value) {
             this.setAttribute("data-state", "active");
             this.removeAttribute("hidden");

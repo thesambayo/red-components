@@ -15,6 +15,7 @@ export class AccordionTrigger extends LitElement {
   // @state() isOpened = false;
 
   connectedCallback() {
+
     super.connectedCallback();
     this.setAttribute("tabindex", "0");
   }

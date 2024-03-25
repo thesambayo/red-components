@@ -105,9 +105,6 @@ importers:
 
   apps/showcase:
     dependencies:
-      '@radix-ui/colors':
-        specifier: ^3.0.0
-        version: 3.0.0
       '@samred/accordion':
         specifier: workspace:*
         version: link:../../packages/accordion
@@ -2072,10 +2069,6 @@ packages:
     engines: {node: '>=14'}
     requiresBuild: true
     optional: true
-
-  /@radix-ui/colors@3.0.0:
-    resolution: {integrity: sha512-FUOsGBkHrYJwCSEtWRCIfQbZG7q1e6DgxCIOe1SUQzDe/7rXXeA47s8yCn6fuTNQAj1Zq4oTFi9Yjp3wzElcxg==}
-    dev: false
 
   /@radix-ui/react-compose-refs@1.0.1(@types/react@18.2.67)(react@18.2.0):
     resolution: {integrity: sha512-fDSBgd44FKHa1FRMU59qBMPFcl2PZE+2nmqunj+BWFyYYjnhIDWL2ItDs3rrbJDQOtzt5nIebLCQc4QRfz6LJw==}
