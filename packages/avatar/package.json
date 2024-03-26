@@ -1,7 +1,7 @@
 {
   "name": "@samred/avatar",
   "version": "0.0.0",
-
+  "private": false,
   "exports": {
     ".": {
       "import": {

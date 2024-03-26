@@ -1,7 +1,7 @@
 {
   "name": "@samred/accordion",
   "version": "0.0.0",
-
+  "private": false,
   "exports": {
     ".": {
       "import": {
@@ -18,5 +18,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"]
+  "files": ["dist"],
+
+  "dependencies": {
+    "@lit/react": "^1.0.4"
+  }
 }

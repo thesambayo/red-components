@@ -1,7 +1,7 @@
 {
   "name": "@samred/tooltip",
   "version": "0.0.0",
-
+  "private": false,
   "exports": {
     ".": {
       "import": {

@@ -3,6 +3,7 @@
   "include": ["src"],
   "exclude": ["src/**/*.stories.ts"],
   "compilerOptions": {
+    "experimentalDecorators": true,
     "outDir": "dist"
   }
 }
