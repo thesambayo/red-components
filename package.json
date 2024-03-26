@@ -16,6 +16,9 @@
   },
   "homepage": "",
   "scripts": {
+    "changeset": "changeset",
+    "publish:packages": "changeset publish",
+    "version:packages": "changeset version",
     "dev": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "showcase:dev": "pnpm --filter showcase dev",
@@ -24,6 +27,7 @@
     "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript --silent"
   },
   "dependencies": {
+    "@changesets/cli": "^2.27.1",
     "@floating-ui/dom": "^1.6.3",
     "@lit/context": "^1.1.0",
     "@lit/react": "^1.0.4",
