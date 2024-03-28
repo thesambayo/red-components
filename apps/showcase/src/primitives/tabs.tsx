@@ -1,4 +1,4 @@
-import {TabContent, TabsList, TabsRoot, TabTrigger} from "@web-elements/tabs";
+import {TabContent, TabsList, TabsRoot, TabTrigger} from "@red-elements/tabs";
 
 export function Tabs() {
     return (
