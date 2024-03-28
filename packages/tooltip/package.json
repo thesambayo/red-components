@@ -1,6 +1,6 @@
 {
-  "name": "@web-elements/tooltip",
-  "version": "0.0.1",
+ "name": "@red-elements/tooltip",
+  "version": "0.0.0",
   "private": false,
   "exports": {
     ".": {

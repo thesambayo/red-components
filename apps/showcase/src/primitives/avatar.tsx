@@ -1,4 +1,4 @@
-import {AvatarFallback, AvatarImage, AvatarRoot} from "@web-elements/avatar";
+import {AvatarFallback, AvatarImage, AvatarRoot} from "@red-elements/avatar";
 
 export function Avatar() {
     return (
