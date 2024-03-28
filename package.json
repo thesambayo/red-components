@@ -22,7 +22,7 @@
     "dev": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "showcase:dev": "pnpm --filter showcase dev",
-    "showcase:build": "pnpm --filter showcase build",
+    "showcase:build": "pnpm build && pnpm --filter showcase build",
     "showcase:lint": "pnpm --filter showcase lint",
     "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript --silent"
   },

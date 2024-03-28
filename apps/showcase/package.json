@@ -10,10 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@samred/accordion": "workspace:*",
-    "@samred/avatar": "workspace:*",
-    "@samred/tabs": "workspace:*",
-    "@samred/tooltip": "workspace:*",
+    "@web-elements/accordion": "workspace:*",
+    "@web-elements/avatar": "workspace:*",
+    "@web-elements/tabs": "workspace:*",
+    "@web-elements/tooltip": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.363.0",

@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react"
-import {AccordionContent, AccordionItem, AccordionRoot, AccordionTrigger} from "@samred/accordion";
+import {AccordionContent, AccordionItem, AccordionRoot, AccordionTrigger} from "@web-elements/accordion";
 
 export function Accordion() {
     return (

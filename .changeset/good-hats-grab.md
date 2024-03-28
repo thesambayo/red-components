@@ -1,8 +1,8 @@
 ---
-"@samred/accordion": patch
-"@samred/avatar": patch
-"@samred/tabs": patch
-"@samred/tooltip": patch
+"@web-elements/accordion": patch
+"@web-elements/avatar": patch
+"@web-elements/tabs": patch
+"@web-elements/tooltip": patch
 ---
 
 initial release

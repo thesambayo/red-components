@@ -1,4 +1,4 @@
-import {AvatarFallback, AvatarImage, AvatarRoot} from "@samred/avatar";
+import {AvatarFallback, AvatarImage, AvatarRoot} from "@web-elements/avatar";
 
 export function Avatar() {
     return (

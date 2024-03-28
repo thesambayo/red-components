@@ -78,16 +78,16 @@ importers:
 
   apps/showcase:
     dependencies:
-      '@samred/accordion':
+      '@web-elements/accordion':
         specifier: workspace:*
         version: link:../../packages/accordion
-      '@samred/avatar':
+      '@web-elements/avatar':
         specifier: workspace:*
         version: link:../../packages/avatar
-      '@samred/tabs':
+      '@web-elements/tabs':
         specifier: workspace:*
         version: link:../../packages/tabs
-      '@samred/tooltip':
+      '@web-elements/tooltip':
         specifier: workspace:*
         version: link:../../packages/tooltip
       class-variance-authority:

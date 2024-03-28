@@ -1,4 +1,4 @@
-import {TabContent, TabsList, TabsRoot, TabTrigger} from "@samred/tabs";
+import {TabContent, TabsList, TabsRoot, TabTrigger} from "@web-elements/tabs";
 
 export function Tabs() {
     return (

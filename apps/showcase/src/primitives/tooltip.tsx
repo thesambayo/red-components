@@ -1,4 +1,4 @@
-import {TooltipContent, TooltipRoot, TooltipTrigger} from "@samred/tooltip";
+import {TooltipContent, TooltipRoot, TooltipTrigger} from "@web-elements/tooltip";
 import {PlusIcon} from "lucide-react";
 
 export function Tooltip() {
