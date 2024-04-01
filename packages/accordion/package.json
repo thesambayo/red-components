@@ -1,5 +1,5 @@
 {
-  "name": "@red-elements/accordion",
+ "name": "@red-elements/accordion",
   "version": "0.0.0",
   "private": false,
   "exports": {
@@ -18,8 +18,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
-
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@lit/react": "^1.0.4"
   }
