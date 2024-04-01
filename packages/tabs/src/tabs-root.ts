@@ -38,11 +38,10 @@ export class TabsRoot extends LitElement {
         orientation: this.orientation ?? "horizontal",
         value: this.defaultValue?.trim().length ? this.defaultValue : defaultSelected!
       };
+
+      this.addEventListener("pointerdown", this.handlePointerDownEvent);
+      this.addEventListener("keynavigation", this.handleKeyNavigationEvent);
     });
-
-
-    this.addEventListener("pointerdown", this.handlePointerDownEvent);
-    this.addEventListener("keynavigation", this.handleKeyNavigationEvent);
   }
 
   disconnectedCallback() {

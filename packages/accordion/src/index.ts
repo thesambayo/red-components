@@ -2,7 +2,6 @@ import React from 'react';
 import {createComponent, EventName} from '@lit/react';
 import * as accordion from "./accordion";
 
-
 /**
  * @name AccordionRoot
  * @summary root container for accordions.
