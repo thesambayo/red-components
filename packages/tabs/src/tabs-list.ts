@@ -34,7 +34,6 @@ export class TabsList extends LitElement {
     connectedCallback() {
         super.connectedCallback();
         this.setAttribute("role", "tablist");
-
         this.addEventListener("keydown", this.handleKeyNavigations);
     }
 
@@ -44,13 +43,11 @@ export class TabsList extends LitElement {
     }
 
     protected render() {
-        return html`
-            <slot></slot>
-        `;
+        return html`<slot></slot>`;
     }
 
-    handleKeyNavigations(event: KeyboardEvent) {
-        const orientation = this._consumer.value?.orientation
+    handleKeyNavigations = (event: KeyboardEvent) => {
+        const orientation = this._consumer.value?.orientation;
         const dir = getComputedStyle(this).direction; // this is also in context value
 
         const prev = orientation === Orientation.vertical
@@ -62,17 +59,17 @@ export class TabsList extends LitElement {
 
         // element selection
         const tabTriggers = Array.from(this.children) as HTMLElement[];
-        const {curTriggerIdx} = this.getCurrentTabTriggerValue(tabTriggers)
+        const {curTriggerIdx} = this.getCurrentTabTriggerValue(tabTriggers);
 
         let element: HTMLElement;
         switch (event.key) {
             case prev:
                 event.preventDefault();
-                element = this.previous(curTriggerIdx, tabTriggers);
+                element = this.previousElement(curTriggerIdx, tabTriggers);
                 break;
             case next:
                 event.preventDefault();
-                element = this.next(curTriggerIdx, tabTriggers);
+                element = this.nextElement(curTriggerIdx, tabTriggers);
                 break;
             case Keys.home:
                 element = tabTriggers[0];
@@ -102,25 +99,26 @@ export class TabsList extends LitElement {
         return {curTriggerIdx, currTriggerVal}
     }
 
-    next(selectedTabIndex: number, elements: HTMLElement[]) {
-        const items = elements;
-        const index = this.#clamp(selectedTabIndex + 1, items.length);
-        return items[index];
+    nextElement(selectedTabIndex: number, elements: HTMLElement[]) {
+        const index = this.clamp(selectedTabIndex + 1, elements.length);
+        return elements[index];
     }
 
-    previous(selectedTabIndex: number, elements: HTMLElement[]) {
-        const items = elements;
-        const index = this.#clamp(selectedTabIndex - 1, items.length);
-        return items[index];
+    previousElement(selectedTabIndex: number, elements: HTMLElement[]) {
+        const index = this.clamp(selectedTabIndex - 1, elements.length);
+        return elements[index];
     }
 
-    #clamp(index: number, elementsLength: number) {
+    private clamp(index: number, elementsLength: number) {
         let returnedIndex = index;
         if (index < 0) {
             returnedIndex = 0;
-        } else if (index >= elementsLength) {
+        }
+
+        if (index >= elementsLength) {
             returnedIndex = elementsLength - 1;
         }
+
         return returnedIndex;
     }
 }

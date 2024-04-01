@@ -46,7 +46,7 @@ export class AccordionRoot extends LitElement {
     super.connectedCallback();
 
     requestAnimationFrame(() => {
-      this.#configureAccordionChildren();
+      this.configureAccordionChildren();
 
       this._provider = {
         ...this._provider,
@@ -58,8 +58,8 @@ export class AccordionRoot extends LitElement {
     })
 
 
-    this.addEventListener("keydown", this.#handleKeydownEvent);
-    this.addEventListener("click", this.#handleClickEvent);
+    this.addEventListener("keydown", this.handleKeydownEvent);
+    this.addEventListener("click", this.handleClickEvent);
   }
 
   protected shouldUpdate(_changedProperties: PropertyValues<this>): boolean {
@@ -74,7 +74,7 @@ export class AccordionRoot extends LitElement {
     return html` <slot></slot> `;
   }
 
-  #configureAccordionChildren() {
+  configureAccordionChildren() {
     const prefix = "4";
     const accItems = this.querySelectorAll<HTMLElement>(accordionTags.ITEM);
 
@@ -101,23 +101,23 @@ export class AccordionRoot extends LitElement {
     }
   }
 
-  #handleKeydownEvent(event: KeyboardEvent) {
+  handleKeydownEvent(event: KeyboardEvent) {
     if (!ACCORDION_ACTIVATION_KEYS.includes(event.key)) return;
     const eventTarget = event.target as HTMLElement | null;
     if (eventTarget?.localName !== "accordion-trigger") return;
     event.preventDefault();
-    this.#activateAccordionItem(eventTarget);
+    this.activateAccordionItem(eventTarget);
   }
 
-  #handleClickEvent(event: MouseEvent) {
+  handleClickEvent(event: MouseEvent) {
     const eventTarget = event.target as HTMLElement;
     if (eventTarget?.localName !== "accordion-trigger") return;
     event.preventDefault();
     // eventTarget.focus();
-    this.#activateAccordionItem(eventTarget);
+    this.activateAccordionItem(eventTarget);
   }
 
-  #activateAccordionItem(eventTarget: HTMLElement) {
+  activateAccordionItem(eventTarget: HTMLElement) {
     if (eventTarget.localName !== "accordion-trigger") return;
 
     const accItemValue = eventTarget.parentElement?.getAttribute("value");

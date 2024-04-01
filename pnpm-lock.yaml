@@ -158,11 +158,23 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4(@types/react@18.2.71)
 
-  packages/avatar: {}
+  packages/avatar:
+    dependencies:
+      '@lit/react':
+        specifier: ^1.0.4
+        version: 1.0.4(@types/react@18.2.71)
 
-  packages/tabs: {}
+  packages/tabs:
+    dependencies:
+      '@lit/react':
+        specifier: ^1.0.4
+        version: 1.0.4(@types/react@18.2.71)
 
-  packages/tooltip: {}
+  packages/tooltip:
+    dependencies:
+      '@lit/react':
+        specifier: ^1.0.4
+        version: 1.0.4(@types/react@18.2.71)
 
 packages:
 

@@ -43,11 +43,10 @@ readdirSync(`${PACKAGE_ROOT_PATH}/packages`).map(dirName => {
         plugins: [
             typescript({
                 tsconfig: `${PACKAGE_ROOT_PATH}/packages/${dirName}/tsconfig.json`,
-                experimentalDecorators: true,
             }),
             resolve(),
             terser(),
-            // filesize()
+            filesize()
         ],
     };
 

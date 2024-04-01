@@ -1,12 +1,13 @@
 import React from 'react';
-import * as avatar from "./avatar";
 import {createComponent} from '@lit/react';
+import * as avatar from "./avatar";
 
 export const AvatarRoot = createComponent({
     tagName: 'avatar-root',
     elementClass: avatar.AvatarRoot,
     react: React,
 });
+
 
 export const AvatarImage = createComponent({
     tagName: 'avatar-image',
