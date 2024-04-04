@@ -1,5 +1,11 @@
 # @web-elements/accordion
 
+## 0.0.3
+
+### Patch Changes
+
+- 1a70f0f: update tooltip, update package.json for all
+
 ## 0.0.2
 
 ### Patch Changes
