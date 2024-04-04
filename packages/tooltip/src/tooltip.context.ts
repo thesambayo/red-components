@@ -1,6 +1,6 @@
 import {createContext} from "@lit/context";
 
-export const DEFAULT_DELAY_DURATION = 500;
+export const DEFAULT_DELAY_DURATION = 550;
 export const tooltipTags = {
     ROOT: "tooltip-root" as HTMLElement['localName'],
     TRIGGER: "tooltip-trigger" as HTMLElement['localName'],
@@ -10,35 +10,10 @@ export const tooltipTags = {
 export interface TooltipContext {
     open: boolean;
     delayDuration: number;
+    controlledState: boolean;
+    trigger: HTMLElement | null;
+    onOpen(eventName: string): void;
+    onclose(eventName: string): void;
 }
 
-export const tooltipContext = createContext<TooltipContext>("Tooltip");
-
-export interface TooltipRootProps {
-    open: boolean;
-    "default-open": boolean;
-    onOpenChange?: () => void;
-}
-
-export interface TooltipTriggerProps {
-    // aria attributes
-    id: string;
-    "aria-description": string;
-}
-
-export interface TooltipContentProps {
-    side: "top" | "right" | "bottom" | "left";
-    "side-offset": number;
-    align: "start" | "end" | "center";
-    "align-offset": number;
-
-    // data attributes
-    "data-state": "closed" | "open";
-    "data-side": "left" | "right" | "bottom" | "top";
-    "data-align": "start" | "end" | "center";
-
-    // aria attributes
-    id: string;
-    "aria-describedby": string;
-
-}
+export const tooltipContext = createContext<TooltipContext, string>("TOOLTIP");

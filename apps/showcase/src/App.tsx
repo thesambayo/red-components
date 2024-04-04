@@ -1,6 +1,7 @@
 import viteLogo from '/vite.svg'
 import {Accordion} from "./primitives/accordion.tsx";
 import {Tabs} from "@/primitives/tabs.tsx";
+import {Tooltip} from "@/primitives/tooltip.tsx";
 
 function App() {
     return (
@@ -14,7 +15,7 @@ function App() {
                 {/*<Avatar />*/}
                 <Accordion />
                 <Tabs />
-                {/*<Tooltip />*/}
+                <Tooltip />
             </div>
         </>
     )

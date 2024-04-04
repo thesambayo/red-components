@@ -1,22 +1,17 @@
-import { css, html, LitElement } from "lit";
-import { property } from "lit/decorators.js";
-
+import {css, html, LitElement} from "lit";
+import {customElement, property} from "lit/decorators.js";
 import {
-  flip,
   shift,
   offset,
+  flip,
+  size,
   computePosition,
-  ComputePositionConfig
+  ComputePositionConfig,
 } from "@floating-ui/dom";
-// import {nextId} from "../../utils/useId";
 import {ContextConsumer} from "@lit/context";
-import {DEFAULT_DELAY_DURATION, tooltipContext, tooltipTags} from "./tooltip.context";
+import { TooltipContext, tooltipContext } from "./tooltip.context";
 
-// Events to turn on/off the tooltip
-const enterEvents = ["pointerenter", "focus"];
-const leaveEvents = ["pointerleave", "blur", "keydown", "click"];
-
-// @customElement("tooltip-content")
+@customElement("tooltip-content")
 export class TooltipContent extends LitElement {
   static styles = css`
     :host {
@@ -28,91 +23,60 @@ export class TooltipContent extends LitElement {
   _consumer = new ContextConsumer(this, {
     context: tooltipContext,
     subscribe: true,
-    callback: (e) => {
-      console.log(e)
-      // if (e && e.open) {
-      //   this.show();
-      // }
-    }
+    callback: (e) => this.tooltipContextCallback(e)
   })
 
   /**
    * @defaultvalue top
    * */
-  @property({type: String}) side: "top" | "right" | "bottom" | "left" = "top";
+  @property({type: String})
+  side: "top" | "right" | "bottom" | "left" = "top";
 
   /**
    * The distance in pixels from the trigger.
    * @defaultvalue 0
    * */
-  @property({ type: Number, attribute: "side-offset" }) sideOffset = 0;
+  @property({ type: Number, attribute: "side-offset" })
+  sideOffset = 0;
 
   /**
    * @defaultvalue top
+   *
    * */
-  @property({type: String}) align: "start" | "end" | "center" = "center";
+  @property({type: String})
+  align: "start" | "end" | "center" = "center";
 
   /**
    * An offset in pixels from the "start" or "end" alignment options.
    * @defaultvalue 0
    * */
-  @property({ type: Number, attribute: "align-offset" }) alignOffset = 0;
-
-  _target: HTMLElement | null = null;
-
-  get target() {
-    return this._target;
-  }
-
-  set target(target: HTMLElement | null) {
-    // Remove events from existing target
-    if (this.target) {
-      enterEvents.forEach((name) =>
-          this.target!.removeEventListener(name, this.show),
-      );
-      leaveEvents.forEach((name) =>
-          this.target!.removeEventListener(name, this.hide),
-      );
-    }
-    // Add events to new target
-    if (target) {
-      enterEvents.forEach((name) => target.addEventListener(name, () => this.show()));
-      leaveEvents.forEach((name) => target.addEventListener(name, this.hide));
-    }
-    this._target = target;
-  }
+  @property({ type: Number, attribute: "align-offset" })
+  alignOffset = 0;
 
   connectedCallback() {
     super.connectedCallback();
     this.hide();
-    const prefix = "1";
-    this.target ??= this.parentElement?.querySelector(tooltipTags.TRIGGER) ?? null;
-
-    const contentId = this.id || `${prefix}-tooltip-content`;
-    const triggerId = this.target?.id || `${prefix}-tooltip-trigger`
-
-    this.target?.setAttribute("id", triggerId);
-    this.target?.setAttribute("aria-description", contentId);
-
-    this.id = contentId;
-    this.setAttribute("aria-describedby", triggerId);
   }
 
   protected render() {
     return html`<slot></slot>`;
   }
 
-  show = () => {
-    window.setTimeout(() => {
-      this.showContent();
-    }, this._consumer.value?.delayDuration ?? DEFAULT_DELAY_DURATION)
+
+  private tooltipContextCallback(context: TooltipContext) {
+    if (!context) return;
+    const { open } = context;
+    open ? this.show() : this.hide();
+  }
+
+  private show = () => {
+      this.getContentPositioning();
   };
 
-  private showContent() {
-    if (!this.target) return;
+  private getContentPositioning() {
+    const trigger = this._consumer.value?.trigger;
+    if (!trigger) return;
     this.style.cssText = "";
-    this.setAttribute("data-state", "open");
-    this.target.setAttribute("data-state", "open");
 
     let placement: ComputePositionConfig['placement'];
     if (this.align.trim().length) {
@@ -122,7 +86,7 @@ export class TooltipContent extends LitElement {
     }
 
     // Robust positioning
-    computePosition(this.target, this, {
+    computePosition(trigger, this, {
       strategy: "fixed",
       placement: placement,
       middleware: [
@@ -131,25 +95,35 @@ export class TooltipContent extends LitElement {
           crossAxis: this.alignOffset,
         }),
         shift(),
-        flip()
+        flip(),
+        size({
+          apply: ({availableHeight, availableWidth, rects,elements}) => {
+            const { width: anchorWidth, height: anchorHeight } = rects.reference;
+            const contentStyle = elements.floating.style;
+            contentStyle.setProperty('--tooltip-trigger-width', `${anchorWidth}px`);
+            contentStyle.setProperty('--tooltip-trigger-height', `${anchorHeight}px`);
+            contentStyle.setProperty('--tooltip-content-available-width', `${availableWidth}px`);
+            contentStyle.setProperty('--tooltip-content-available-height', `${availableHeight}px`);
+          },
+        }),
       ],
     }).then(({x, y, placement}) => {
+      this.setAttribute("data-state", "open");
+      trigger.setAttribute("data-state", "open");
       this.style.top = `${y}px`;
       this.style.left = `${x}px`;
-
       const [side, align] = placement.split("-");
       this.setAttribute("data-side", side);
       this.setAttribute("data-align", align ?? "center");
     });
-  }
+  };
 
   private hide = () => {
     this.style.cssText = "";
     this.style.display = "none";
     this.setAttribute("data-state", "closed");
-    this.target?.setAttribute("data-state", "closed");
+    this._consumer.value?.trigger?.setAttribute("data-state", "closed");
     this.removeAttribute("data-side");
     this.removeAttribute("data-align");
   };
 }
-customElements.define("tooltip-content", TooltipContent);
