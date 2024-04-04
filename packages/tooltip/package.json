@@ -26,5 +26,14 @@
 
   "dependencies": {
     "@lit/react": "^1.0.4"
+  },
+  "license": "MIT",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samuelkurdz/web-components-lib.git"
+  },
+  "bugs": {
+    "url": "https://github.com/samuelkurdz/web-components-lib/issues"
   }
 }

@@ -74,7 +74,7 @@ export class AccordionRoot extends LitElement {
     return html` <slot></slot> `;
   }
 
-  configureAccordionChildren() {
+  private configureAccordionChildren() {
     const prefix = "4";
     const accItems = this.querySelectorAll<HTMLElement>(accordionTags.ITEM);
 

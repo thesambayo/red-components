@@ -13,8 +13,8 @@ const meta = {
     tags: ['autodocs'],
     render: (_args) => {
         return html`
-<tooltip-root>
-    <tooltip-trigger>Trigger</tooltip-trigger>
+<tooltip-root >
+    <tooltip-trigger>Tooltip trigger</tooltip-trigger>
     <tooltip-content>Content</tooltip-content>
 </tooltip-root>
 `
