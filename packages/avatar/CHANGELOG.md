@@ -1,5 +1,11 @@
 # @web-elements/avatar
 
+## 0.0.3
+
+### Patch Changes
+
+- d44dc9f: updated dependencies, fix web components generation
+
 ## 0.0.2
 
 ### Patch Changes
