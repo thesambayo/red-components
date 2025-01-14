@@ -52,6 +52,6 @@ coming soon...
 
 ## License
 
-Licensed under the MIT License, Copyright © 2022-present [WorkOS](https://workos.com).
+<!-- Licensed under the MIT License, Copyright © 2022-present [WorkOS](https://workos.com). -->
 
 See [LICENSE](./LICENSE) for more information.
