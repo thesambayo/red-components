@@ -1,11 +1,11 @@
-import React from 'react';
-import {createComponent, EventName} from '@lit/react';
+import React from "react";
+import { createComponent, EventName } from "@lit/react";
 import * as accordion from "./accordion";
 
 /**
  * @name AccordionRoot
  * @summary root container for accordions.
- * @documentation https://web-components-lib.vercel.app/?path=/docs/accordion-accordion--docs
+ * @documentation https://red-components.vercel.app/?path=/docs/accordion-accordion--docs
  * @status unstable
  * @since 0.0.0
  *
@@ -17,12 +17,12 @@ import * as accordion from "./accordion";
  * @event {CustomEvent<string[]>} onchange - Emitted when opened primitives items are updated.
  */
 export const AccordionRoot = createComponent({
-    tagName: 'accordion-root',
-    elementClass: accordion.AccordionRoot,
-    react: React,
-    events: {
-        onchange: "change" as EventName<CustomEvent<string[]>>,
-    },
+  tagName: "accordion-root",
+  elementClass: accordion.AccordionRoot,
+  react: React,
+  events: {
+    onchange: "change" as EventName<CustomEvent<string[]>>,
+  },
 });
 
 /**
@@ -33,9 +33,9 @@ export const AccordionRoot = createComponent({
  * @prop {string} value - value that identifies primitives item
  */
 export const AccordionItem = createComponent({
-    tagName: 'accordion-item',
-    elementClass: accordion.AccordionItem,
-    react: React,
+  tagName: "accordion-item",
+  elementClass: accordion.AccordionItem,
+  react: React,
 });
 
 /**
@@ -45,9 +45,9 @@ export const AccordionItem = createComponent({
  * @since 0.0.0
  */
 export const AccordionTrigger = createComponent({
-    tagName: 'accordion-trigger',
-    elementClass: accordion.AccordionTrigger,
-    react: React,
+  tagName: "accordion-trigger",
+  elementClass: accordion.AccordionTrigger,
+  react: React,
 });
 
 /**
@@ -57,7 +57,7 @@ export const AccordionTrigger = createComponent({
  * @since 0.0.0
  */
 export const AccordionContent = createComponent({
-    tagName: 'accordion-content',
-    elementClass: accordion.AccordionContent,
-    react: React,
+  tagName: "accordion-content",
+  elementClass: accordion.AccordionContent,
+  react: React,
 });

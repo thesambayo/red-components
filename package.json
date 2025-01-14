@@ -1,55 +1,62 @@
 {
-  "name": "web-components",
+  "name": "red-components",
   "version": "0.0.0",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@8.15.5",
-  "description": "Accessible web components",
+  "packageManager": "pnpm@9.15.4",
+  "description": "Accessible unstyled web components",
   "author": "Samuel Adebayo <sambayo28@gmail.com>",
   "license": "MIT",
   "keywords": [
-    "web components"
+    "web components",
+    "accessible",
+    "unstyled",
+    "customizable"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/samuelkurdz/web-components.git"
+    "url": "https://github.com/thesambayo/red-components.git"
   },
   "homepage": "",
   "scripts": {
     "changeset": "changeset",
     "publish:packages": "changeset publish",
     "version:packages": "changeset version",
+    "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript --silent",
     "dev": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "showcase:dev": "pnpm --filter showcase dev",
     "showcase:build": "pnpm build && pnpm --filter showcase build",
-    "showcase:lint": "pnpm --filter showcase lint",
-    "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript --silent"
+    "showcase:lint": "pnpm --filter showcase lint"
   },
   "dependencies": {
-    "@changesets/cli": "^2.27.1",
-    "@floating-ui/dom": "^1.6.3",
-    "@lit/context": "^1.1.0",
-    "@lit/react": "^1.0.4",
-    "lit": "^3.1.2"
+    "@changesets/cli": "^2.27.11",
+    "@floating-ui/dom": "^1.6.13",
+    "@lit/context": "^1.1.3",
+    "@lit/react": "^1.0.7",
+    "lit": "^3.2.1"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^1.2.25",
-    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@chromatic-com/storybook": "^3.2.3",
+    "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.1.6",
-    "@storybook/addon-essentials": "^8.0.4",
-    "@storybook/addon-links": "^8.0.4",
-    "@storybook/blocks": "^8.0.4",
-    "@storybook/test": "^8.0.4",
-    "@storybook/web-components": "^8.0.4",
-    "@storybook/web-components-vite": "^8.0.4",
-    "@types/node": "^20.11.30",
-    "@types/react": "^18.2.66",
-    "react": "^18.2.0",
-    "rollup": "^4.13.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@storybook/addon-essentials": "^8.4.7",
+    "@storybook/addon-links": "^8.4.7",
+    "@storybook/blocks": "^8.4.7",
+    "@storybook/test": "^8.4.7",
+    "@storybook/web-components": "^8.4.7",
+    "@storybook/web-components-vite": "^8.4.7",
+    "@types/node": "^22.10.6",
+    "@types/react": "^19.0.6",
+    "react": "^19.0.0",
+    "rollup": "^4.30.1",
     "rollup-plugin-filesize": "^10.0.0",
-    "storybook": "^8.0.4",
-    "typescript": "^5.2.2"
+    "storybook": "^8.4.7",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
   }
 }

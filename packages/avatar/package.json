@@ -24,15 +24,15 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@lit/react": "^1.0.4"
+    "@lit/react": "^1.0.7"
   },
   "license": "MIT",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/samuelkurdz/web-components-lib.git"
+    "url": "git+https://github.com/thesambayo/red-components.git"
   },
   "bugs": {
-    "url": "https://github.com/samuelkurdz/web-components-lib/issues"
+    "url": "https://github.com/thesambayo/red-components/issues"
   }
 }

@@ -1,13 +1,16 @@
 import { provide } from "@lit/context";
-import {LitElement, html, PropertyValues} from "lit";
+import { LitElement, html, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import {AccordionContext, accordionContext, accordionTags} from "./accordion-context";
+import {
+  AccordionContext,
+  accordionContext,
+  accordionTags,
+} from "./accordion-context";
 
-const ACCORDION_ACTIVATION_KEYS = [' ', 'Enter'];
+const ACCORDION_ACTIVATION_KEYS = [" ", "Enter"];
 
 @customElement("accordion-root")
 export class AccordionRoot extends LitElement {
-
   @provide({ context: accordionContext })
   @property({ type: Object })
   private _provider: AccordionContext = {
@@ -55,8 +58,7 @@ export class AccordionRoot extends LitElement {
         orientation: this.orientation,
         value: this.defaultValue,
       };
-    })
-
+    });
 
     this.addEventListener("keydown", this.handleKeydownEvent);
     this.addEventListener("click", this.handleClickEvent);
@@ -80,15 +82,22 @@ export class AccordionRoot extends LitElement {
 
     for (let index = 0; index < accItems.length; index++) {
       const accordionItem = accItems[index];
-      const accordionTrigger = accordionItem.querySelector(accordionTags.TRIGGER);
-      const accordionContent = accordionItem.querySelector(accordionTags.CONTENT);
+      const accordionTrigger = accordionItem.querySelector(
+        accordionTags.TRIGGER,
+      );
+      const accordionContent = accordionItem.querySelector(
+        accordionTags.CONTENT,
+      );
 
       if (!accordionTrigger || !accordionContent) {
         console.warn("Accordion Triggers/Contents mismatch");
         continue;
       }
 
-      accordionItem.setAttribute("id", accordionItem.id || `${prefix}-item-${index}`);
+      accordionItem.setAttribute(
+        "id",
+        accordionItem.id || `${prefix}-item-${index}`,
+      );
       const triggerId = accordionTrigger.id || `${prefix}-trigger-${index}`;
       const contentId = accordionContent.id || `${prefix}-content-${index}`;
 
@@ -110,6 +119,7 @@ export class AccordionRoot extends LitElement {
   }
 
   handleClickEvent(event: MouseEvent) {
+    console.log(event);
     const eventTarget = event.target as HTMLElement;
     if (eventTarget?.localName !== "accordion-trigger") return;
     event.preventDefault();
@@ -128,8 +138,8 @@ export class AccordionRoot extends LitElement {
     }
 
     const updatedValues = this._provider.value.includes(accItemValue)
-        ? this._provider.value.filter((item) => item !== accItemValue)
-        : [
+      ? this._provider.value.filter((item) => item !== accItemValue)
+      : [
           ...(this._provider.type === "multiple" ? this._provider.value : []),
           accItemValue,
         ];
