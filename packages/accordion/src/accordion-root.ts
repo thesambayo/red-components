@@ -119,7 +119,6 @@ export class AccordionRoot extends LitElement {
   }
 
   handleClickEvent(event: MouseEvent) {
-    console.log(event);
     const eventTarget = event.target as HTMLElement;
     if (eventTarget?.localName !== "accordion-trigger") return;
     event.preventDefault();

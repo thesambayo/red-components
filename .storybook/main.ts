@@ -1,53 +1,43 @@
 import type { StorybookConfig } from "@storybook/web-components-vite";
+import { getPackageImportURL } from "./packages";
 
 const config: StorybookConfig = {
-  stories: [
-    // "../stories/**/*.mdx",
-    // "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    // "../stories/**/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    '../packages/**/**/*.stories.ts'
-  ],
+  stories: ["../packages/**/**/*.stories.ts"],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
+    "@storybook/addon-actions",
     "@chromatic-com/storybook",
   ],
   framework: {
     name: "@storybook/web-components-vite",
     options: {},
   },
-  docs: {
-    autodocs: "tag",
-  },
-	async viteFinal(config, { configType }) {
-    // customize the Vite config here
-		config.optimizeDeps = {
-			include: [...(config.optimizeDeps?.include ?? []), '@storybook/web-components', 'lit', 'lit-html'],
-			// exclude: [...(config.optimizeDeps?.exclude ?? []), 'lit', 'lit-html']
-		}
-    // config.optimizeDeps.include = [...(config.optimizeDeps?.include ?? []), '@storybook/web-components']
-    // config.optimizeDeps.exclude = [...(config.optimizeDeps?.exclude ?? []), 'lit', 'lit-html']
-
-    // return the customized config
-    return config
+  docs: {},
+  async viteFinal(config, { configType }) {
+    const newConfig = {
+      ...config,
+      build: {
+        ...config.build,
+        target: "esnext",
+      },
+      define: {
+        ...config.define,
+        "import.meta.env.VITE_ACCORDION_URL": JSON.stringify(
+          getPackageImportURL("ACCORDION", configType),
+        ),
+        "import.meta.env.VITE_AVATAR_URL": JSON.stringify(
+          getPackageImportURL("AVATAR", configType),
+        ),
+        "import.meta.env.VITE_TABS_URL": JSON.stringify(
+          getPackageImportURL("TABS", configType),
+        ),
+        "import.meta.env.VITE_TOOLTIP_URL": JSON.stringify(
+          getPackageImportURL("TOOLTIP", configType),
+        ),
+      },
+    };
+    return newConfig;
   },
 };
 export default config;
-
-// // .storybook/main.js
-// module.exports = {
-//   stories: ['../src/ **/*.stories.mdx', '../src/** /*.stories.@(js|jsx|ts|tsx)'],
-//   addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
-//   framework: '@storybook/web-components',
-//   core: {
-//     builder: 'storybook-builder-vite',
-//   },
-//   async viteFinal(config, { configType }) {
-//     // customize the Vite config here
-//     config.optimizeDeps.include = [...(config.optimizeDeps?.include ?? []), '@storybook/web-components']
-//     config.optimizeDeps.exclude = [...(config.optimizeDeps?.exclude ?? []), 'lit', 'lit-html']
-
-//     // return the customized config
-//     return config
-//   },
-// }

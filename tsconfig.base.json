@@ -7,24 +7,17 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-//    "esModuleInterop": true,
-
-    /* Bundler mode */
     "moduleResolution": "bundler",
-//    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "declaration": true,
-//    "declarationMap": true,
 
-    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["rollup.config.ts"],
-  "exclude": ["apps/*", "packages/**/*/stories.ts"],
-//  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["apps/*", "packages/**/*/stories.ts"]
 }

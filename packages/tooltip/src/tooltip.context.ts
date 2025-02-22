@@ -1,19 +1,21 @@
-import {createContext} from "@lit/context";
+import { createContext } from "@lit/context";
 
-export const DEFAULT_DELAY_DURATION = 550;
+export const DEFAULT_DELAY_DURATION = 500; // 0.5s
+export const DEFAULT_SKIP_DELAY_DURATION = 10000; // 10 seconds
 export const tooltipTags = {
-    ROOT: "tooltip-root" as HTMLElement['localName'],
-    TRIGGER: "tooltip-trigger" as HTMLElement['localName'],
-    CONTENT: "tooltip-content" as HTMLElement['localName'],
-}
+  ROOT: "tooltip-root" as HTMLElement["localName"],
+  TRIGGER: "tooltip-trigger" as HTMLElement["localName"],
+  CONTENT: "tooltip-content" as HTMLElement["localName"],
+};
 
 export interface TooltipContext {
-    open: boolean;
-    delayDuration: number;
-    controlledState: boolean;
-    trigger: HTMLElement | null;
-    onOpen(eventName: string): void;
-    onclose(eventName: string): void;
+  open: boolean;
+  delayDuration: number;
+  skipDelayDuration: number;
+  controlledState: boolean;
+  trigger: HTMLElement | null;
+  onOpen(eventName: string): void;
+  onclose(eventName: string): void;
 }
 
 export const tooltipContext = createContext<TooltipContext, string>("TOOLTIP");
