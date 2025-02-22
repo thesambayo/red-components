@@ -1,5 +1,11 @@
 # @web-elements/tooltip
 
+## 0.0.5
+
+### Patch Changes
+
+- 1fad00b: complete first working tooltip
+
 ## 0.0.4
 
 ### Patch Changes
