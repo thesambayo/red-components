@@ -1,5 +1,15 @@
 # showcase
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [1a70f0f]
+  - @red-elements/accordion@0.0.3
+  - @red-elements/tooltip@0.0.3
+  - @red-elements/avatar@0.0.2
+  - @red-elements/tabs@0.0.3
+
 ## 0.0.3
 
 ### Patch Changes

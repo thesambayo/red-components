@@ -1,5 +1,17 @@
 # @web-elements/avatar
 
+## 0.0.3
+
+### Patch Changes
+
+- d44dc9f: updated dependencies, fix web components generation
+
+## 0.0.2
+
+### Patch Changes
+
+- 1a70f0f: update tooltip, update package.json for all
+
 ## 0.0.1
 
 ### Patch Changes
