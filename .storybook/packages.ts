@@ -13,7 +13,7 @@ const PACKAGES = {
   },
   TOOLTIP: {
     dev: "./tooltip",
-    prod: "https://unpkg.com/@red-elements/tooltip@0.0.4/dist/tooltip.mjs",
+    prod: "https://unpkg.com/@red-elements/tooltip@0.0.5/dist/tooltip.mjs",
   },
 };
 
