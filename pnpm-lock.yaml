@@ -93,6 +93,9 @@ importers:
       '@red-elements/tabs':
         specifier: workspace:*
         version: link:../../packages/tabs
+      '@red-elements/toast':
+        specifier: workspace:*
+        version: link:../../packages/toast
       '@red-elements/tooltip':
         specifier: workspace:*
         version: link:../../packages/tooltip

@@ -2,8 +2,16 @@ import viteLogo from "/vite.svg";
 import { Accordion } from "./primitives/accordion.tsx";
 import { Tabs } from "@/primitives/tabs.tsx";
 import { Tooltip } from "@/primitives/tooltip.tsx";
+import { ToastRoot, toaster } from "@red-elements/toast";
 
 function App() {
+  function sendToast() {
+    toaster.add({
+      content: "send toast",
+      onDismiss: (t) => console.log("toast closed", t.id),
+      onAutoClose: (t) => console.log("toast autoclosed", t.id),
+    });
+  }
   return (
     <>
       <div>
@@ -15,6 +23,8 @@ function App() {
         <Accordion />
         <Tabs />
         <Tooltip />
+        <button onClick={sendToast}>send toast</button>
+        <ToastRoot />
       </div>
     </>
   );

@@ -1,24 +1,17 @@
-import * as tooltip from "./toast";
-import { createComponent, EventName } from "@lit/react";
+import { createComponent } from "@lit/react";
 import React from "react";
+import * as toast from "./toast";
 
-// export const TooltipRoot = createComponent({
-//   tagName: "tooltip-root",
-//   elementClass: tooltip.TooltipRoot,
-//   react: React,
-//   events: {
-//     onOpenChange: "openChange" as EventName<CustomEvent<{ open: boolean }>>,
-//   },
-// });
+export const ToastRoot = createComponent({
+  tagName: "toast-root",
+  elementClass: toast.ToastRoot,
+  react: React,
+});
 
-// export const TooltipTrigger = createComponent({
-//   tagName: "tooltip-trigger",
-//   elementClass: tooltip.TooltipTrigger,
-//   react: React,
-// });
+export const ToastClose = createComponent({
+  tagName: "tooltip-close",
+  elementClass: toast.ToastClose,
+  react: React,
+});
 
-// export const TooltipContent = createComponent({
-//   tagName: "tooltip-content",
-//   elementClass: tooltip.TooltipContent,
-//   react: React,
-// });
+export const toaster = toast.toaster;
