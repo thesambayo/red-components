@@ -24,16 +24,19 @@ const config: StorybookConfig = {
       define: {
         ...config.define,
         "import.meta.env.VITE_ACCORDION_URL": JSON.stringify(
-          getPackageImportURL("ACCORDION", configType),
+          getPackageImportURL("ACCORDION", configType)
         ),
         "import.meta.env.VITE_AVATAR_URL": JSON.stringify(
-          getPackageImportURL("AVATAR", configType),
+          getPackageImportURL("AVATAR", configType)
         ),
         "import.meta.env.VITE_TABS_URL": JSON.stringify(
-          getPackageImportURL("TABS", configType),
+          getPackageImportURL("TABS", configType)
+        ),
+        "import.meta.env.VITE_TOAST_URL": JSON.stringify(
+          getPackageImportURL("TOAST", configType)
         ),
         "import.meta.env.VITE_TOOLTIP_URL": JSON.stringify(
-          getPackageImportURL("TOOLTIP", configType),
+          getPackageImportURL("TOOLTIP", configType)
         ),
       },
     };

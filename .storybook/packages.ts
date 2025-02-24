@@ -11,6 +11,10 @@ const PACKAGES = {
     dev: "./tabs",
     prod: "https://unpkg.com/@red-elements/tabs@0.0.4/dist/tabs.mjs",
   },
+  TOAST: {
+    dev: "./toast",
+    prod: "https://unpkg.com/@red-elements/toast@0.0.1/dist/toast.mjs",
+  },
   TOOLTIP: {
     dev: "./tooltip",
     prod: "https://unpkg.com/@red-elements/tooltip@0.0.5/dist/tooltip.mjs",
@@ -19,7 +23,7 @@ const PACKAGES = {
 
 export function getPackageImportURL(
   packageName: keyof typeof PACKAGES,
-  configType?: "DEVELOPMENT" | "PRODUCTION",
+  configType?: "DEVELOPMENT" | "PRODUCTION"
 ) {
   if (configType === "PRODUCTION") {
     return PACKAGES[packageName].prod;
