@@ -10,7 +10,9 @@ export interface Toast {
 }
 
 export type ToastOptions = Optional<Toast, "id" | "duration">;
+
 type Subscriber = (toasts: Toast[]) => void;
+
 type DismissOptions = {
   /** manually closing toast */
   manuallyDismiised?: boolean;
