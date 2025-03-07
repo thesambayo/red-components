@@ -7,13 +7,17 @@ const PACKAGES = {
     dev: "./avatar",
     prod: "https://unpkg.com/@red-elements/avatar@0.0.3/dist/avatar.mjs",
   },
+  DROPDOWN: {
+    dev: "./dropdown",
+    prod: "https://unpkg.com/@red-elements/dropdown@0.0.1/dist/dropdown.mjs",
+  },
   TABS: {
     dev: "./tabs",
     prod: "https://unpkg.com/@red-elements/tabs@0.0.4/dist/tabs.mjs",
   },
   TOAST: {
     dev: "./toast",
-    prod: "https://unpkg.com/@red-elements/toast@0.0.1/dist/toast.mjs",
+    prod: "https://unpkg.com/@red-elements/toast@0.0.2/dist/toast.mjs",
   },
   TOOLTIP: {
     dev: "./tooltip",

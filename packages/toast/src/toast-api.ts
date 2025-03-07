@@ -5,6 +5,7 @@ import { ToastOptions, toastStore } from "./toast-store";
 
 // do i want to use event based OR direct store methods
 export const toaster = {
+  // basics API
   add(toast: ToastOptions): string {
     return toastStore.addToast(toast);
   },
@@ -18,6 +19,10 @@ export const toaster = {
   // create(options: ToastOptions) {
   //   window.dispatchEvent(new ToastEvent(options));
   // },
+  // creational API
+  success(toast: ToastOptions): string {
+    return toastStore.addToast({ ...toast, type: "success" });
+  },
 };
 
 // todo: declare this in window

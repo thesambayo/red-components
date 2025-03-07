@@ -7,6 +7,8 @@ import { ToastRoot, toaster } from "@red-elements/toast";
 function App() {
   function sendToast() {
     toaster.add({
+      type: "success",
+      duration: 30000,
       content: "send toast",
       onDismiss: (t) => console.log("toast closed", t.id),
       onAutoClose: (t) => console.log("toast autoclosed", t.id),
@@ -24,8 +26,8 @@ function App() {
         <Tabs />
         <Tooltip />
         <button onClick={sendToast}>send toast</button>
-        <ToastRoot />
       </div>
+      <ToastRoot />
     </>
   );
 }

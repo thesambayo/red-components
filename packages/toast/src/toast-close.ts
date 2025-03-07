@@ -18,6 +18,11 @@ export class ToastClose extends LitElement {
     return html` <slot></slot>`;
   }
 
+  /**
+   * finds the first parent element with role="alert" and data-red-toast attributes
+   * @param element
+   * @returns element
+   */
   private findToastParent(element: Element | null): Element | null {
     // Base cases
     if (!element) return null;
