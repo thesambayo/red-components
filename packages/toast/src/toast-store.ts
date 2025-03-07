@@ -1,9 +1,12 @@
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
+export type ToastTypes = "success" | "info" | "warning" | "error" | "loading";
+
 export interface Toast {
   id: string;
   duration: number;
   content: string;
+  type?: ToastTypes;
   // callbacks
   onDismiss?: (toast: Toast) => void;
   onAutoClose?: (toast: Toast) => void;

@@ -173,6 +173,12 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(@types/react@19.0.10)
 
+  packages/dropdown:
+    dependencies:
+      '@lit/react':
+        specifier: ^1.0.7
+        version: 1.0.7(@types/react@19.0.10)
+
   packages/tabs:
     dependencies:
       '@lit/react':
