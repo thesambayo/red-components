@@ -12,6 +12,7 @@
   "dependencies": {
     "@red-elements/accordion": "workspace:*",
     "@red-elements/avatar": "workspace:*",
+    "@red-elements/dropdown": "workspace:*",
     "@red-elements/tabs": "workspace:*",
     "@red-elements/toast": "workspace:*",
     "@red-elements/tooltip": "workspace:*",

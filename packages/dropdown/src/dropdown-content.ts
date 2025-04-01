@@ -7,23 +7,23 @@ import {
   size,
   computePosition,
   ComputePositionConfig,
-  Middleware,
   Placement,
+  Middleware,
 } from "@floating-ui/dom";
 import { ContextConsumer } from "@lit/context";
-import { TooltipContext, tooltipContext } from "./tooltip.context";
+import { DropdownContext, dropdownContext } from "./dropdown.context";
 
 const SIDE_OPTIONS = ["top", "right", "bottom", "left"] as const;
 const ALIGN_OPTIONS = ["start", "center", "end"] as const;
 type Side = (typeof SIDE_OPTIONS)[number];
 type Align = (typeof ALIGN_OPTIONS)[number];
 
-@customElement("tooltip-content")
-export class TooltipContent extends LitElement {
+@customElement("dropdown-content")
+export class DropdownContent extends LitElement {
   static styles = css`
     :host {
       position: fixed;
-      pointer-events: none;
+      pointer-events: auto;
     }
 
     :host([data-state="closed"]) {
@@ -33,7 +33,7 @@ export class TooltipContent extends LitElement {
 
   @state()
   private _consumer = new ContextConsumer(this, {
-    context: tooltipContext,
+    context: dropdownContext,
     subscribe: true,
     callback: (e) => this.tooltipContextCallback(e),
   });
@@ -66,25 +66,38 @@ export class TooltipContent extends LitElement {
   @property({ type: Number, attribute: "align-offset" })
   alignOffset = 0;
 
+  private focusableItems: HTMLElement[] = [];
+
   connectedCallback() {
     super.connectedCallback();
+    this.setAttribute("tabindex", "0");
+    this.setAttribute("role", "menu");
+    this.setAttribute("data-state", "closed");
+
+    this.addEventListener("click", (e) => e.stopPropagation());
+    this.addEventListener("keydown", this.handleKeyDown);
   }
 
   protected willUpdate(_changedProperties: PropertyValues): void {
-    const open = this._consumer.value?.open;
+    const open = this._consumer.value?.isOpen;
     if (open) {
       this.showContent();
     }
   }
 
-  protected render() {
-    return html`<slot></slot>`;
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener("click", (e) => e.stopPropagation());
+    this.removeEventListener("keydown", this.handleKeyDown);
   }
 
-  private tooltipContextCallback(context: TooltipContext) {
+  protected render() {
+    return html` <slot></slot> `;
+  }
+
+  private tooltipContextCallback(context: DropdownContext) {
     if (!context) return;
-    const { open } = context;
-    open ? this.showContent() : this.hideContent();
+    context.isOpen ? this.showContent() : this.hideContent();
   }
 
   transformOrigin = (options: {
@@ -159,26 +172,28 @@ export class TooltipContent extends LitElement {
           crossAxis: this.alignOffset,
         }),
         shift(),
-        flip(),
+        flip({
+          fallbackAxisSideDirection: "start",
+          crossAxis: false,
+        }),
         size({
           apply: ({ availableHeight, availableWidth, rects, elements }) => {
             const { width: anchorWidth, height: anchorHeight } =
               rects.reference;
-            const contentStyle = elements.floating.style;
-            contentStyle.setProperty(
-              "--tooltip-trigger-width",
+            elements.floating.style.setProperty(
+              "--dropdown-trigger-width",
               `${anchorWidth}px`
             );
-            contentStyle.setProperty(
-              "--tooltip-trigger-height",
+            elements.floating.style.setProperty(
+              "--dropdown-trigger-height",
               `${anchorHeight}px`
             );
-            contentStyle.setProperty(
-              "--tooltip-content-available-width",
+            elements.floating.style.setProperty(
+              "--dropdown-content-available-width",
               `${availableWidth}px`
             );
-            contentStyle.setProperty(
-              "--tooltip-content-available-height",
+            elements.floating.style.setProperty(
+              "--dropdown-content-available-height",
               `${availableHeight}px`
             );
           },
@@ -188,28 +203,105 @@ export class TooltipContent extends LitElement {
     });
 
     const { x, y, placement, middlewareData } = computedPosition;
-    this.style.top = `${y}px`;
-    this.style.left = `${x}px`;
     this.style.setProperty(
-      "--tooltip-content-transform-origin",
+      "--dropdown-content-transform-origin",
       [
         middlewareData.transformOrigin?.x,
         middlewareData.transformOrigin?.y,
       ].join(" ")
     );
+    this.style.top = `${y}px`;
+    this.style.left = `${x}px`;
     this.setAttribute("data-state", "open");
     trigger.setAttribute("data-state", "open");
     const [side, align] = placement.split("-");
     this.setAttribute("data-side", side);
     this.setAttribute("data-align", align ?? "center");
+    setTimeout(() => {
+      this.focus();
+    }, 0);
   }
 
   private hideContent() {
     this.style.cssText = "";
-    this.style.display = "none";
     this.setAttribute("data-state", "closed");
     this._consumer.value?.trigger?.setAttribute("data-state", "closed");
     this.removeAttribute("data-side");
     this.removeAttribute("data-align");
+  }
+
+  handleKeyDown(event: KeyboardEvent) {
+    if (!this._consumer.value?.isOpen) {
+      return;
+    }
+
+    // Update focusable items
+    this.focusableItems = Array.from(
+      this.querySelectorAll("dropdown-item")
+    ) as HTMLElement[];
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        this.focusNextItem();
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        this.focusPreviousItem();
+        break;
+      case "Escape":
+        event.preventDefault();
+        this._consumer.value.onClose("keyboard");
+        break;
+    }
+  }
+
+  private focusNextItem() {
+    const currentIndex = this.focusableItems.findIndex(
+      (item) => item === document.activeElement
+    );
+
+    let nextIndex;
+    if (currentIndex === -1) {
+      // No item focused, focus first item
+      nextIndex = 0;
+    } else {
+      // Focus next item, or wrap to first
+      nextIndex =
+        currentIndex === this.focusableItems.length - 1 ? 0 : currentIndex + 1;
+    }
+
+    this.setFocusableItemTabIndex(this.focusableItems, nextIndex);
+    // this.focusableItems[nextIndex]?.focus();
+  }
+
+  private focusPreviousItem() {
+    const currentIndex = this.focusableItems.findIndex(
+      (item) => item === document.activeElement
+    );
+
+    let previousIndex;
+    if (currentIndex === -1) {
+      // No item focused, focus last item
+      previousIndex = this.focusableItems.length - 1;
+    } else {
+      // Focus previous item, or wrap to last
+      previousIndex =
+        currentIndex === 0 ? this.focusableItems.length - 1 : currentIndex - 1;
+    }
+
+    this.setFocusableItemTabIndex(this.focusableItems, previousIndex);
+    // this.focusableItems[previousIndex]?.focus();
+  }
+
+  private setFocusableItemTabIndex(items: HTMLElement[], activeIndex: number) {
+    items[activeIndex]?.focus();
+    // items.forEach((item, index) => {
+    //   const isActive = index === activeIndex;
+    //   item.setAttribute("tabindex", isActive ? "0" : "-1");
+    //   isActive
+    //     ? item.setAttribute("data-highlighted", "")
+    //     : item.removeAttribute("data-highlighted");
+    // });
   }
 }

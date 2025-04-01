@@ -31,7 +31,6 @@ export class TooltipRoot extends LitElement {
   @property({
     attribute: "open",
     type: Boolean,
-    reflect: true,
     converter: {
       fromAttribute: (attrValue: string | null) => {
         if (attrValue === null) return false;
@@ -138,7 +137,7 @@ export class TooltipRoot extends LitElement {
         detail: { open: isOpen },
         bubbles: true,
         composed: true,
-      }),
+      })
     );
   }
 

@@ -9,7 +9,7 @@ const PACKAGES = {
   },
   DROPDOWN: {
     dev: "./dropdown",
-    prod: "https://unpkg.com/@red-elements/dropdown@0.0.1/dist/dropdown.mjs",
+    prod: "https://unpkg.com/@red-elements/dropdown@0.0.3/dist/dropdown.mjs",
   },
   TABS: {
     dev: "./tabs",
@@ -17,11 +17,11 @@ const PACKAGES = {
   },
   TOAST: {
     dev: "./toast",
-    prod: "https://unpkg.com/@red-elements/toast@0.0.2/dist/toast.mjs",
+    prod: "https://unpkg.com/@red-elements/toast@0.0.3/dist/toast.mjs",
   },
   TOOLTIP: {
     dev: "./tooltip",
-    prod: "https://unpkg.com/@red-elements/tooltip@0.0.5/dist/tooltip.mjs",
+    prod: "https://unpkg.com/@red-elements/tooltip@0.0.6/dist/tooltip.mjs",
   },
 };
 
