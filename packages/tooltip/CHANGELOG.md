@@ -1,5 +1,11 @@
 # @web-elements/tooltip
 
+## 0.0.6
+
+### Patch Changes
+
+- 9b4c7c8: base complete dropdown, update tooltip with transform origin, toast with sample styling
+
 ## 0.0.5
 
 ### Patch Changes
