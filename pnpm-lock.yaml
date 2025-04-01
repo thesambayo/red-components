@@ -90,6 +90,9 @@ importers:
       '@red-elements/avatar':
         specifier: workspace:*
         version: link:../../packages/avatar
+      '@red-elements/dropdown':
+        specifier: workspace:*
+        version: link:../../packages/dropdown
       '@red-elements/tabs':
         specifier: workspace:*
         version: link:../../packages/tabs

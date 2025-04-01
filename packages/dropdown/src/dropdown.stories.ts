@@ -8,9 +8,18 @@ const meta = {
   tags: ["autodocs"],
   render: () => {
     return html`<dropdown-root>
-      <div @click=${() => console.log("Option 1 selected")}>Option 1</div>
-      <div @click=${() => console.log("Option 2 selected")}>Option 2</div>
-      <div @click=${() => console.log("Option 3 selected")}>Option 3</div>
+      <dropdown-trigger>Dropdown</dropdown-trigger>
+      <dropdown-content side="top" side-offset="10">
+        <dropdown-item @onSelect=${(event) => console.log(event)}>
+          Option 1
+        </dropdown-item>
+        <dropdown-item @onSelect=${(event) => console.log(event)}>
+          Option 2
+        </dropdown-item>
+        <dropdown-item @onSelect=${(event) => console.log(event)}>
+          Option 3
+        </dropdown-item>
+      </dropdown-content>
     </dropdown-root>`;
   },
 } satisfies Meta<any>;

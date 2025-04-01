@@ -166,6 +166,27 @@ export const toastColorStyles = css`
     border-color: var(--error-border);
     color: var(--error-text);
   }
+
+	[data-red-toast] [data-title] {
+		font-weight: 500;
+		line-height: 1.5;
+		color: inherit;
+		margin: 0;
+		padding: 0;
+	}
+
+	[data-red-toast] [data-description] {
+		font-weight: 400;
+		line-height: 1.4;
+		color: #3f3f3f;
+		font-size: 14px;
+		margin: 0;
+		padding: 0;
+	}
+
+	:host([data-red-theme='dark'] [data-description]) {
+		color: hsl(0, 0%, 91%);
+	}
 `;
 
 export const offsetConverter = {

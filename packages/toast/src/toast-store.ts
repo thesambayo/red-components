@@ -97,9 +97,9 @@ class ToastStore {
   };
 
   handleEvent = (event: Event) => {
-    if (event instanceof CustomEvent) {
-      this.addToast(event.detail);
-    }
+    console.log(event);
+    console.log(event instanceof CustomEvent);
+    this.addToast((event as CustomEvent).detail);
   };
 }
 
