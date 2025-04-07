@@ -29,6 +29,9 @@ const config: StorybookConfig = {
         "import.meta.env.VITE_AVATAR_URL": JSON.stringify(
           getPackageImportURL("AVATAR", configType)
         ),
+        "import.meta.env.VITE_DIALOG_URL": JSON.stringify(
+          getPackageImportURL("DIALOG", configType)
+        ),
         "import.meta.env.VITE_DROPDOWN_URL": JSON.stringify(
           getPackageImportURL("DROPDOWN", configType)
         ),
