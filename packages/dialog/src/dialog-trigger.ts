@@ -1,10 +1,9 @@
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { SignalWatcher } from "@lit-labs/signals";
 import { DIALOG_ATTRIBUTES, DIALOG_EVENTS_RECORD } from "./dialog.context";
 
 @customElement("dialog-trigger")
-export class DialogTrigger extends SignalWatcher(LitElement) {
+export class DialogTrigger extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.setAttribute("tabindex", "0");

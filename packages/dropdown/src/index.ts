@@ -7,7 +7,7 @@ export const DropdownRoot = createComponent({
   elementClass: dropdown.DropdownRoot,
   react: React,
   events: {
-    onOpenChange: "openChange" as EventName<CustomEvent<{ open: boolean }>>,
+    onDropdownStateChange: "dropdown-state-change" as EventName<CustomEvent<{ open: boolean }>>,
   },
 });
 
@@ -28,7 +28,7 @@ export const DropdownItem = createComponent({
   elementClass: dropdown.DropdownItem,
   react: React,
   events: {
-    onSelect: "onSelect" as EventName<CustomEvent<{ itemId: string }>>,
+    onSelect: "select" as EventName<CustomEvent<{ itemId: string }>>,
   },
 });
 

@@ -17,51 +17,57 @@ export class DropdownTrigger extends LitElement {
     this.setAttribute("tabindex", "0");
 
     // Handle click for toggle behavior
-    this.addEventListener("click", () => {
-      if (this._consumer.value?.isOpen) {
-        this._consumer.value.onClose("click");
-      } else {
-        this._consumer.value?.onOpen("click");
-      }
-    });
+    this.addEventListener("click", this.clickHandler);
 
     // Handle keyboard events
-    this.addEventListener("keydown", (event) => {
-      // toggle for SPACE and ENTER key
-      if (event.key === " " || event.key === "Enter") {
-        event.preventDefault(); // Prevent page scroll on spacebar
-        if (this._consumer.value?.isOpen) {
-          this._consumer.value?.onClose("keyboard");
-        } else {
-          this._consumer.value?.onOpen("keyboard");
-        }
-      }
-
-      // close for ESCAPE key
-      if (event.key === "Escape") {
-        event.preventDefault();
-        if (this._consumer.value?.isOpen) {
-          this._consumer.value?.onClose("keyboard");
-        }
-      }
-    });
+    this.addEventListener("keydown", this.keyDownHandler);
 
     // click outside close event
-    document.addEventListener("click", (event) => {
-      if (
-        !this.contains(event.target as Node) &&
-        this._consumer.value?.isOpen
-      ) {
-        this._consumer.value?.onClose("click-outside");
-      }
-    });
+    document.addEventListener("click", this.clickOutsideHandler);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.removeEventListener("click", this.clickHandler);
+    this.removeEventListener("keydown", this.keyDownHandler);
+    document.removeEventListener("click", this.clickOutsideHandler);
   }
 
   protected render() {
     return html`<slot></slot>`;
   }
+
+  clickHandler = () => {
+    if (this._consumer.value?.isOpen) {
+      this._consumer.value.onClose("click");
+    } else {
+      this._consumer.value?.onOpen("click");
+    }
+  };
+
+  keyDownHandler = (event: KeyboardEvent) => {
+    // toggle for SPACE and ENTER key
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault(); // Prevent page scroll on spacebar
+      if (this._consumer.value?.isOpen) {
+        this._consumer.value?.onClose("keyboard");
+      } else {
+        this._consumer.value?.onOpen("keyboard");
+      }
+    }
+
+    // close for ESCAPE key
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (this._consumer.value?.isOpen) {
+        this._consumer.value?.onClose("keyboard");
+      }
+    }
+  };
+
+  clickOutsideHandler = (event: MouseEvent) => {
+    if (!this.contains(event.target as Node) && this._consumer.value?.isOpen) {
+      this._consumer.value?.onClose("click-outside");
+    }
+  };
 }

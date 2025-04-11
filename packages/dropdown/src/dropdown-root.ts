@@ -81,7 +81,7 @@ export class DropdownRoot extends LitElement {
 
   emitOpenEvent(isOpen: boolean) {
     this.dispatchEvent(
-      new CustomEvent("openChange", {
+      new CustomEvent("dropdown-state-change", {
         detail: { open: isOpen },
         bubbles: true,
         composed: true,

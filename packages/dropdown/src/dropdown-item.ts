@@ -60,7 +60,7 @@ export class DropdownItem extends LitElement {
 
   _handleClick() {
     this.dispatchEvent(
-      new CustomEvent("onSelect", {
+      new CustomEvent("select", {
         detail: { itemId: this.id },
         bubbles: true,
         composed: true,
