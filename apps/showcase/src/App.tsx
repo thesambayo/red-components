@@ -6,6 +6,7 @@ import { ToastRoot, toaster } from "@red-elements/toast";
 import {
   DropdownRoot,
   DropdownTrigger,
+  DropdownPortal,
   DropdownContent,
   DropdownItem,
 } from "@red-elements/dropdown";
@@ -21,6 +22,7 @@ import {
 import { X } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { cn } from "./util.ts";
+import { useState } from "react";
 
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -42,6 +44,7 @@ const sheetVariants = cva(
 );
 
 function App() {
+  const [show, setShow] = useState(false);
   function sendToast() {
     toaster.add({
       type: "success",
@@ -70,35 +73,49 @@ function App() {
             <DropdownTrigger className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3.5 py-1.5">
               open dropdown
             </DropdownTrigger>
-            <DropdownContent
-              side="top"
-              sideOffset={8}
-              className="flex flex-col z-50 max-h-[var(--dropdown-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--dropdown-content-transform-origin]"
-            >
-              <DropdownItem
-                onSelect={(e) => console.log(e)}
-                id="first"
-                className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+            <DropdownPortal>
+              <DropdownContent
+                side="right"
+                align="end"
+                sideOffset={30}
+                className="flex flex-col z-50 max-h-[var(--dropdown-content-available-height)] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--dropdown-content-transform-origin]"
               >
-                first
-              </DropdownItem>
-              <DropdownItem
-                id="second"
-                className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
-              >
-                second
-              </DropdownItem>
-              <DropdownItem
-                id="third"
-                className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
-              >
-                third
-              </DropdownItem>
-            </DropdownContent>
+                <DropdownItem
+                  onSelect={(e) => console.log(e.detail)}
+                  id="first"
+                  className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+                >
+                  first
+                </DropdownItem>
+                <DropdownItem
+                  onSelect={(e) => console.log(e.detail)}
+                  id="second"
+                  className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+                >
+                  second
+                </DropdownItem>
+                <DropdownItem
+                  onSelect={(e) => console.log(e.detail)}
+                  id="third"
+                  className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0"
+                >
+                  third
+                </DropdownItem>
+              </DropdownContent>
+            </DropdownPortal>
           </DropdownRoot>
         </div>
         <div className="max-w-md mx-auto space-x-5">
-          <DialogRoot onDialogStateChange={(e) => console.log(e.detail)}>
+          <button
+            onClick={() => setShow(!show)}
+            className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3.5 py-1.5"
+          >
+            open dropdown
+          </button>
+          <DialogRoot
+            open={show}
+            onDialogStateChange={(e) => console.log(e.detail, show)}
+          >
             <DialogTrigger className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3.5 py-1.5">
               Dialog
             </DialogTrigger>

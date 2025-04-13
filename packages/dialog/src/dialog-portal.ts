@@ -1,4 +1,4 @@
-import { LitElement, PropertyValues, html } from "lit";
+import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
   CustomDialogEvent,
@@ -13,6 +13,12 @@ import {
  */
 @customElement("dialog-portal")
 export class DialogPortal extends LitElement {
+  static styles = css`
+    :host {
+      display: none !important;
+    }
+  `;
+
   /**
       @description  destination is the id of the element you want to be the container of the portal content.
       @default document.body
@@ -24,7 +30,6 @@ export class DialogPortal extends LitElement {
     @description containerElement is the element queried from the DOM using the container property.
     It is expected to always have a value (with document.body being the backup if user-given container
     is not in the DOM)
-
   */
   @state() private containerElement!: HTMLElement;
   @state() private observer: MutationObserver | null = null;
@@ -80,6 +85,19 @@ export class DialogPortal extends LitElement {
   render() {
     return html` <slot></slot> `;
   }
+
+  private handleDialogStateChangeEvent = (event: Event) => {
+    const dialogEvent = event as CustomDialogEvent;
+
+    if (
+      this.getAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY) !==
+      dialogEvent.detail.dialogDataId
+    ) {
+      return;
+    }
+    this._open = dialogEvent.detail.open ?? false;
+    this.requestUpdate();
+  };
 
   /**
    * @description Returns the element to which the content should be "portal-ed"
@@ -178,20 +196,7 @@ export class DialogPortal extends LitElement {
       });
   }
 
-  handleDialogStateChangeEvent = (event: Event) => {
-    const dialogEvent = event as CustomDialogEvent;
-
-    if (
-      this.getAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY) !==
-      dialogEvent.detail.dialogDataId
-    ) {
-      return;
-    }
-    this._open = dialogEvent.detail.open ?? false;
-    this.requestUpdate();
-  };
-
-  handleDialogCloseEvent = (event: Event) => {
+  private handleDialogCloseEvent = (event: Event) => {
     const dialogCloseElement = event.currentTarget as HTMLElement;
     dialogCloseElement.dispatchEvent(
       DIALOG_EVENTS_RECORD.CLOSE({

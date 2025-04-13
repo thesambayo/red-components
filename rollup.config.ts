@@ -41,10 +41,6 @@ readdirSync(PACKAGES_DIR_PATH).forEach((dirName) => {
     output: [
       {
         file: `${packageFullPath}/dist/${dirName}.js`,
-        format: "cjs",
-      },
-      {
-        file: `${packageFullPath}/dist/${dirName}.mjs`,
         format: "es",
       },
     ],
@@ -61,10 +57,6 @@ readdirSync(PACKAGES_DIR_PATH).forEach((dirName) => {
     output: [
       {
         file: `${packageFullPath}/dist/index.js`,
-        format: "cjs",
-      },
-      {
-        file: `${packageFullPath}/dist/index.mjs`,
         format: "es",
       },
     ],

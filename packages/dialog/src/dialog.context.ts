@@ -58,7 +58,6 @@ export const DIALOG_EVENTS_RECORD: DialogEventRecord = {
 
 export const DIALOG_ATTRIBUTES = {
   // The HTML attribute name used to store dialog IDs
-  // Usage: element.setAttribute(DIALOG_ATTRIBUTES.DATA_ID, "my-dialog")
   DATA_ID_KEY: "data-dialog-id" as const,
   PORTALLED_ID_KEY: "data-dialog-portalled-id" as const,
   DATA_DIALOG_CLOSE: "data-dialog-close" as const,

@@ -30,13 +30,13 @@ export class DialogOverlay extends LitElement {
     return html`${nothing}`;
   }
 
-  closeDialogEvent() {
+  private closeDialogEvent = () => {
     this.dispatchEvent(
       DIALOG_EVENTS_RECORD.CLOSE({
         dialogDataId: this.getAttribute(DIALOG_ATTRIBUTES.PORTALLED_ID_KEY),
       })
     );
-  }
+  };
 }
 
 declare global {
