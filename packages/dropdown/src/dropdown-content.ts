@@ -1,5 +1,5 @@
-import { css, html, LitElement, PropertyValues } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { _$LE, css, html, LitElement, PropertyValues } from "lit";
+import { customElement, property } from "lit/decorators.js";
 import {
   shift,
   offset,
@@ -10,8 +10,10 @@ import {
   Placement,
   Middleware,
 } from "@floating-ui/dom";
-import { ContextConsumer } from "@lit/context";
-import { DropdownContext, dropdownContext } from "./dropdown.context";
+import {
+  DROPDOWN_ATTRIBUTES,
+  DROPDOWN_EVENTS_RECORD,
+} from "./dropdown.context";
 
 const SIDE_OPTIONS = ["top", "right", "bottom", "left"] as const;
 const ALIGN_OPTIONS = ["start", "center", "end"] as const;
@@ -30,13 +32,6 @@ export class DropdownContent extends LitElement {
       display: none !important;
     }
   `;
-
-  @state()
-  private _consumer = new ContextConsumer(this, {
-    context: dropdownContext,
-    subscribe: true,
-    callback: (e) => this.tooltipContextCallback(e),
-  });
 
   /**
    * The side of the trigger to display the content
@@ -74,30 +69,58 @@ export class DropdownContent extends LitElement {
     this.setAttribute("role", "menu");
     this.setAttribute("data-state", "closed");
 
-    this.addEventListener("click", (e) => e.stopPropagation());
-    this.addEventListener("keydown", this.handleKeyDown);
+    requestAnimationFrame(() => {
+      if (this.hasAttribute(DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY)) {
+        this.showContent();
+        this.addEventListener("keydown", this.handleKeyDown);
+        document.addEventListener("scroll", this.showContent);
+        // window.addEventListener("resize", (e) => {
+        //   // console.log(e);
+        //   this.showContent();
+        // });
+      }
+    });
   }
 
   protected willUpdate(_changedProperties: PropertyValues): void {
-    const open = this._consumer.value?.isOpen;
-    if (open) {
-      this.showContent();
-    }
+    // console.log("willUpdate", _changedProperties);
+    // const open = this._consumer.value?.isOpen;
+    // if (open) {
+    //   this.showContent();
+    // }
   }
 
   disconnectedCallback() {
+    this.hideContent();
     super.disconnectedCallback();
-    this.removeEventListener("click", (e) => e.stopPropagation());
     this.removeEventListener("keydown", this.handleKeyDown);
+    document.removeEventListener("click", this.clickOutsideHandler);
+    // document.removeEventListener("scroll", () => this.showContent);
+    // window.removeEventListener("resize", (e) => {
+    //   // console.log(e);
+    //   this.showContent();
+    // });
   }
 
   protected render() {
     return html` <slot></slot> `;
   }
 
-  private tooltipContextCallback(context: DropdownContext) {
-    if (!context) return;
-    context.isOpen ? this.showContent() : this.hideContent();
+  private clickOutsideHandler = (event: MouseEvent) => {
+    if (
+      !this.contains(event.target as Node) &&
+      this.hasAttribute(DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY)
+    ) {
+      requestAnimationFrame(() => this.closeDropdownEvent());
+    }
+  };
+
+  private closeDropdownEvent() {
+    this.dispatchEvent(
+      DROPDOWN_EVENTS_RECORD.CLOSE({
+        dropdownDataId: this.getAttribute(DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY),
+      })
+    );
   }
 
   transformOrigin = (options: {
@@ -149,7 +172,11 @@ export class DropdownContent extends LitElement {
   };
 
   private async showContent() {
-    const trigger = this._consumer.value?.trigger;
+    const trigger = document.querySelector(
+      `dropdown-trigger[${DROPDOWN_ATTRIBUTES.DATA_ID_KEY}="${this.getAttribute(
+        DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY
+      )}"]`
+    );
     if (!trigger) return;
     this.style.cssText = "";
     this.setAttribute("data-state", "open");
@@ -217,24 +244,26 @@ export class DropdownContent extends LitElement {
     const [side, align] = placement.split("-");
     this.setAttribute("data-side", side);
     this.setAttribute("data-align", align ?? "center");
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       this.focus();
-    }, 0);
+    });
   }
 
-  private hideContent() {
+  hideContent() {
+    const trigger = document.querySelector(
+      `dropdown-trigger[${DROPDOWN_ATTRIBUTES.DATA_ID_KEY}="${this.getAttribute(
+        DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY
+      )}"]`
+    );
     this.style.cssText = "";
     this.setAttribute("data-state", "closed");
-    this._consumer.value?.trigger?.setAttribute("data-state", "closed");
     this.removeAttribute("data-side");
     this.removeAttribute("data-align");
+    trigger?.setAttribute("data-state", "closed");
+    trigger?.setAttribute("aria-expanded", "false");
   }
 
   handleKeyDown(event: KeyboardEvent) {
-    if (!this._consumer.value?.isOpen) {
-      return;
-    }
-
     // Update focusable items
     this.focusableItems = Array.from(
       this.querySelectorAll("dropdown-item")
@@ -251,7 +280,7 @@ export class DropdownContent extends LitElement {
         break;
       case "Escape":
         event.preventDefault();
-        this._consumer.value.onClose("keyboard");
+        this.closeDropdownEvent();
         break;
     }
   }

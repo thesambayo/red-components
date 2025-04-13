@@ -6,10 +6,24 @@ await import(/* @vite-ignore */ import.meta.env.VITE_DIALOG_URL);
 const meta = {
   title: "Primitives/Dialog",
   tags: ["autodocs"],
-  render: () => {
+  argTypes: {
+    open: {
+      control: { type: "boolean" },
+      value: false,
+      type: "boolean",
+      description: "The controlled display of dialog content",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+  },
+  args: {
+    open: false,
+  },
+  render: (args) => {
     return html`
-      <dialog-root>
-        <dialog-trigger>Dropdown</dialog-trigger>
+      <dialog-root open=${args.open}>
+        <dialog-trigger>Open</dialog-trigger>
         <dialog-portal>
           <dialog-overlay></dialog-overlay>
           <dialog-content>

@@ -40,17 +40,12 @@ export class DialogRoot extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    const DATA_DIALOG_ID = nextId();
-
-    this.setAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY, DATA_DIALOG_ID);
-    this.querySelector(dialogTags.TRIGGER)?.setAttribute(
-      DIALOG_ATTRIBUTES.DATA_ID_KEY,
-      DATA_DIALOG_ID
-    );
-    this.querySelector(dialogTags.PORTAL)?.setAttribute(
-      DIALOG_ATTRIBUTES.DATA_ID_KEY,
-      DATA_DIALOG_ID
-    );
+    const dialogID = nextId();
+    this.setAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY, dialogID);
+    // expected children => dialogTags.TRIGGER & dialogTags.PORTAL
+    Array.from(this.children).map((child) => {
+      child.setAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY, dialogID);
+    });
 
     document.addEventListener(DIALOG_EVENTS_NAME.OPEN, this.handleOpenAction);
     document.addEventListener(DIALOG_EVENTS_NAME.CLOSE, this.handleCloseAction);
@@ -97,7 +92,7 @@ export class DialogRoot extends LitElement {
     return html` <slot></slot> `;
   }
 
-  emitOpenChangeEvent() {
+  private emitOpenChangeEvent() {
     this.dispatchEvent(
       DIALOG_EVENTS_RECORD.STATE_CHANGE({
         open: this.currentDialogOpenState,
@@ -113,19 +108,15 @@ export class DialogRoot extends LitElement {
     );
   }
 
-  handleOpenAction = (event: Event) => {
+  private handleOpenAction = (event: Event) => {
     const dialogEvent = event as CustomDialogEvent;
-    if (!this.checkSameDialogId(dialogEvent)) {
-      return;
-    }
+    if (!this.checkSameDialogId(dialogEvent)) return;
     this.currentDialogOpenState = true;
   };
 
-  handleCloseAction = (event: Event) => {
+  private handleCloseAction = (event: Event) => {
     const dialogEvent = event as CustomDialogEvent;
-    if (!this.checkSameDialogId(dialogEvent)) {
-      return;
-    }
+    if (!this.checkSameDialogId(dialogEvent)) return;
     this.currentDialogOpenState = false;
     (this.querySelector(dialogTags.TRIGGER) as HTMLElement).focus();
   };

@@ -8,15 +8,14 @@ export class DialogTrigger extends LitElement {
     super.connectedCallback();
     this.setAttribute("tabindex", "0");
     this.setAttribute("aria-haspopup", "dialog");
+    // to fix
     this.setAttribute("aria-controls", "contentId");
-
     // dynamic attributes
     this.setAttribute("aria-expanded", "false");
     this.setAttribute("data-state", "closed");
 
     // Handle click for toggle behavior
     this.addEventListener("click", this.clickHandler);
-
     // Handle keyboard events
     this.addEventListener("keydown", this.keyDownHandler);
   }
@@ -31,7 +30,25 @@ export class DialogTrigger extends LitElement {
     return html` <slot></slot> `;
   }
 
-  openDialogEvent() {
+  private clickHandler = () => {
+    this.openDialogEvent();
+  };
+
+  private keyDownHandler = (event: KeyboardEvent) => {
+    // toggle for SPACE and ENTER key
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault(); // Prevent page scroll on spacebar
+      this.openDialogEvent();
+    }
+
+    // close for ESCAPE key
+    // if (event.key === "Escape") {
+    //   event.preventDefault();
+    //   this.closeDialogEvent();
+    // }
+  };
+
+  private openDialogEvent() {
     this.dispatchEvent(
       DIALOG_EVENTS_RECORD.OPEN({
         dialogDataId: this.getAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY),
@@ -41,33 +58,15 @@ export class DialogTrigger extends LitElement {
     this.setAttribute("data-state", "open");
   }
 
-  closeDialogEvent() {
-    this.dispatchEvent(
-      DIALOG_EVENTS_RECORD.CLOSE({
-        dialogDataId: this.getAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY),
-      })
-    );
-    this.setAttribute("aria-expanded", "false");
-    this.setAttribute("data-state", "closed");
-  }
-
-  clickHandler = () => {
-    this.openDialogEvent();
-  };
-
-  keyDownHandler = (event: KeyboardEvent) => {
-    // toggle for SPACE and ENTER key
-    if (event.key === " " || event.key === "Enter") {
-      event.preventDefault(); // Prevent page scroll on spacebar
-      this.openDialogEvent();
-    }
-
-    // close for ESCAPE key
-    if (event.key === "Escape") {
-      event.preventDefault();
-      this.closeDialogEvent();
-    }
-  };
+  // private closeDialogEvent() {
+  //   this.dispatchEvent(
+  //     DIALOG_EVENTS_RECORD.CLOSE({
+  //       dialogDataId: this.getAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY),
+  //     })
+  //   );
+  //   this.setAttribute("aria-expanded", "false");
+  //   this.setAttribute("data-state", "closed");
+  // }
 }
 
 declare global {

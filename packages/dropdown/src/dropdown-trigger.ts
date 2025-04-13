@@ -1,16 +1,12 @@
 import { html, LitElement } from "lit";
-import { customElement, state } from "lit/decorators.js";
-import { ContextConsumer } from "@lit/context";
-import { dropdownContext } from "./dropdown.context";
+import { customElement } from "lit/decorators.js";
+import {
+  DROPDOWN_ATTRIBUTES,
+  DROPDOWN_EVENTS_RECORD,
+} from "./dropdown.context";
 
 @customElement("dropdown-trigger")
 export class DropdownTrigger extends LitElement {
-  @state()
-  _consumer = new ContextConsumer(this, {
-    context: dropdownContext,
-    subscribe: true,
-  });
-
   connectedCallback() {
     super.connectedCallback();
     this.setAttribute("aria-haspopup", "menu");
@@ -18,56 +14,46 @@ export class DropdownTrigger extends LitElement {
 
     // Handle click for toggle behavior
     this.addEventListener("click", this.clickHandler);
-
     // Handle keyboard events
     this.addEventListener("keydown", this.keyDownHandler);
-
-    // click outside close event
-    document.addEventListener("click", this.clickOutsideHandler);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener("click", this.clickHandler);
     this.removeEventListener("keydown", this.keyDownHandler);
-    document.removeEventListener("click", this.clickOutsideHandler);
   }
 
   protected render() {
     return html`<slot></slot>`;
   }
 
-  clickHandler = () => {
-    if (this._consumer.value?.isOpen) {
-      this._consumer.value.onClose("click");
-    } else {
-      this._consumer.value?.onOpen("click");
-    }
+  private clickHandler = () => {
+    this.openDropdownEvent();
+    // maybe toggle
   };
 
-  keyDownHandler = (event: KeyboardEvent) => {
+  private keyDownHandler = (event: KeyboardEvent) => {
     // toggle for SPACE and ENTER key
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault(); // Prevent page scroll on spacebar
-      if (this._consumer.value?.isOpen) {
-        this._consumer.value?.onClose("keyboard");
-      } else {
-        this._consumer.value?.onOpen("keyboard");
-      }
-    }
-
-    // close for ESCAPE key
-    if (event.key === "Escape") {
-      event.preventDefault();
-      if (this._consumer.value?.isOpen) {
-        this._consumer.value?.onClose("keyboard");
-      }
+      this.openDropdownEvent();
     }
   };
 
-  clickOutsideHandler = (event: MouseEvent) => {
-    if (!this.contains(event.target as Node) && this._consumer.value?.isOpen) {
-      this._consumer.value?.onClose("click-outside");
-    }
-  };
+  private openDropdownEvent() {
+    this.dispatchEvent(
+      DROPDOWN_EVENTS_RECORD.OPEN({
+        dropdownDataId: this.getAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY),
+      })
+    );
+    this.setAttribute("aria-expanded", "true");
+    this.setAttribute("data-state", "open");
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "dropdown-trigger": DropdownTrigger;
+  }
 }

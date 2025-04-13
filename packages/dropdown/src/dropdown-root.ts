@@ -1,25 +1,16 @@
-import { LitElement, html } from "lit";
-import { provide } from "@lit/context";
+import { LitElement, PropertyValues, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
-  DropdownContext,
-  dropdownContext,
+  CustomDropdownEvent,
+  DROPDOWN_ATTRIBUTES,
+  DROPDOWN_EVENTS_NAME,
+  DROPDOWN_EVENTS_RECORD,
   dropdownTags,
 } from "./dropdown.context";
 import { nextId } from "./randomId";
 
 @customElement("dropdown-root")
 export class DropdownRoot extends LitElement {
-  @provide({ context: dropdownContext })
-  @state()
-  private _provider: DropdownContext = {
-    isOpen: false,
-    trigger: null,
-    controlledState: false,
-    onOpen: (eventName: string) => this.handleOpenAction(eventName),
-    onClose: (eventName: string) => this.handleCloseAction(eventName),
-  };
-
   /**
    * The controlled display of tooltip content
    * @default false
@@ -40,38 +31,47 @@ export class DropdownRoot extends LitElement {
   })
   accessor open = false;
 
+  /**
+    This monitors is dropdown is opened or not.
+    Unlike open (which tracks open attribute from the user/outside environment)
+  */
+  @state()
+  accessor currentDropdownOpenState = false;
+
+  /**
+    This monitors if the user is controlling the dropdown open state.
+    If true, then the dropdown can only the opened and closed from open attribute changes
+  */
+  @state()
+  accessor isOpenStateControlled = false;
+
   connectedCallback() {
     super.connectedCallback();
+    this.isOpenStateControlled = this.hasAttribute("open");
 
+    const dropdownID = nextId();
     this.setAttribute("role", "dropdown");
-    const dropdownPrefix = nextId();
-    const trigger = this.querySelector<HTMLElement>(dropdownTags.TRIGGER);
-    const content = this.querySelector<HTMLElement>(dropdownTags.CONTENT);
-    const triggerId = trigger?.id || `${dropdownPrefix}-dropdown-trigger`;
-    const contentId = content?.id || `${dropdownPrefix}-dropdown-content`;
-    trigger?.setAttribute("id", triggerId);
-    trigger?.setAttribute("aria-controls", contentId);
-    content?.setAttribute("id", contentId);
-    content?.setAttribute("aria-labelledby", triggerId);
+    this.setAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY, dropdownID);
+    // expected children => dropdownTags.TRIGGER & dropdownTags.PORTAL
+    Array.from(this.children).map((child) => {
+      child.setAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY, dropdownID);
+    });
 
-    this._provider = {
-      ...this._provider,
-      trigger: trigger,
-      isOpen: this.open,
-      controlledState: this.hasAttribute("open"),
-    };
+    document.addEventListener(DROPDOWN_EVENTS_NAME.OPEN, this.handleOpenAction);
+    document.addEventListener(
+      DROPDOWN_EVENTS_NAME.CLOSE,
+      this.handleCloseAction
+    );
   }
 
-  protected willUpdate(_changedProperties: Map<string, any>): void {
-    for (const [key] of _changedProperties.entries()) {
-      if (key === "_provider") {
-        this.open = this._provider.isOpen;
-      } else {
-        this._provider = {
-          ...this._provider,
-          [key]: this[key as keyof this],
-        };
-      }
+  protected willUpdate(_changedProperties: PropertyValues<this>): void {
+    // console.log(_changedProperties);
+    // console.log(this.open);
+    if (
+      _changedProperties.has("currentDropdownOpenState") &&
+      _changedProperties.get("open") !== this.open
+    ) {
+      this.emitOpenChangeEvent();
     }
   }
 
@@ -79,32 +79,44 @@ export class DropdownRoot extends LitElement {
     return html`<slot></slot>`;
   }
 
-  emitOpenEvent(isOpen: boolean) {
+  emitOpenChangeEvent() {
     this.dispatchEvent(
-      new CustomEvent("dropdown-state-change", {
-        detail: { open: isOpen },
-        bubbles: true,
-        composed: true,
+      DROPDOWN_EVENTS_RECORD.STATE_CHANGE({
+        dropdownDataId: this.getAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY),
+        open: this.currentDropdownOpenState,
       })
     );
   }
 
-  handleOpenAction(_eventName: string) {
-    this._provider = {
-      ...this._provider,
-      isOpen: true,
-    };
-    document.body.style.pointerEvents = "none";
-    this.emitOpenEvent(true);
+  private checkSameDropdownId(event: CustomDropdownEvent): boolean {
+    return (
+      this.getAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY) ===
+      event.detail.dropdownDataId
+    );
   }
 
-  handleCloseAction = (_eventName: string) => {
-    this._provider = {
-      ...this._provider,
-      isOpen: false,
-    };
-    this._provider.trigger?.focus();
-    document.body.removeAttribute("style");
-    this.emitOpenEvent(false);
+  handleOpenAction = (event: Event) => {
+    const dialogEvent = event as CustomDropdownEvent;
+    if (!this.checkSameDropdownId(dialogEvent)) {
+      return;
+    }
+    this.currentDropdownOpenState = true;
+    document.body.style.pointerEvents = "none";
   };
+
+  handleCloseAction = (event: Event) => {
+    const dialogEvent = event as CustomDropdownEvent;
+    if (!this.checkSameDropdownId(dialogEvent)) {
+      return;
+    }
+    this.currentDropdownOpenState = false;
+    (this.querySelector(dropdownTags.TRIGGER) as HTMLElement).focus();
+    document.body.removeAttribute("style");
+  };
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "dropdown-root": DropdownRoot;
+  }
 }
