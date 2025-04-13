@@ -1,5 +1,11 @@
 ## 0.0.2
 
+## 0.0.4
+
+### Patch Changes
+
+- 7666e0c: use portals for dialog and dropdown
+
 ## 0.0.3
 
 ### Patch Changes
