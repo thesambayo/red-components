@@ -73,7 +73,7 @@ export class DropdownContent extends LitElement {
       if (this.hasAttribute(DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY)) {
         this.showContent();
         this.addEventListener("keydown", this.handleKeyDown);
-        document.addEventListener("scroll", this.showContent);
+        document.addEventListener("click", this.clickOutsideHandler);
         // window.addEventListener("resize", (e) => {
         //   // console.log(e);
         //   this.showContent();
