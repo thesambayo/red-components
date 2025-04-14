@@ -1,5 +1,11 @@
 ## 0.0.2
 
+## 0.0.5
+
+### Patch Changes
+
+- b699e77: fix dropdown content clickoutside
+
 ## 0.0.4
 
 ### Patch Changes
