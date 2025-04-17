@@ -1,5 +1,11 @@
 # @red-elements/dialog
 
+## 0.0.3
+
+### Patch Changes
+
+- 1187cce: update dialog portal to move content instead of cloning
+
 ## 0.0.2
 
 ### Patch Changes
