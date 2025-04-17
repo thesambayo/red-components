@@ -14,9 +14,7 @@ export class DialogTrigger extends LitElement {
     this.setAttribute("aria-expanded", "false");
     this.setAttribute("data-state", "closed");
 
-    // Handle click for toggle behavior
     this.addEventListener("click", this.clickHandler);
-    // Handle keyboard events
     this.addEventListener("keydown", this.keyDownHandler);
   }
 
@@ -35,17 +33,11 @@ export class DialogTrigger extends LitElement {
   };
 
   private keyDownHandler = (event: KeyboardEvent) => {
-    // toggle for SPACE and ENTER key
+    //  trigger with SPACE and ENTER key
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault(); // Prevent page scroll on spacebar
       this.openDialogEvent();
     }
-
-    // close for ESCAPE key
-    // if (event.key === "Escape") {
-    //   event.preventDefault();
-    //   this.closeDialogEvent();
-    // }
   };
 
   private openDialogEvent() {
@@ -57,16 +49,6 @@ export class DialogTrigger extends LitElement {
     this.setAttribute("aria-expanded", "true");
     this.setAttribute("data-state", "open");
   }
-
-  // private closeDialogEvent() {
-  //   this.dispatchEvent(
-  //     DIALOG_EVENTS_RECORD.CLOSE({
-  //       dialogDataId: this.getAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY),
-  //     })
-  //   );
-  //   this.setAttribute("aria-expanded", "false");
-  //   this.setAttribute("data-state", "closed");
-  // }
 }
 
 declare global {
