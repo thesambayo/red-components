@@ -144,10 +144,13 @@ function App() {
                         className="col-span-3"
                       />
                     </div>
-                    <DialogClose className="absolute cursor-pointer right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                    <button
+                      data-dialog-close
+                      className="absolute cursor-pointer right-0 top-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                    >
                       <X className="size-5" />
                       <span className="sr-only">Close</span>
-                    </DialogClose>
+                    </button>
                   </div>
                 </div>
               </DialogContent>
