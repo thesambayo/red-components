@@ -1,29 +1,30 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { consume } from "@lit/context";
-import { dialogRootContext } from "./context";
-import type { DialogRootContextValue } from "./types";
+import { alertDialogRootContext } from "./context";
+import type { AlertDialogRootContextValue } from "./types";
 import { FocusTrap } from "./utils/focus-trap";
 import { lockScroll, unlockScroll } from "./utils/scroll-lock";
 
 /**
- * Main content container for the dialog.
+ * Main content container for the alert dialog.
  * Handles focus trapping, escape key, and scroll lock.
+ * Uses role="alertdialog" and auto-focuses the cancel button.
  *
- * @element dialog-content
+ * @element alert-dialog-content
  *
  * @example
  * ```html
- * <dialog-content>
- *   <dialog-title>Title</dialog-title>
- *   <dialog-description>Description</dialog-description>
- *   <p>Content here</p>
- *   <dialog-close><button>Close</button></dialog-close>
- * </dialog-content>
+ * <alert-dialog-content>
+ *   <alert-dialog-title>Confirm Action</alert-dialog-title>
+ *   <alert-dialog-description>Are you sure?</alert-dialog-description>
+ *   <alert-dialog-cancel><button>Cancel</button></alert-dialog-cancel>
+ *   <alert-dialog-action><button>Confirm</button></alert-dialog-action>
+ * </alert-dialog-content>
  * ```
  */
-@customElement("dialog-content")
-export class DialogContent extends LitElement {
+@customElement("alert-dialog-content")
+export class AlertDialogContent extends LitElement {
   static styles = css`
     :host {
       pointer-events: auto;
@@ -34,8 +35,8 @@ export class DialogContent extends LitElement {
     }
   `;
 
-  @consume({ context: dialogRootContext, subscribe: true })
-  private _rootContext?: DialogRootContextValue;
+  @consume({ context: alertDialogRootContext, subscribe: true })
+  private _rootContext?: AlertDialogRootContextValue;
 
   /**
    * Whether to force-mount the content regardless of open state.
@@ -95,15 +96,10 @@ export class DialogContent extends LitElement {
     // Set data-state for styling
     this.setAttribute("data-state", shouldShow ? "open" : "closed");
 
-    // Set accessibility attributes
-    this.setAttribute("role", "dialog");
+    // Set accessibility attributes - alertdialog role
+    this.setAttribute("role", "alertdialog");
     this.setAttribute("id", this._rootContext.contentId);
-
-    if (this._rootContext.modal) {
-      this.setAttribute("aria-modal", "true");
-    } else {
-      this.removeAttribute("aria-modal");
-    }
+    this.setAttribute("aria-modal", "true");
 
     // Link to title and description
     this.setAttribute("aria-labelledby", this._rootContext.titleId);
@@ -111,22 +107,14 @@ export class DialogContent extends LitElement {
   }
 
   private _onOpen() {
-    // Apply scroll lock in modal mode
-    if (this._rootContext?.modal) {
-      lockScroll();
-      this._hasScrollLock = true;
-    }
+    // Apply scroll lock (alert dialogs are always modal)
+    lockScroll();
+    this._hasScrollLock = true;
 
-    // Create and activate focus trap in modal mode
-    if (this._rootContext?.modal) {
-      this._focusTrap = new FocusTrap(this);
-      this._focusTrap.activate();
-    } else {
-      // Non-modal: just focus the content
-      requestAnimationFrame(() => {
-        this.focus();
-      });
-    }
+    // Create and activate focus trap
+    // Pass the cancel element for initial focus
+    this._focusTrap = new FocusTrap(this);
+    this._focusTrap.activate(this._rootContext?.cancelElement);
   }
 
   private _onClose() {
@@ -148,6 +136,7 @@ export class DialogContent extends LitElement {
   }
 
   private _onKeyDown(event: KeyboardEvent) {
+    // Escape closes the alert dialog (via cancel action)
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
@@ -162,6 +151,6 @@ export class DialogContent extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dialog-content": DialogContent;
+    "alert-dialog-content": AlertDialogContent;
   }
 }

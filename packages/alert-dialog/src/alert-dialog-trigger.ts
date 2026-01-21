@@ -1,26 +1,26 @@
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { consume } from "@lit/context";
-import { dialogRootContext } from "./context";
-import type { DialogRootContextValue } from "./types";
+import { alertDialogRootContext } from "./context";
+import type { AlertDialogRootContextValue } from "./types";
 
 /**
- * Trigger element that opens the dialog on click.
+ * Trigger element that opens the alert dialog on click.
  * Wrap your interactive element (button, etc.) inside this.
  *
- * @element dialog-trigger
+ * @element alert-dialog-trigger
  *
  * @example
  * ```html
- * <dialog-trigger>
- *   <button>Open Dialog</button>
- * </dialog-trigger>
+ * <alert-dialog-trigger>
+ *   <button>Delete Item</button>
+ * </alert-dialog-trigger>
  * ```
  */
-@customElement("dialog-trigger")
-export class DialogTrigger extends LitElement {
-  @consume({ context: dialogRootContext, subscribe: true })
-  private _rootContext?: DialogRootContextValue;
+@customElement("alert-dialog-trigger")
+export class AlertDialogTrigger extends LitElement {
+  @consume({ context: alertDialogRootContext, subscribe: true })
+  private _rootContext?: AlertDialogRootContextValue;
 
   /** Stored handler references for proper cleanup */
   private _handleClick = this._onClick.bind(this);
@@ -92,6 +92,6 @@ export class DialogTrigger extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dialog-trigger": DialogTrigger;
+    "alert-dialog-trigger": AlertDialogTrigger;
   }
 }

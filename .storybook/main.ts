@@ -26,6 +26,9 @@ const config: StorybookConfig = {
         "import.meta.env.VITE_ACCORDION_URL": JSON.stringify(
           getPackageImportURL("ACCORDION", configType)
         ),
+        "import.meta.env.VITE_ALERT_DIALOG_URL": JSON.stringify(
+          getPackageImportURL("ALERT_DIALOG", configType)
+        ),
         "import.meta.env.VITE_AVATAR_URL": JSON.stringify(
           getPackageImportURL("AVATAR", configType)
         ),

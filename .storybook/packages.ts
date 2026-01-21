@@ -3,6 +3,10 @@ const PACKAGES = {
     dev: "./accordion",
     prod: "https://unpkg.com/@red-elements/accordion@0.0.4/dist/accordion.mjs",
   },
+  ALERT_DIALOG: {
+    dev: "./alert-dialog",
+    prod: "https://unpkg.com/@red-elements/alert-dialog@0.0.1/dist/alert-dialog.mjs",
+  },
   AVATAR: {
     dev: "./avatar",
     prod: "https://unpkg.com/@red-elements/avatar@0.0.3/dist/avatar.mjs",

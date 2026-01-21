@@ -13,7 +13,11 @@ import {
   Placement,
 } from "@floating-ui/dom";
 import { tooltipRootContext } from "./context";
-import type { TooltipRootContextValue, TooltipSide, TooltipAlign } from "./types";
+import type {
+  TooltipRootContextValue,
+  TooltipSide,
+  TooltipAlign,
+} from "./types";
 
 /**
  * The content that appears when the tooltip is open.
@@ -147,21 +151,31 @@ export class TooltipContent extends LitElement {
     return `${this.side}-${this.align}`;
   }
 
-  private _transformOriginMiddleware(arrowWidth = 0, arrowHeight = 0): Middleware {
+  private _transformOriginMiddleware(
+    arrowWidth = 0,
+    arrowHeight = 0
+  ): Middleware {
     return {
       name: "transformOrigin",
       fn: (data) => {
         const { placement, rects, middlewareData } = data;
-        const [placedSide, placedAlign = "center"] = placement.split("-") as [TooltipSide, TooltipAlign];
+        const [placedSide, placedAlign = "center"] = placement.split("-") as [
+          TooltipSide,
+          TooltipAlign
+        ];
 
         const cannotCenterArrow = middlewareData.arrow?.centerOffset !== 0;
         const isArrowHidden = cannotCenterArrow;
         const effectiveArrowWidth = isArrowHidden ? 0 : arrowWidth;
         const effectiveArrowHeight = isArrowHidden ? 0 : arrowHeight;
 
-        const noArrowAlign = { start: "0%", center: "50%", end: "100%" }[placedAlign];
-        const arrowXCenter = (middlewareData.arrow?.x ?? 0) + effectiveArrowWidth / 2;
-        const arrowYCenter = (middlewareData.arrow?.y ?? 0) + effectiveArrowHeight / 2;
+        const noArrowAlign = { start: "0%", center: "50%", end: "100%" }[
+          placedAlign
+        ];
+        const arrowXCenter =
+          (middlewareData.arrow?.x ?? 0) + effectiveArrowWidth / 2;
+        const arrowYCenter =
+          (middlewareData.arrow?.y ?? 0) + effectiveArrowHeight / 2;
 
         let x = "";
         let y = "";
@@ -216,18 +230,28 @@ export class TooltipContent extends LitElement {
       size({
         padding: this.collisionPadding,
         apply: ({ availableHeight, availableWidth, rects }) => {
-          this.style.setProperty("--tooltip-trigger-width", `${rects.reference.width}px`);
-          this.style.setProperty("--tooltip-trigger-height", `${rects.reference.height}px`);
-          this.style.setProperty("--tooltip-content-available-width", `${availableWidth}px`);
-          this.style.setProperty("--tooltip-content-available-height", `${availableHeight}px`);
+          this.style.setProperty(
+            "--tooltip-trigger-width",
+            `${rects.reference.width}px`
+          );
+          this.style.setProperty(
+            "--tooltip-trigger-height",
+            `${rects.reference.height}px`
+          );
+          this.style.setProperty(
+            "--tooltip-content-available-width",
+            `${availableWidth}px`
+          );
+          this.style.setProperty(
+            "--tooltip-content-available-height",
+            `${availableHeight}px`
+          );
         },
       })
     );
 
     if (this._arrowElement) {
-      middleware.push(
-        arrow({ element: this._arrowElement, padding: 8 })
-      );
+      middleware.push(arrow({ element: this._arrowElement, padding: 8 }));
     }
 
     middleware.push(
@@ -258,7 +282,10 @@ export class TooltipContent extends LitElement {
 
     // Set data attributes for styling
     const [side, align = "center"] = placement.split("-");
-    this.setAttribute("data-state", this._rootContext?.stateAttribute ?? "instant-open");
+    this.setAttribute(
+      "data-state",
+      this._rootContext?.stateAttribute ?? "instant-open"
+    );
     this.setAttribute("data-side", side);
     this.setAttribute("data-align", align);
 

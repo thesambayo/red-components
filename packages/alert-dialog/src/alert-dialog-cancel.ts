@@ -1,26 +1,27 @@
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { consume } from "@lit/context";
-import { dialogRootContext } from "./context";
-import type { DialogRootContextValue } from "./types";
+import { alertDialogRootContext } from "./context";
+import type { AlertDialogRootContextValue } from "./types";
 
 /**
- * Close button that closes the dialog when clicked.
+ * Cancel button that dismisses the alert dialog without action.
+ * Receives auto-focus when the dialog opens.
  * Wrap your button element inside this.
  *
- * @element dialog-close
+ * @element alert-dialog-cancel
  *
  * @example
  * ```html
- * <dialog-close>
- *   <button>Close</button>
- * </dialog-close>
+ * <alert-dialog-cancel>
+ *   <button>Cancel</button>
+ * </alert-dialog-cancel>
  * ```
  */
-@customElement("dialog-close")
-export class DialogClose extends LitElement {
-  @consume({ context: dialogRootContext, subscribe: true })
-  private _rootContext?: DialogRootContextValue;
+@customElement("alert-dialog-cancel")
+export class AlertDialogCancel extends LitElement {
+  @consume({ context: alertDialogRootContext, subscribe: true })
+  private _rootContext?: AlertDialogRootContextValue;
 
   /** Stored handler references for proper cleanup */
   private _handleClick = this._onClick.bind(this);
@@ -28,6 +29,9 @@ export class DialogClose extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+
+    // Register with root context for auto-focus
+    this._rootContext?.onCancelMount(this);
 
     // Add event listeners
     this.addEventListener("click", this._handleClick);
@@ -66,6 +70,6 @@ export class DialogClose extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dialog-close": DialogClose;
+    "alert-dialog-cancel": AlertDialogCancel;
   }
 }

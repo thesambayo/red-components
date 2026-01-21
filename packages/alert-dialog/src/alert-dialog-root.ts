@@ -1,35 +1,37 @@
 import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { provide } from "@lit/context";
-import { dialogRootContext, generateId } from "./context";
-import type { DialogRootContextValue, DialogState } from "./types";
+import { alertDialogRootContext, generateId } from "./context";
+import type { AlertDialogRootContextValue, AlertDialogState } from "./types";
 
 /**
- * Root component for a dialog. Manages open/close state and provides context.
+ * Root component for an alert dialog. Always modal.
+ * Manages open/close state and provides context.
  *
- * @element dialog-root
+ * @element alert-dialog-root
  *
  * @fires openChange - Emitted when open state changes. Detail: { open: boolean }
  *
  * @example
  * ```html
- * <dialog-root>
- *   <dialog-trigger>
- *     <button>Open Dialog</button>
- *   </dialog-trigger>
- *   <dialog-portal>
- *     <dialog-overlay></dialog-overlay>
- *     <dialog-content>
- *       <dialog-title>Dialog Title</dialog-title>
- *       <dialog-description>Description here</dialog-description>
- *       <dialog-close><button>Close</button></dialog-close>
- *     </dialog-content>
- *   </dialog-portal>
- * </dialog-root>
+ * <alert-dialog-root>
+ *   <alert-dialog-trigger>
+ *     <button>Delete Item</button>
+ *   </alert-dialog-trigger>
+ *   <alert-dialog-portal>
+ *     <alert-dialog-overlay></alert-dialog-overlay>
+ *     <alert-dialog-content>
+ *       <alert-dialog-title>Confirm Deletion</alert-dialog-title>
+ *       <alert-dialog-description>This action cannot be undone.</alert-dialog-description>
+ *       <alert-dialog-cancel><button>Cancel</button></alert-dialog-cancel>
+ *       <alert-dialog-action><button>Delete</button></alert-dialog-action>
+ *     </alert-dialog-content>
+ *   </alert-dialog-portal>
+ * </alert-dialog-root>
  * ```
  */
-@customElement("dialog-root")
-export class DialogRoot extends LitElement {
+@customElement("alert-dialog-root")
+export class AlertDialogRoot extends LitElement {
   /**
    * Controlled open state. When set, component is controlled.
    */
@@ -41,13 +43,6 @@ export class DialogRoot extends LitElement {
    */
   @property({ type: Boolean, attribute: "default-open" })
   defaultOpen = false;
-
-  /**
-   * Whether dialog is modal (traps focus, has overlay backdrop).
-   * Default: true
-   */
-  @property({ type: Boolean })
-  modal = true;
 
   /** Internal open state for uncontrolled mode */
   @state()
@@ -61,19 +56,23 @@ export class DialogRoot extends LitElement {
   @state()
   private _contentElement: HTMLElement | null = null;
 
+  /** Reference to cancel element */
+  @state()
+  private _cancelElement: HTMLElement | null = null;
+
   /** Unique ID for content */
-  private _contentId = generateId("dialog-content");
+  private _contentId = generateId("alert-dialog-content");
 
   /** Unique ID for title */
-  private _titleId = generateId("dialog-title");
+  private _titleId = generateId("alert-dialog-title");
 
   /** Unique ID for description */
-  private _descriptionId = generateId("dialog-description");
+  private _descriptionId = generateId("alert-dialog-description");
 
   /** Provide root context to children */
-  @provide({ context: dialogRootContext })
+  @provide({ context: alertDialogRootContext })
   @property({ attribute: false })
-  context: DialogRootContextValue = this._createContext();
+  context: AlertDialogRootContextValue = this._createContext();
 
   /** Whether controlled mode is active */
   private get _isControlled(): boolean {
@@ -86,7 +85,7 @@ export class DialogRoot extends LitElement {
   }
 
   /** State attribute for styling */
-  private get _stateAttribute(): DialogState {
+  private get _stateAttribute(): AlertDialogState {
     return this._isOpen ? "open" : "closed";
   }
 
@@ -102,25 +101,26 @@ export class DialogRoot extends LitElement {
       changed.has("_internalOpen") ||
       changed.has("_trigger") ||
       changed.has("_contentElement") ||
-      changed.has("modal")
+      changed.has("_cancelElement")
     ) {
       this._updateContext();
     }
   }
 
-  private _createContext(): DialogRootContextValue {
+  private _createContext(): AlertDialogRootContextValue {
     return {
       open: this._isOpen,
       stateAttribute: this._stateAttribute,
-      modal: this.modal,
       contentId: this._contentId,
       titleId: this._titleId,
       descriptionId: this._descriptionId,
       trigger: this._trigger,
       contentElement: this._contentElement,
+      cancelElement: this._cancelElement,
       onOpenChange: this._handleOpenChange.bind(this),
       onTriggerMount: this._handleTriggerMount.bind(this),
       onContentMount: this._handleContentMount.bind(this),
+      onCancelMount: this._handleCancelMount.bind(this),
     };
   }
 
@@ -159,6 +159,10 @@ export class DialogRoot extends LitElement {
     this._contentElement = el;
   }
 
+  private _handleCancelMount(el: HTMLElement) {
+    this._cancelElement = el;
+  }
+
   protected render() {
     return html`<slot></slot>`;
   }
@@ -166,6 +170,6 @@ export class DialogRoot extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dialog-root": DialogRoot;
+    "alert-dialog-root": AlertDialogRoot;
   }
 }

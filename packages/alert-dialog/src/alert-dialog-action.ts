@@ -1,26 +1,26 @@
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { consume } from "@lit/context";
-import { dialogRootContext } from "./context";
-import type { DialogRootContextValue } from "./types";
+import { alertDialogRootContext } from "./context";
+import type { AlertDialogRootContextValue } from "./types";
 
 /**
- * Close button that closes the dialog when clicked.
+ * Action button that confirms and closes the alert dialog.
  * Wrap your button element inside this.
  *
- * @element dialog-close
+ * @element alert-dialog-action
  *
  * @example
  * ```html
- * <dialog-close>
- *   <button>Close</button>
- * </dialog-close>
+ * <alert-dialog-action>
+ *   <button>Delete</button>
+ * </alert-dialog-action>
  * ```
  */
-@customElement("dialog-close")
-export class DialogClose extends LitElement {
-  @consume({ context: dialogRootContext, subscribe: true })
-  private _rootContext?: DialogRootContextValue;
+@customElement("alert-dialog-action")
+export class AlertDialogAction extends LitElement {
+  @consume({ context: alertDialogRootContext, subscribe: true })
+  private _rootContext?: AlertDialogRootContextValue;
 
   /** Stored handler references for proper cleanup */
   private _handleClick = this._onClick.bind(this);
@@ -66,6 +66,6 @@ export class DialogClose extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dialog-close": DialogClose;
+    "alert-dialog-action": AlertDialogAction;
   }
 }

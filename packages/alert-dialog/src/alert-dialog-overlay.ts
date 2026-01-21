@@ -1,22 +1,23 @@
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { consume } from "@lit/context";
-import { dialogRootContext } from "./context";
-import type { DialogRootContextValue } from "./types";
+import { alertDialogRootContext } from "./context";
+import type { AlertDialogRootContextValue } from "./types";
 
 /**
- * Overlay/backdrop that appears behind the dialog content.
- * Clicking the overlay closes the dialog (in modal mode).
+ * Overlay/backdrop that appears behind the alert dialog content.
+ * Unlike regular dialog, clicking the overlay does NOT close the alert dialog.
+ * Users must explicitly click action or cancel buttons.
  *
- * @element dialog-overlay
+ * @element alert-dialog-overlay
  *
  * @example
  * ```html
- * <dialog-overlay></dialog-overlay>
+ * <alert-dialog-overlay></alert-dialog-overlay>
  * ```
  */
-@customElement("dialog-overlay")
-export class DialogOverlay extends LitElement {
+@customElement("alert-dialog-overlay")
+export class AlertDialogOverlay extends LitElement {
   static styles = css`
     :host {
       pointer-events: auto;
@@ -27,8 +28,8 @@ export class DialogOverlay extends LitElement {
     }
   `;
 
-  @consume({ context: dialogRootContext, subscribe: true })
-  private _rootContext?: DialogRootContextValue;
+  @consume({ context: alertDialogRootContext, subscribe: true })
+  private _rootContext?: AlertDialogRootContextValue;
 
   /**
    * Whether to force-mount the overlay regardless of open state.
@@ -36,22 +37,11 @@ export class DialogOverlay extends LitElement {
   @property({ type: Boolean, attribute: "force-mount" })
   forceMount = false;
 
-  /** Stored handler reference for cleanup */
-  private _handleClick = this._onClick.bind(this);
-
   connectedCallback() {
     super.connectedCallback();
 
     // Set accessibility attributes
     this.setAttribute("aria-hidden", "true");
-
-    // Add click listener
-    this.addEventListener("click", this._handleClick);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this.removeEventListener("click", this._handleClick);
   }
 
   protected willUpdate() {
@@ -65,12 +55,7 @@ export class DialogOverlay extends LitElement {
     this.setAttribute("data-state", shouldShow ? "open" : "closed");
   }
 
-  private _onClick() {
-    // Only close on click if modal mode is enabled
-    if (this._rootContext?.modal) {
-      this._rootContext.onOpenChange(false);
-    }
-  }
+  // Note: No click handler - alert dialogs require explicit action/cancel
 
   protected render() {
     return html`${nothing}`;
@@ -79,6 +64,6 @@ export class DialogOverlay extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dialog-overlay": DialogOverlay;
+    "alert-dialog-overlay": AlertDialogOverlay;
   }
 }

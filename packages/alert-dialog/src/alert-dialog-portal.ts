@@ -1,33 +1,33 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { consume } from "@lit/context";
-import { dialogRootContext } from "./context";
-import type { DialogRootContextValue } from "./types";
+import { alertDialogRootContext } from "./context";
+import type { AlertDialogRootContextValue } from "./types";
 
 /**
  * Portal component that moves its children to the body (or specified container).
- * This ensures the dialog renders above other content.
+ * This ensures the alert dialog renders above other content.
  *
- * @element dialog-portal
+ * @element alert-dialog-portal
  *
  * @example
  * ```html
- * <dialog-portal>
- *   <dialog-overlay></dialog-overlay>
- *   <dialog-content>...</dialog-content>
- * </dialog-portal>
+ * <alert-dialog-portal>
+ *   <alert-dialog-overlay></alert-dialog-overlay>
+ *   <alert-dialog-content>...</alert-dialog-content>
+ * </alert-dialog-portal>
  * ```
  */
-@customElement("dialog-portal")
-export class DialogPortal extends LitElement {
+@customElement("alert-dialog-portal")
+export class AlertDialogPortal extends LitElement {
   static styles = css`
     :host {
       display: none !important;
     }
   `;
 
-  @consume({ context: dialogRootContext, subscribe: true })
-  private _rootContext?: DialogRootContextValue;
+  @consume({ context: alertDialogRootContext, subscribe: true })
+  private _rootContext?: AlertDialogRootContextValue;
 
   /**
    * Container element selector or "body" (default).
@@ -120,6 +120,6 @@ export class DialogPortal extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dialog-portal": DialogPortal;
+    "alert-dialog-portal": AlertDialogPortal;
   }
 }
