@@ -1,38 +1,74 @@
 import { LitElement, html } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 import { consume } from "@lit/context";
 import { alertDialogRootContext } from "./context";
 import type { AlertDialogRootContextValue } from "./types";
 
 /**
  * Trigger element that opens the alert dialog on click.
- * Wrap your interactive element (button, etc.) inside this.
+ *
+ * With `as-child`, passes behavior to the slotted child element.
+ * Without `as-child`, acts as the trigger itself.
  *
  * @element alert-dialog-trigger
  *
  * @example
  * ```html
- * <alert-dialog-trigger>
+ * <!-- With as-child: behavior passed to button -->
+ * <alert-dialog-trigger as-child>
  *   <button>Delete Item</button>
  * </alert-dialog-trigger>
+ *
+ * <!-- Without as-child: component is the trigger -->
+ * <alert-dialog-trigger>Delete Item</alert-dialog-trigger>
  * ```
  */
 @customElement("alert-dialog-trigger")
 export class AlertDialogTrigger extends LitElement {
+  /**
+   * Pass behavior to slotted child instead of rendering wrapper
+   */
+  @property({ type: Boolean, attribute: "as-child" })
+  asChild = false;
+
   @consume({ context: alertDialogRootContext, subscribe: true })
   private _rootContext?: AlertDialogRootContextValue;
+
+  /** Reference to the child element when using as-child */
+  private _childElement: HTMLElement | null = null;
 
   /** Stored handler references for proper cleanup */
   private _handleClick = this._onClick.bind(this);
   private _handleKeyDown = this._onKeyDown.bind(this);
+  private _handleSlotChange = this._onSlotChange.bind(this);
 
   connectedCallback() {
     super.connectedCallback();
 
     // Register with root context
-    this._rootContext?.onTriggerMount(this);
+    if (this.asChild) {
+      // Will register child element after slot change
+    } else {
+      this._rootContext?.onTriggerMount(this);
+      this._setupSelfAsTrigger();
+    }
+  }
 
-    // Add event listeners
+  disconnectedCallback() {
+    super.disconnectedCallback();
+
+    if (this.asChild) {
+      this._cleanupChildTrigger();
+    } else {
+      this._cleanupSelfAsTrigger();
+    }
+  }
+
+  protected willUpdate() {
+    this._updateAttributes();
+  }
+
+  private _setupSelfAsTrigger() {
     this.addEventListener("click", this._handleClick);
     this.addEventListener("keydown", this._handleKeyDown);
 
@@ -45,32 +81,99 @@ export class AlertDialogTrigger extends LitElement {
     this.setAttribute("aria-haspopup", "dialog");
   }
 
-  disconnectedCallback() {
-    super.disconnectedCallback();
-
-    // Remove event listeners
+  private _cleanupSelfAsTrigger() {
     this.removeEventListener("click", this._handleClick);
     this.removeEventListener("keydown", this._handleKeyDown);
   }
 
-  protected willUpdate() {
-    this._updateAttributes();
+  private _setupChildTrigger(child: HTMLElement) {
+    this._childElement = child;
+
+    // Register child with root context
+    this._rootContext?.onTriggerMount(child);
+
+    // Add event listeners to child
+    child.addEventListener("click", this._handleClick);
+    child.addEventListener("keydown", this._handleKeyDown);
+
+    // Set accessibility attributes on child
+    child.setAttribute("aria-haspopup", "dialog");
+
+    // Update attributes on child
+    this._updateChildAttributes();
+  }
+
+  private _cleanupChildTrigger() {
+    if (this._childElement) {
+      this._childElement.removeEventListener("click", this._handleClick);
+      this._childElement.removeEventListener("keydown", this._handleKeyDown);
+      this._childElement = null;
+    }
+  }
+
+  private _onSlotChange(event: Event) {
+    if (!this.asChild) return;
+
+    const slot = event.target as HTMLSlotElement;
+    const children = slot.assignedElements();
+
+    // Cleanup previous child
+    this._cleanupChildTrigger();
+
+    // Setup new child
+    if (children.length > 0) {
+      const child = children[0] as HTMLElement;
+      this._setupChildTrigger(child);
+    }
   }
 
   private _updateAttributes() {
     if (!this._rootContext) return;
 
-    // Set aria-expanded
+    if (this.asChild) {
+      this._updateChildAttributes();
+    } else {
+      this._updateSelfAttributes();
+    }
+  }
+
+  private _updateSelfAttributes() {
+    if (!this._rootContext) return;
+
     this.setAttribute(
       "aria-expanded",
       this._rootContext.open ? "true" : "false"
     );
+    this.setAttribute("data-state", this._rootContext.open ? "open" : "closed");
 
-    // Set aria-controls
-    this.setAttribute("aria-controls", this._rootContext.contentId);
+    if (this._rootContext.dialogElement) {
+      const dialogId =
+        this._rootContext.dialogElement.id || this._rootContext.titleId;
+      if (dialogId) {
+        this.setAttribute("aria-controls", dialogId);
+      }
+    }
+  }
 
-    // Set data-state for styling
-    this.setAttribute("data-state", this._rootContext.stateAttribute);
+  private _updateChildAttributes() {
+    if (!this._rootContext || !this._childElement) return;
+
+    this._childElement.setAttribute(
+      "aria-expanded",
+      this._rootContext.open ? "true" : "false"
+    );
+    this._childElement.setAttribute(
+      "data-state",
+      this._rootContext.open ? "open" : "closed"
+    );
+
+    if (this._rootContext.dialogElement) {
+      const dialogId =
+        this._rootContext.dialogElement.id || this._rootContext.titleId;
+      if (dialogId) {
+        this._childElement.setAttribute("aria-controls", dialogId);
+      }
+    }
   }
 
   private _onClick() {
@@ -78,7 +181,6 @@ export class AlertDialogTrigger extends LitElement {
   }
 
   private _onKeyDown(event: KeyboardEvent) {
-    // Trigger with SPACE and ENTER key
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
       this._rootContext?.onOpenChange(true);
@@ -86,7 +188,7 @@ export class AlertDialogTrigger extends LitElement {
   }
 
   protected render() {
-    return html`<slot></slot>`;
+    return html`<slot @slotchange=${this._handleSlotChange}></slot>`;
   }
 }
 

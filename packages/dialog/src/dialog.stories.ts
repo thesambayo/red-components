@@ -18,7 +18,7 @@ const meta = {
     modal: {
       control: { type: "boolean" },
       type: "boolean",
-      description: "Whether dialog is modal (traps focus, has overlay)",
+      description: "Whether dialog is modal (traps focus, has backdrop)",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -43,52 +43,45 @@ export default meta;
 type Story = StoryObj<any>;
 
 /**
- * Basic dialog with overlay, title, description, and close button.
+ * Basic dialog using native `<dialog>` element with backdrop styling.
+ * Uses `data-dialog-title`, `data-dialog-description`, and `data-dialog-close` attributes.
  */
 export const Basic: Story = {
   render: () => html`
     <style>
-      dialog-trigger button {
+      .trigger-button {
         padding: 8px 16px;
         border-radius: 4px;
         border: 1px solid #ccc;
         background: white;
         cursor: pointer;
       }
-      dialog-trigger button:hover {
+      .trigger-button:hover {
         background: #f5f5f5;
       }
-      dialog-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 50;
-      }
-      dialog-content {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
+
+      dialog {
         padding: 24px;
         border-radius: 8px;
+        border: none;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         max-width: 450px;
         width: 90%;
-        z-index: 51;
       }
-      dialog-title {
-        display: block;
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      dialog h2 {
+        margin: 0 0 8px;
         font-size: 18px;
         font-weight: 600;
-        margin-bottom: 8px;
       }
-      dialog-description {
-        display: block;
+      dialog .description {
         color: #666;
-        margin-bottom: 16px;
+        margin: 0 0 16px;
       }
-      dialog-close button {
+      dialog .close-button {
         padding: 8px 16px;
         border-radius: 4px;
         border: none;
@@ -96,28 +89,94 @@ export const Basic: Story = {
         color: white;
         cursor: pointer;
       }
-      dialog-close button:hover {
+      dialog .close-button:hover {
         background: #2563eb;
       }
     </style>
 
     <dialog-root>
-      <dialog-trigger>
-        <button>Open Dialog</button>
+      <dialog-trigger as-child>
+        <button class="trigger-button">Open Dialog</button>
       </dialog-trigger>
-      <dialog-portal>
-        <dialog-overlay></dialog-overlay>
-        <dialog-content>
-          <dialog-title>Edit Profile</dialog-title>
-          <dialog-description>
-            Make changes to your profile here. Click save when you're done.
-          </dialog-description>
-          <p>Your profile content goes here...</p>
-          <dialog-close>
-            <button>Close</button>
-          </dialog-close>
-        </dialog-content>
-      </dialog-portal>
+
+      <dialog>
+        <h2 data-dialog-title>Edit Profile</h2>
+        <p class="description" data-dialog-description>
+          Make changes to your profile here. Click save when you're done.
+        </p>
+        <p>Your profile content goes here...</p>
+        <button class="close-button" data-dialog-close>Close</button>
+      </dialog>
+    </dialog-root>
+  `,
+};
+
+/**
+ * Dialog with as-child trigger and dialog-close component.
+ */
+export const WithCloseComponent: Story = {
+  render: () => html`
+    <style>
+      .trigger-button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background: white;
+        cursor: pointer;
+      }
+      .trigger-button:hover {
+        background: #f5f5f5;
+      }
+
+      dialog {
+        padding: 24px;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        max-width: 450px;
+        width: 90%;
+      }
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      dialog h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      dialog .description {
+        color: #666;
+        margin: 0 0 16px;
+      }
+      dialog .close-button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        background: #3b82f6;
+        color: white;
+        cursor: pointer;
+      }
+      dialog .close-button:hover {
+        background: #2563eb;
+      }
+    </style>
+
+    <dialog-root>
+      <dialog-trigger as-child>
+        <button class="trigger-button">Open Dialog</button>
+      </dialog-trigger>
+
+      <dialog>
+        <h2 data-dialog-title>Edit Profile</h2>
+        <p class="description" data-dialog-description>
+          This example uses dialog-close component instead of data-dialog-close
+          attribute.
+        </p>
+        <dialog-close as-child>
+          <button class="close-button">Close</button>
+        </dialog-close>
+      </dialog>
     </dialog-root>
   `,
 };
@@ -128,8 +187,7 @@ export const Basic: Story = {
 export const Controlled: Story = {
   render: (args) => html`
     <style>
-      dialog-trigger button,
-      .external-trigger {
+      .trigger-button {
         padding: 8px 16px;
         border-radius: 4px;
         border: 1px solid #ccc;
@@ -137,37 +195,29 @@ export const Controlled: Story = {
         cursor: pointer;
         margin-right: 8px;
       }
-      dialog-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 50;
-      }
-      dialog-content {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
+
+      dialog {
         padding: 24px;
         border-radius: 8px;
+        border: none;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         max-width: 450px;
         width: 90%;
-        z-index: 51;
       }
-      dialog-title {
-        display: block;
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      dialog h2 {
+        margin: 0 0 8px;
         font-size: 18px;
         font-weight: 600;
-        margin-bottom: 8px;
       }
-      dialog-description {
-        display: block;
+      dialog .description {
         color: #666;
-        margin-bottom: 16px;
+        margin: 0 0 16px;
       }
-      dialog-close button {
+      dialog .close-button {
         padding: 8px 16px;
         border-radius: 4px;
         border: none;
@@ -178,21 +228,17 @@ export const Controlled: Story = {
     </style>
 
     <dialog-root .open=${args.open}>
-      <dialog-trigger>
-        <button>Open Dialog</button>
+      <dialog-trigger as-child>
+        <button class="trigger-button">Open Dialog</button>
       </dialog-trigger>
-      <dialog-portal>
-        <dialog-overlay></dialog-overlay>
-        <dialog-content>
-          <dialog-title>Controlled Dialog</dialog-title>
-          <dialog-description>
-            This dialog's open state is controlled via the "open" prop.
-          </dialog-description>
-          <dialog-close>
-            <button>Close</button>
-          </dialog-close>
-        </dialog-content>
-      </dialog-portal>
+
+      <dialog>
+        <h2 data-dialog-title>Controlled Dialog</h2>
+        <p class="description" data-dialog-description>
+          This dialog's open state is controlled via the "open" prop.
+        </p>
+        <button class="close-button" data-dialog-close>Close</button>
+      </dialog>
     </dialog-root>
   `,
   args: {
@@ -202,41 +248,41 @@ export const Controlled: Story = {
 
 /**
  * Non-modal dialog that doesn't trap focus or block interaction.
+ * Uses native dialog's `show()` instead of `showModal()`.
  */
 export const NonModal: Story = {
   render: () => html`
     <style>
-      dialog-trigger button {
+      .trigger-button {
         padding: 8px 16px;
         border-radius: 4px;
         border: 1px solid #ccc;
         background: white;
         cursor: pointer;
       }
-      dialog-content {
+
+      dialog {
         position: fixed;
         top: 20%;
         right: 20px;
-        background: white;
         padding: 24px;
         border-radius: 8px;
+        border: 1px solid #ccc;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         max-width: 300px;
-        z-index: 51;
       }
-      dialog-title {
-        display: block;
+
+      dialog h2 {
+        margin: 0 0 8px;
         font-size: 16px;
         font-weight: 600;
-        margin-bottom: 8px;
       }
-      dialog-description {
-        display: block;
+      dialog .description {
         color: #666;
         font-size: 14px;
-        margin-bottom: 16px;
+        margin: 0 0 16px;
       }
-      dialog-close button {
+      dialog .close-button {
         padding: 6px 12px;
         border-radius: 4px;
         border: 1px solid #ccc;
@@ -258,21 +304,18 @@ export const NonModal: Story = {
       }
     </style>
 
-    <dialog-root modal="false">
-      <dialog-trigger>
-        <button>Open Non-Modal Dialog</button>
+    <dialog-root .modal=${false}>
+      <dialog-trigger as-child>
+        <button class="trigger-button">Open Non-Modal Dialog</button>
       </dialog-trigger>
-      <dialog-portal>
-        <dialog-content>
-          <dialog-title>Notification Panel</dialog-title>
-          <dialog-description>
-            This is a non-modal dialog. You can still interact with the page.
-          </dialog-description>
-          <dialog-close>
-            <button>Dismiss</button>
-          </dialog-close>
-        </dialog-content>
-      </dialog-portal>
+
+      <dialog>
+        <h2 data-dialog-title>Notification Panel</h2>
+        <p class="description" data-dialog-description>
+          This is a non-modal dialog. You can still interact with the page.
+        </p>
+        <button class="close-button" data-dialog-close>Dismiss</button>
+      </dialog>
     </dialog-root>
 
     <div class="other-content">
@@ -289,42 +332,34 @@ export const NonModal: Story = {
 export const WithForm: Story = {
   render: () => html`
     <style>
-      dialog-trigger button {
+      .trigger-button {
         padding: 8px 16px;
         border-radius: 4px;
         border: 1px solid #ccc;
         background: white;
         cursor: pointer;
       }
-      dialog-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 50;
-      }
-      dialog-content {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
+
+      dialog {
         padding: 24px;
         border-radius: 8px;
+        border: none;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         max-width: 450px;
         width: 90%;
-        z-index: 51;
       }
-      dialog-title {
-        display: block;
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      dialog h2 {
+        margin: 0 0 8px;
         font-size: 18px;
         font-weight: 600;
-        margin-bottom: 8px;
       }
-      dialog-description {
-        display: block;
+      dialog .description {
         color: #666;
-        margin-bottom: 16px;
+        margin: 0 0 16px;
       }
       .form-field {
         margin-bottom: 16px;
@@ -363,36 +398,103 @@ export const WithForm: Story = {
     </style>
 
     <dialog-root>
-      <dialog-trigger>
-        <button>Edit Profile</button>
+      <dialog-trigger as-child>
+        <button class="trigger-button">Edit Profile</button>
       </dialog-trigger>
-      <dialog-portal>
-        <dialog-overlay></dialog-overlay>
-        <dialog-content>
-          <dialog-title>Edit Profile</dialog-title>
-          <dialog-description>
-            Update your profile information below.
-          </dialog-description>
-          <form @submit=${(e: Event) => e.preventDefault()}>
-            <div class="form-field">
-              <label for="name">Name</label>
-              <input type="text" id="name" value="John Doe" />
-            </div>
-            <div class="form-field">
-              <label for="email">Email</label>
-              <input type="email" id="email" value="john@example.com" />
-            </div>
-            <div class="button-group">
-              <dialog-close>
-                <button type="button" class="button-cancel">Cancel</button>
-              </dialog-close>
-              <dialog-close>
-                <button type="submit" class="button-save">Save Changes</button>
-              </dialog-close>
-            </div>
-          </form>
-        </dialog-content>
-      </dialog-portal>
+
+      <dialog>
+        <h2 data-dialog-title>Edit Profile</h2>
+        <p class="description" data-dialog-description>
+          Update your profile information below.
+        </p>
+        <form @submit=${(e: Event) => e.preventDefault()}>
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input type="text" id="name" value="John Doe" />
+          </div>
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input type="email" id="email" value="john@example.com" />
+          </div>
+          <div class="button-group">
+            <button type="button" class="button-cancel" data-dialog-close>
+              Cancel
+            </button>
+            <button type="submit" class="button-save" data-dialog-close>
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </dialog>
+    </dialog-root>
+  `,
+};
+
+/**
+ * Dialog without as-child - the trigger component itself acts as the button.
+ */
+export const WithoutAsChild: Story = {
+  render: () => html`
+    <style>
+      dialog-trigger {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background: white;
+        cursor: pointer;
+      }
+      dialog-trigger:hover {
+        background: #f5f5f5;
+      }
+
+      dialog {
+        padding: 24px;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        max-width: 450px;
+        width: 90%;
+      }
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      dialog h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      dialog .description {
+        color: #666;
+        margin: 0 0 16px;
+      }
+      dialog-close {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        background: #3b82f6;
+        color: white;
+        cursor: pointer;
+      }
+      dialog-close:hover {
+        background: #2563eb;
+      }
+    </style>
+
+    <dialog-root>
+      <dialog-trigger>Open Dialog</dialog-trigger>
+
+      <dialog>
+        <h2 data-dialog-title>Without as-child</h2>
+        <p class="description" data-dialog-description>
+          This example shows dialog-trigger and dialog-close components used
+          without the as-child attribute. The components themselves act as the
+          interactive elements.
+        </p>
+        <dialog-close>Close</dialog-close>
+      </dialog>
     </dialog-root>
   `,
 };

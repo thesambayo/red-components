@@ -1,32 +1,37 @@
 /**
- * Dialog Web Components
+ * Dialog Web Components (Native-First)
+ *
+ * Uses native `<dialog>` element under the hood for:
+ * - Automatic top-layer positioning
+ * - Built-in focus trapping (modal mode)
+ * - Native backdrop via `::backdrop`
+ * - Escape key handling
  *
  * @example
  * ```html
- * <dialog-root>
- *   <dialog-trigger>
+ * <dialog-root modal>
+ *   <dialog-trigger as-child>
  *     <button>Open Dialog</button>
  *   </dialog-trigger>
- *   <dialog-portal>
- *     <dialog-overlay></dialog-overlay>
- *     <dialog-content>
- *       <dialog-title>Dialog Title</dialog-title>
- *       <dialog-description>Dialog description here</dialog-description>
- *       <p>Content</p>
- *       <dialog-close><button>Close</button></dialog-close>
- *     </dialog-content>
- *   </dialog-portal>
+ *
+ *   <dialog>
+ *     <h2 data-dialog-title>Edit Profile</h2>
+ *     <p data-dialog-description>Make changes to your profile.</p>
+ *
+ *     <label>Name <input type="text" /></label>
+ *     <label>Email <input type="email" /></label>
+ *
+ *     <footer>
+ *       <button data-dialog-close>Cancel</button>
+ *       <button data-dialog-close>Save</button>
+ *     </footer>
+ *   </dialog>
  * </dialog-root>
  * ```
  */
 
 export { DialogRoot } from "./dialog-root";
 export { DialogTrigger } from "./dialog-trigger";
-export { DialogPortal } from "./dialog-portal";
-export { DialogOverlay } from "./dialog-overlay";
-export { DialogContent } from "./dialog-content";
-export { DialogTitle } from "./dialog-title";
-export { DialogDescription } from "./dialog-description";
 export { DialogClose } from "./dialog-close";
 
 // Re-export types
@@ -34,7 +39,6 @@ export type {
   DialogState,
   DialogRootContextValue,
   DialogRootProps,
-  DialogContentProps,
-  DialogPortalProps,
-  DialogOverlayProps,
+  DialogTriggerProps,
+  DialogCloseProps,
 } from "./types";

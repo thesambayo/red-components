@@ -9,26 +9,20 @@ export type AlertDialogState = "open" | "closed";
 export interface AlertDialogRootContextValue {
   /** Current open state */
   open: boolean;
-  /** State attribute for styling */
-  stateAttribute: AlertDialogState;
-  /** Unique ID for content (for aria-labelledby) */
-  contentId: string;
-  /** Unique ID for title (for aria-labelledby) */
+  /** Reference to native dialog element */
+  dialogElement: HTMLDialogElement | null;
+  /** Generated ID for title element (for aria-labelledby) */
   titleId: string;
-  /** Unique ID for description (for aria-describedby) */
+  /** Generated ID for description element (for aria-describedby) */
   descriptionId: string;
-  /** Reference to trigger element */
-  trigger: HTMLElement | null;
-  /** Reference to content element */
-  contentElement: HTMLElement | null;
-  /** Reference to cancel button (for auto-focus) */
+  /** Reference to trigger element (for returning focus) */
+  triggerElement: HTMLElement | null;
+  /** Reference to cancel element (for auto-focus) */
   cancelElement: HTMLElement | null;
   /** Open or close the dialog */
   onOpenChange: (open: boolean) => void;
   /** Called when trigger element mounts */
   onTriggerMount: (el: HTMLElement) => void;
-  /** Called when content element mounts */
-  onContentMount: (el: HTMLElement) => void;
   /** Called when cancel element mounts */
   onCancelMount: (el: HTMLElement) => void;
 }
@@ -44,27 +38,25 @@ export interface AlertDialogRootProps {
 }
 
 /**
- * Props for AlertDialogContent
+ * Props for AlertDialogTrigger
  */
-export interface AlertDialogContentProps {
-  /** Whether to force-mount the content */
-  forceMount?: boolean;
+export interface AlertDialogTriggerProps {
+  /** Pass behavior to slotted child instead of rendering wrapper */
+  asChild?: boolean;
 }
 
 /**
- * Props for AlertDialogPortal
+ * Props for AlertDialogAction
  */
-export interface AlertDialogPortalProps {
-  /** Container element or selector to portal into */
-  container?: string | HTMLElement;
-  /** Whether to force-mount the portal content */
-  forceMount?: boolean;
+export interface AlertDialogActionProps {
+  /** Pass behavior to slotted child instead of rendering wrapper */
+  asChild?: boolean;
 }
 
 /**
- * Props for AlertDialogOverlay
+ * Props for AlertDialogCancel
  */
-export interface AlertDialogOverlayProps {
-  /** Whether to force-mount the overlay */
-  forceMount?: boolean;
+export interface AlertDialogCancelProps {
+  /** Pass behavior to slotted child instead of rendering wrapper */
+  asChild?: boolean;
 }

@@ -5,7 +5,8 @@ import * as alertDialog from "./alert-dialog";
 /**
  * React wrapper for alert-dialog-root
  *
- * Root component for an alert dialog. Always modal.
+ * Root component for an alert dialog. Uses native `<dialog>` element under the hood.
+ * Always modal, cannot be dismissed by clicking backdrop or pressing Escape.
  *
  * @prop {boolean} open - Controlled open state
  * @prop {boolean} defaultOpen - Default open state for uncontrolled mode
@@ -25,6 +26,8 @@ export const AlertDialogRoot = createComponent({
  * React wrapper for alert-dialog-trigger
  *
  * Trigger element that opens the alert dialog on click.
+ *
+ * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const AlertDialogTrigger = createComponent({
   tagName: "alert-dialog-trigger",
@@ -33,72 +36,11 @@ export const AlertDialogTrigger = createComponent({
 });
 
 /**
- * React wrapper for alert-dialog-portal
- *
- * Portal component that moves its children to the body.
- *
- * @prop {string} container - Container element selector or "body" (default)
- * @prop {boolean} forceMount - Whether to force-mount regardless of open state
- */
-export const AlertDialogPortal = createComponent({
-  tagName: "alert-dialog-portal",
-  elementClass: alertDialog.AlertDialogPortal,
-  react: React,
-});
-
-/**
- * React wrapper for alert-dialog-overlay
- *
- * Overlay/backdrop that appears behind the alert dialog content.
- * Does NOT close on click (unlike regular dialog).
- *
- * @prop {boolean} forceMount - Whether to force-mount regardless of open state
- */
-export const AlertDialogOverlay = createComponent({
-  tagName: "alert-dialog-overlay",
-  elementClass: alertDialog.AlertDialogOverlay,
-  react: React,
-});
-
-/**
- * React wrapper for alert-dialog-content
- *
- * Main content container for the alert dialog.
- *
- * @prop {boolean} forceMount - Whether to force-mount regardless of open state
- */
-export const AlertDialogContent = createComponent({
-  tagName: "alert-dialog-content",
-  elementClass: alertDialog.AlertDialogContent,
-  react: React,
-});
-
-/**
- * React wrapper for alert-dialog-title
- *
- * Title element for the alert dialog.
- */
-export const AlertDialogTitle = createComponent({
-  tagName: "alert-dialog-title",
-  elementClass: alertDialog.AlertDialogTitle,
-  react: React,
-});
-
-/**
- * React wrapper for alert-dialog-description
- *
- * Description element for the alert dialog.
- */
-export const AlertDialogDescription = createComponent({
-  tagName: "alert-dialog-description",
-  elementClass: alertDialog.AlertDialogDescription,
-  react: React,
-});
-
-/**
  * React wrapper for alert-dialog-action
  *
  * Action button that confirms and closes the alert dialog.
+ *
+ * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const AlertDialogAction = createComponent({
   tagName: "alert-dialog-action",
@@ -111,6 +53,8 @@ export const AlertDialogAction = createComponent({
  *
  * Cancel button that dismisses the alert dialog.
  * Receives auto-focus when the dialog opens.
+ *
+ * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const AlertDialogCancel = createComponent({
   tagName: "alert-dialog-cancel",
@@ -123,7 +67,7 @@ export type {
   AlertDialogState,
   AlertDialogRootContextValue,
   AlertDialogRootProps,
-  AlertDialogContentProps,
-  AlertDialogPortalProps,
-  AlertDialogOverlayProps,
+  AlertDialogTriggerProps,
+  AlertDialogActionProps,
+  AlertDialogCancelProps,
 } from "./types";

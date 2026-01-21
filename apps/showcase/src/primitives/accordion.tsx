@@ -44,6 +44,7 @@ export function Accordion() {
       >
         {accordionItems.map((accordionItem) => (
           <AccordionItem
+            key={accordionItem.value}
             value={accordionItem.value}
             className="flex flex-col border-b focus-visible:outline-0"
           >

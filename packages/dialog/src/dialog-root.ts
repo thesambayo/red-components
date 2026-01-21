@@ -2,10 +2,17 @@ import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { provide } from "@lit/context";
 import { dialogRootContext, generateId } from "./context";
-import type { DialogRootContextValue, DialogState } from "./types";
+import type { DialogRootContextValue } from "./types";
 
 /**
- * Root component for a dialog. Manages open/close state and provides context.
+ * Root component for a dialog. Uses native `<dialog>` element under the hood.
+ * Manages open/close state and provides context.
+ *
+ * Features handled by native dialog:
+ * - Top-layer positioning (no portal needed)
+ * - Focus trapping (automatic in modal mode)
+ * - Backdrop via `::backdrop` pseudo-element
+ * - Escape key closes dialog
  *
  * @element dialog-root
  *
@@ -13,18 +20,17 @@ import type { DialogRootContextValue, DialogState } from "./types";
  *
  * @example
  * ```html
- * <dialog-root>
- *   <dialog-trigger>
+ * <dialog-root modal>
+ *   <dialog-trigger as-child>
  *     <button>Open Dialog</button>
  *   </dialog-trigger>
- *   <dialog-portal>
- *     <dialog-overlay></dialog-overlay>
- *     <dialog-content>
- *       <dialog-title>Dialog Title</dialog-title>
- *       <dialog-description>Description here</dialog-description>
- *       <dialog-close><button>Close</button></dialog-close>
- *     </dialog-content>
- *   </dialog-portal>
+ *
+ *   <dialog>
+ *     <h2 data-dialog-title>Dialog Title</h2>
+ *     <p data-dialog-description>Description here</p>
+ *     <p>Content</p>
+ *     <button data-dialog-close>Close</button>
+ *   </dialog>
  * </dialog-root>
  * ```
  */
@@ -43,7 +49,7 @@ export class DialogRoot extends LitElement {
   defaultOpen = false;
 
   /**
-   * Whether dialog is modal (traps focus, has overlay backdrop).
+   * Whether dialog is modal (traps focus, has backdrop).
    * Default: true
    */
   @property({ type: Boolean })
@@ -55,14 +61,11 @@ export class DialogRoot extends LitElement {
 
   /** Reference to trigger element */
   @state()
-  private _trigger: HTMLElement | null = null;
+  private _triggerElement: HTMLElement | null = null;
 
-  /** Reference to content element */
+  /** Reference to native dialog element */
   @state()
-  private _contentElement: HTMLElement | null = null;
-
-  /** Unique ID for content */
-  private _contentId = generateId("dialog-content");
+  private _dialogElement: HTMLDialogElement | null = null;
 
   /** Unique ID for title */
   private _titleId = generateId("dialog-title");
@@ -75,6 +78,11 @@ export class DialogRoot extends LitElement {
   @property({ attribute: false })
   context: DialogRootContextValue = this._createContext();
 
+  /** Bound event handlers */
+  private _boundHandleDialogClose = this._handleDialogClose.bind(this);
+  private _boundHandleDialogCancel = this._handleDialogCancel.bind(this);
+  private _boundHandleBackdropClick = this._handleBackdropClick.bind(this);
+
   /** Whether controlled mode is active */
   private get _isControlled(): boolean {
     return this.open !== undefined;
@@ -85,42 +93,176 @@ export class DialogRoot extends LitElement {
     return this._isControlled ? !!this.open : this._internalOpen;
   }
 
-  /** State attribute for styling */
-  private get _stateAttribute(): DialogState {
-    return this._isOpen ? "open" : "closed";
-  }
-
   connectedCallback() {
     super.connectedCallback();
     this._internalOpen = this.defaultOpen;
+
+    // Find the native dialog element
+    this._setupDialog();
+
     this._updateContext();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._cleanupDialog();
   }
 
   protected willUpdate(changed: Map<string, unknown>) {
     if (
       changed.has("open") ||
       changed.has("_internalOpen") ||
-      changed.has("_trigger") ||
-      changed.has("_contentElement") ||
+      changed.has("_triggerElement") ||
+      changed.has("_dialogElement") ||
       changed.has("modal")
     ) {
       this._updateContext();
+    }
+
+    // Handle dialog visibility changes
+    if (changed.has("open") || changed.has("_internalOpen")) {
+      this._syncDialogState();
+    }
+  }
+
+  private _setupDialog() {
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      this._dialogElement = this.querySelector("dialog");
+
+      if (this._dialogElement) {
+        // Setup accessibility attributes
+        this._setupAriaAttributes();
+
+        // Setup close button handlers
+        this._setupCloseButtons();
+
+        // Add event listeners
+        this._dialogElement.addEventListener(
+          "close",
+          this._boundHandleDialogClose
+        );
+        this._dialogElement.addEventListener(
+          "cancel",
+          this._boundHandleDialogCancel
+        );
+        this._dialogElement.addEventListener(
+          "click",
+          this._boundHandleBackdropClick
+        );
+
+        // Sync initial state
+        this._syncDialogState();
+        this._updateContext();
+      }
+    });
+  }
+
+  private _cleanupDialog() {
+    if (this._dialogElement) {
+      this._dialogElement.removeEventListener(
+        "close",
+        this._boundHandleDialogClose
+      );
+      this._dialogElement.removeEventListener(
+        "cancel",
+        this._boundHandleDialogCancel
+      );
+      this._dialogElement.removeEventListener(
+        "click",
+        this._boundHandleBackdropClick
+      );
+    }
+  }
+
+  private _setupAriaAttributes() {
+    if (!this._dialogElement) return;
+
+    // Find title element and set up aria-labelledby
+    const titleEl = this._dialogElement.querySelector("[data-dialog-title]");
+    if (titleEl) {
+      if (!titleEl.id) {
+        titleEl.id = this._titleId;
+      }
+      this._dialogElement.setAttribute("aria-labelledby", titleEl.id);
+    }
+
+    // Find description element and set up aria-describedby
+    const descEl = this._dialogElement.querySelector(
+      "[data-dialog-description]"
+    );
+    if (descEl) {
+      if (!descEl.id) {
+        descEl.id = this._descriptionId;
+      }
+      this._dialogElement.setAttribute("aria-describedby", descEl.id);
+    }
+  }
+
+  private _setupCloseButtons() {
+    if (!this._dialogElement) return;
+
+    // Find all elements with data-dialog-close attribute
+    const closeButtons = this._dialogElement.querySelectorAll(
+      "[data-dialog-close]"
+    );
+    closeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        this._handleOpenChange(false);
+      });
+    });
+  }
+
+  private _syncDialogState() {
+    if (!this._dialogElement) return;
+
+    const shouldBeOpen = this._isOpen;
+    const isCurrentlyOpen = this._dialogElement.open;
+
+    if (shouldBeOpen && !isCurrentlyOpen) {
+      if (this.modal) {
+        this._dialogElement.showModal();
+      } else {
+        this._dialogElement.show();
+      }
+    } else if (!shouldBeOpen && isCurrentlyOpen) {
+      this._dialogElement.close();
+      // Return focus to trigger
+      this._triggerElement?.focus();
+    }
+  }
+
+  private _handleDialogClose() {
+    // Sync our state when native dialog closes
+    if (this._isOpen) {
+      this._handleOpenChange(false);
+    }
+  }
+
+  private _handleDialogCancel(event: Event) {
+    // Allow escape to close dialog (default behavior)
+    // The close event will handle state sync
+    event.preventDefault();
+    this._handleOpenChange(false);
+  }
+
+  private _handleBackdropClick(event: MouseEvent) {
+    // Close on backdrop click (only for modal dialogs)
+    if (this.modal && event.target === this._dialogElement) {
+      this._handleOpenChange(false);
     }
   }
 
   private _createContext(): DialogRootContextValue {
     return {
       open: this._isOpen,
-      stateAttribute: this._stateAttribute,
       modal: this.modal,
-      contentId: this._contentId,
+      dialogElement: this._dialogElement,
       titleId: this._titleId,
       descriptionId: this._descriptionId,
-      trigger: this._trigger,
-      contentElement: this._contentElement,
+      triggerElement: this._triggerElement,
       onOpenChange: this._handleOpenChange.bind(this),
       onTriggerMount: this._handleTriggerMount.bind(this),
-      onContentMount: this._handleContentMount.bind(this),
     };
   }
 
@@ -152,11 +294,7 @@ export class DialogRoot extends LitElement {
   }
 
   private _handleTriggerMount(el: HTMLElement) {
-    this._trigger = el;
-  }
-
-  private _handleContentMount(el: HTMLElement) {
-    this._contentElement = el;
+    this._triggerElement = el;
   }
 
   protected render() {

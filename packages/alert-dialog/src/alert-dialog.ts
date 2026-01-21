@@ -1,41 +1,44 @@
 /**
- * AlertDialog Web Components
+ * AlertDialog Web Components (Native-First)
  *
  * Alert dialogs are modal dialogs that interrupt the user with important content
- * and expect a response. Unlike regular dialogs, they:
- * - Cannot be dismissed by clicking the overlay
- * - Must be explicitly closed via action or cancel buttons
- * - Auto-focus the cancel button for safer UX
- * - Use role="alertdialog" for better accessibility
+ * and expect a response. Uses native `<dialog>` element under the hood.
+ *
+ * Key differences from regular Dialog:
+ * - Always modal (no `modal` prop)
+ * - Cannot be dismissed by clicking backdrop
+ * - Cannot be dismissed by pressing Escape
+ * - Auto-focuses the cancel button for safer UX
+ * - Uses role="alertdialog" for better accessibility
  *
  * @example
  * ```html
  * <alert-dialog-root>
- *   <alert-dialog-trigger>
+ *   <alert-dialog-trigger as-child>
  *     <button>Delete Item</button>
  *   </alert-dialog-trigger>
- *   <alert-dialog-portal>
- *     <alert-dialog-overlay></alert-dialog-overlay>
- *     <alert-dialog-content>
- *       <alert-dialog-title>Confirm Deletion</alert-dialog-title>
- *       <alert-dialog-description>
- *         This action cannot be undone. This will permanently delete the item.
- *       </alert-dialog-description>
- *       <alert-dialog-cancel><button>Cancel</button></alert-dialog-cancel>
- *       <alert-dialog-action><button>Delete</button></alert-dialog-action>
- *     </alert-dialog-content>
- *   </alert-dialog-portal>
+ *
+ *   <dialog>
+ *     <h2 data-dialog-title>Confirm Deletion</h2>
+ *     <p data-dialog-description>
+ *       This action cannot be undone. This will permanently delete the item.
+ *     </p>
+ *
+ *     <footer>
+ *       <alert-dialog-cancel as-child>
+ *         <button>Cancel</button>
+ *       </alert-dialog-cancel>
+ *       <alert-dialog-action as-child>
+ *         <button>Delete</button>
+ *       </alert-dialog-action>
+ *     </footer>
+ *   </dialog>
  * </alert-dialog-root>
  * ```
  */
 
 export { AlertDialogRoot } from "./alert-dialog-root";
 export { AlertDialogTrigger } from "./alert-dialog-trigger";
-export { AlertDialogPortal } from "./alert-dialog-portal";
-export { AlertDialogOverlay } from "./alert-dialog-overlay";
-export { AlertDialogContent } from "./alert-dialog-content";
-export { AlertDialogTitle } from "./alert-dialog-title";
-export { AlertDialogDescription } from "./alert-dialog-description";
 export { AlertDialogAction } from "./alert-dialog-action";
 export { AlertDialogCancel } from "./alert-dialog-cancel";
 
@@ -44,7 +47,7 @@ export type {
   AlertDialogState,
   AlertDialogRootContextValue,
   AlertDialogRootProps,
-  AlertDialogContentProps,
-  AlertDialogPortalProps,
-  AlertDialogOverlayProps,
+  AlertDialogTriggerProps,
+  AlertDialogActionProps,
+  AlertDialogCancelProps,
 } from "./types";

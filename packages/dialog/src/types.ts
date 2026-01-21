@@ -9,26 +9,20 @@ export type DialogState = "open" | "closed";
 export interface DialogRootContextValue {
   /** Current open state */
   open: boolean;
-  /** State attribute for styling */
-  stateAttribute: DialogState;
-  /** Whether dialog is modal (traps focus, has overlay) */
+  /** Whether dialog is modal (uses showModal() vs show()) */
   modal: boolean;
-  /** Unique ID for content (for aria-labelledby) */
-  contentId: string;
-  /** Unique ID for title (for aria-labelledby) */
+  /** Reference to native dialog element */
+  dialogElement: HTMLDialogElement | null;
+  /** Generated ID for title element (for aria-labelledby) */
   titleId: string;
-  /** Unique ID for description (for aria-describedby) */
+  /** Generated ID for description element (for aria-describedby) */
   descriptionId: string;
-  /** Reference to trigger element */
-  trigger: HTMLElement | null;
-  /** Reference to content element */
-  contentElement: HTMLElement | null;
+  /** Reference to trigger element (for returning focus) */
+  triggerElement: HTMLElement | null;
   /** Open or close the dialog */
   onOpenChange: (open: boolean) => void;
   /** Called when trigger element mounts */
   onTriggerMount: (el: HTMLElement) => void;
-  /** Called when content element mounts */
-  onContentMount: (el: HTMLElement) => void;
 }
 
 /**
@@ -44,27 +38,17 @@ export interface DialogRootProps {
 }
 
 /**
- * Props for DialogContent
+ * Props for DialogTrigger
  */
-export interface DialogContentProps {
-  /** Whether to force-mount the content */
-  forceMount?: boolean;
+export interface DialogTriggerProps {
+  /** Pass behavior to slotted child instead of rendering wrapper */
+  asChild?: boolean;
 }
 
 /**
- * Props for DialogPortal
+ * Props for DialogClose
  */
-export interface DialogPortalProps {
-  /** Container element or selector to portal into */
-  container?: string | HTMLElement;
-  /** Whether to force-mount the portal content */
-  forceMount?: boolean;
-}
-
-/**
- * Props for DialogOverlay
- */
-export interface DialogOverlayProps {
-  /** Whether to force-mount the overlay */
-  forceMount?: boolean;
+export interface DialogCloseProps {
+  /** Pass behavior to slotted child instead of rendering wrapper */
+  asChild?: boolean;
 }
