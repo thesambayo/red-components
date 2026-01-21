@@ -99,6 +99,9 @@ importers:
       '@red-elements/dropdown':
         specifier: workspace:*
         version: link:../../packages/dropdown
+      '@red-elements/new-accordion':
+        specifier: workspace:*
+        version: link:../../packages/new-accordion
       '@red-elements/tabs':
         specifier: workspace:*
         version: link:../../packages/tabs
@@ -189,6 +192,12 @@ importers:
         version: 1.0.8(@types/react@19.2.9)
 
   packages/dropdown:
+    dependencies:
+      '@lit/react':
+        specifier: ^1.0.8
+        version: 1.0.8(@types/react@19.2.9)
+
+  packages/new-accordion:
     dependencies:
       '@lit/react':
         specifier: ^1.0.8

@@ -61,8 +61,8 @@ function App() {
       </div>
 
       <div className="space-y-10">
-        {/* <Avatar /> */}
         <Accordion />
+        {/* <Avatar /> */}
         <Tabs />
         <Tooltip />
         <div className="max-w-md mx-auto space-x-5">

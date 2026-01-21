@@ -14,6 +14,7 @@
     "@red-elements/avatar": "workspace:*",
     "@red-elements/dialog": "workspace:*",
     "@red-elements/dropdown": "workspace:*",
+    "@red-elements/new-accordion": "workspace:*",
     "@red-elements/tabs": "workspace:*",
     "@red-elements/toast": "workspace:*",
     "@red-elements/tooltip": "workspace:*",

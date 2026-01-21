@@ -1,165 +1,237 @@
-import { html, LitElement } from "lit";
+import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { provide } from "@lit/context";
+import { provide, consume } from "@lit/context";
 import {
-  DEFAULT_DELAY_DURATION,
-  DEFAULT_SKIP_DELAY_DURATION,
-  TooltipContext,
-  tooltipContext,
-  tooltipTags,
-} from "./tooltip.context";
-import { nextId } from "./randomId";
+  tooltipProviderContext,
+  tooltipRootContext,
+  defaultProviderContext,
+  generateId,
+} from "./context";
+import type {
+  TooltipProviderContextValue,
+  TooltipRootContextValue,
+  TooltipState,
+} from "./types";
 
+/**
+ * Root component for a tooltip. Manages open/close state and timing.
+ *
+ * @element tooltip-root
+ *
+ * @fires openChange - Emitted when open state changes. Detail: { open: boolean }
+ *
+ * @example
+ * ```html
+ * <tooltip-root>
+ *   <tooltip-trigger>
+ *     <button>Hover me</button>
+ *   </tooltip-trigger>
+ *   <tooltip-content>Tooltip text</tooltip-content>
+ * </tooltip-root>
+ * ```
+ */
 @customElement("tooltip-root")
 export class TooltipRoot extends LitElement {
-  @provide({ context: tooltipContext })
+  /**
+   * Controlled open state. When set, component is controlled.
+   */
+  @property({ type: Boolean })
+  open?: boolean;
+
+  /**
+   * Default open state for uncontrolled mode.
+   */
+  @property({ type: Boolean, attribute: "default-open" })
+  defaultOpen = false;
+
+  /**
+   * Delay before showing tooltip (ms). Overrides provider value.
+   */
+  @property({ type: Number, attribute: "delay-duration" })
+  delayDuration?: number;
+
+  /**
+   * When true, tooltip closes immediately when leaving trigger.
+   * When false (default), user can hover the content.
+   */
+  @property({ type: Boolean, attribute: "disable-hoverable-content" })
+  disableHoverableContent = false;
+
+  /** Internal open state for uncontrolled mode */
   @state()
-  private _provider: TooltipContext = {
-    open: false,
-    trigger: null,
-    controlledState: false,
-    delayDuration: DEFAULT_DELAY_DURATION,
-    skipDelayDuration: DEFAULT_SKIP_DELAY_DURATION,
-    onOpen: (eventName: string) => this.handleOpenAction(eventName),
-    onclose: (eventName: string) => this.handleCloseAction(eventName),
-  };
+  private _internalOpen = false;
 
-  /**
-   * The controlled display of tooltip content
-   * @default false
-   */
-  @property({
-    attribute: "open",
-    type: Boolean,
-    converter: {
-      fromAttribute: (attrValue: string | null) => {
-        if (attrValue === null) return false;
-        if (attrValue === "") return true;
-        return attrValue === "true";
-      },
-      toAttribute: (value: boolean | null) => {
-        return value ? "true" : "false";
-      },
-    },
-  })
-  accessor open = false;
+  /** Tracks if current open was instant (no delay) */
+  @state()
+  private _wasInstantOpen = false;
 
-  /**
-   * The initial open state of the tooltip. Use when you do not want to control the open state.
-   * @default false
-   */
-  @property({
-    attribute: "default-open",
-    type: Boolean,
-    converter: {
-      fromAttribute: (attrValue: string | null) => {
-        // When attribute is not present at all
-        if (attrValue === null) return false;
-        // When attribute is present without value (open="")
-        if (attrValue === "") return true;
-        // When attribute has explicit value
-        return attrValue === "true";
-      },
-    },
-  })
-  accessor defaultOpen = false;
+  /** Reference to trigger element */
+  @state()
+  private _trigger: HTMLElement | null = null;
 
-  /**
-   * @description The duration from when the mouse enters a tooltip trigger until the tooltip content opens. Value is in milliseconds
-   * @default 500 (which equals 0.5 seconds)
-   * */
-  @property({ attribute: "delay-duration", type: Number })
-  accessor delayDuration = DEFAULT_DELAY_DURATION;
+  /** Unique ID for content */
+  private _contentId = generateId("tooltip-content");
 
-  /**
-   * @description How much time a user has to enter another trigger without incurring a delay again.
-   * @default 10000 (which equals 10 seconds)
-   * */
-  @property({ attribute: "skip-delay-duration", type: Number })
-  accessor skipDelayDuration = DEFAULT_SKIP_DELAY_DURATION;
+  /** Delay timer */
+  private _openTimer: ReturnType<typeof setTimeout> | null = null;
 
-  private delayTimer?: number;
-  private lastShownTime: number = 0;
+  /** Consume provider context (optional) */
+  @consume({ context: tooltipProviderContext, subscribe: true })
+  private _providerContext?: TooltipProviderContextValue;
+
+  /** Provide root context to children */
+  @provide({ context: tooltipRootContext })
+  @property({ attribute: false })
+  context: TooltipRootContextValue = this._createContext();
+
+  /** Whether controlled mode is active */
+  private get _isControlled(): boolean {
+    return this.open !== undefined;
+  }
+
+  /** Current open state (controlled or uncontrolled) */
+  private get _isOpen(): boolean {
+    return this._isControlled ? !!this.open : this._internalOpen;
+  }
+
+  /** Effective delay duration */
+  private get _effectiveDelay(): number {
+    return (
+      this.delayDuration ??
+      this._providerContext?.delayDuration ??
+      defaultProviderContext.delayDuration
+    );
+  }
+
+  /** State attribute for styling */
+  private get _stateAttribute(): TooltipState {
+    if (!this._isOpen) return "closed";
+    return this._wasInstantOpen ? "instant-open" : "delayed-open";
+  }
 
   connectedCallback() {
     super.connectedCallback();
+    this._internalOpen = this.defaultOpen;
+    this._updateContext();
+  }
 
-    this.setAttribute("role", "tooltip");
-    const tooltipPrefix = nextId();
-    const trigger = this.querySelector<HTMLElement>(tooltipTags.TRIGGER);
-    const content = this.querySelector<HTMLElement>(tooltipTags.CONTENT);
-    const triggerId = trigger?.id || `${tooltipPrefix}-tooltip-trigger`;
-    const contentId = content?.id || `${tooltipPrefix}-tooltip-content`;
-    trigger?.setAttribute("id", triggerId);
-    trigger?.setAttribute("aria-description", contentId);
-    content?.setAttribute("id", contentId);
-    content?.setAttribute("aria-describedby", triggerId);
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._clearTimer();
+  }
 
-    this._provider = {
-      ...this._provider,
-      trigger: trigger,
-      delayDuration: this.delayDuration,
-      skipDelayDuration: this.skipDelayDuration,
-      open: this.defaultOpen || this.open,
-      controlledState: this.hasAttribute("open"),
+  protected willUpdate(changed: Map<string, unknown>) {
+    if (
+      changed.has("open") ||
+      changed.has("_internalOpen") ||
+      changed.has("_wasInstantOpen") ||
+      changed.has("_trigger") ||
+      changed.has("delayDuration") ||
+      changed.has("disableHoverableContent")
+    ) {
+      this._updateContext();
+    }
+  }
+
+  private _createContext(): TooltipRootContextValue {
+    return {
+      open: this._isOpen,
+      stateAttribute: this._stateAttribute,
+      contentId: this._contentId,
+      trigger: this._trigger,
+      delayDuration: this._effectiveDelay,
+      disableHoverableContent: this.disableHoverableContent,
+      onOpen: this._handleOpen.bind(this),
+      onClose: this._handleClose.bind(this),
+      onTriggerMount: this._handleTriggerMount.bind(this),
+      onTriggerUnmount: this._handleTriggerUnmount.bind(this),
     };
   }
 
-  protected willUpdate(_changedProperties: Map<string, any>): void {
-    for (const [key] of _changedProperties.entries()) {
-      if (key === "_provider") {
-        this.open = this._provider.open;
-      } else {
-        this._provider = {
-          ...this._provider,
-          [key]: this[key as keyof this],
-        };
+  private _updateContext() {
+    this.context = this._createContext();
+  }
+
+  private _clearTimer() {
+    if (this._openTimer) {
+      clearTimeout(this._openTimer);
+      this._openTimer = null;
+    }
+  }
+
+  private _handleOpen(instant = false) {
+    this._clearTimer();
+
+    // Check if we should skip delay
+    const provider = this._providerContext ?? defaultProviderContext;
+    const shouldSkipDelay = instant || !provider.isOpenDelayed;
+
+    if (shouldSkipDelay) {
+      this._wasInstantOpen = true;
+      this._setOpen(true);
+    } else {
+      // Open after delay
+      this._openTimer = setTimeout(() => {
+        this._wasInstantOpen = false;
+        this._setOpen(true);
+        this._openTimer = null;
+      }, this._effectiveDelay);
+    }
+  }
+
+  private _handleClose() {
+    this._clearTimer();
+    this._setOpen(false);
+  }
+
+  private _setOpen(value: boolean) {
+    if (this._isControlled) {
+      // In controlled mode, just emit event
+      this._emitOpenChange(value);
+    } else {
+      // In uncontrolled mode, update internal state
+      if (this._internalOpen !== value) {
+        this._internalOpen = value;
+        this._emitOpenChange(value);
       }
     }
+
+    // Notify provider
+    const provider = this._providerContext;
+    if (provider) {
+      if (value) {
+        provider.onOpen();
+      } else {
+        provider.onClose();
+      }
+    }
+  }
+
+  private _emitOpenChange(open: boolean) {
+    this.dispatchEvent(
+      new CustomEvent("openChange", {
+        bubbles: true,
+        composed: true,
+        detail: { open },
+      })
+    );
+  }
+
+  private _handleTriggerMount(el: HTMLElement) {
+    this._trigger = el;
+  }
+
+  private _handleTriggerUnmount() {
+    this._trigger = null;
   }
 
   protected render() {
     return html`<slot></slot>`;
   }
+}
 
-  openContent() {
-    this._provider = {
-      ...this._provider,
-      open: true,
-    };
-    this.lastShownTime = Date.now();
-    this.emitOpenEvent(true);
+declare global {
+  interface HTMLElementTagNameMap {
+    "tooltip-root": TooltipRoot;
   }
-
-  emitOpenEvent(isOpen: boolean) {
-    this.dispatchEvent(
-      new CustomEvent("openChange", {
-        detail: { open: isOpen },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  handleOpenAction(_eventName: string) {
-    const currentTime = Date.now();
-    const timeSinceLastShown = currentTime - this.lastShownTime;
-
-    if (timeSinceLastShown < this._provider.skipDelayDuration) {
-      this.openContent();
-    } else {
-      this.delayTimer = window.setTimeout(() => {
-        this.openContent();
-      }, this._provider.delayDuration);
-    }
-  }
-
-  handleCloseAction = (_eventName: string) => {
-    window.clearTimeout(this.delayTimer);
-    this._provider = {
-      ...this._provider,
-      open: false,
-    };
-    this.emitOpenEvent(false);
-  };
 }
