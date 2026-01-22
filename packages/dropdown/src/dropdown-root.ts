@@ -1,6 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { generateDropdownId, DROPDOWN_EVENTS } from "./dropdown.context";
+import type { DropdownTrigger } from "./dropdown-trigger";
 
 /**
  * Root container for dropdown menu.
@@ -28,7 +29,7 @@ export class DropdownRoot extends LitElement {
   @property({ type: Boolean, reflect: true })
   accessor open = false;
 
-  private _trigger: HTMLElement | null = null;
+  private _trigger: DropdownTrigger | null = null;
   private _content: HTMLElement | null = null;
 
   get dropdownId() {
@@ -50,7 +51,7 @@ export class DropdownRoot extends LitElement {
 
   private _setupChildren() {
     // Find and configure trigger
-    this._trigger = this.querySelector("dropdown-trigger");
+    this._trigger = this.querySelector("dropdown-trigger") as DropdownTrigger;
     if (this._trigger) {
       this._trigger.setAttribute("data-dropdown-id", this._dropdownId);
     }
@@ -77,15 +78,15 @@ export class DropdownRoot extends LitElement {
     const wasOpen = this.isOpen;
     this.isOpen = event.newState === "open";
 
-    // Update trigger aria-expanded
-    this._trigger?.setAttribute("aria-expanded", String(this.isOpen));
+    // Update trigger state (handles as-child internally)
+    this._trigger?.updateState(this.isOpen);
 
     if (this.isOpen && !wasOpen) {
       this._dispatchOpen();
     } else if (!this.isOpen && wasOpen) {
       this._dispatchClose();
-      // Return focus to trigger
-      this._trigger?.focus();
+      // Return focus to the actual trigger element
+      this._trigger?.getTriggerElement()?.focus();
     }
   };
 

@@ -100,19 +100,16 @@ export class TooltipTrigger extends LitElement {
     // Ignore touch events
     if (event.pointerType === "touch") return;
 
-    // If hoverable content is enabled, check if moving to content
-    if (!this._rootContext?.disableHoverableContent) {
-      // Give a small delay to allow moving to content
-      // The content will cancel the close if pointer enters it
-    }
-
-    this._rootContext?.onClose();
+    // When hoverable content is enabled, use delayed close
+    // This gives the user time to move pointer to the content
+    const instant = this._rootContext?.disableHoverableContent ?? true;
+    this._rootContext?.onClose(instant);
   }
 
   private _onPointerDown() {
     this._isPointerDown = true;
-    // Close on pointer down (click)
-    this._rootContext?.onClose();
+    // Close immediately on pointer down (click)
+    this._rootContext?.onClose(true);
 
     // Reset pointer down state after a tick
     setTimeout(() => {
@@ -137,19 +134,19 @@ export class TooltipTrigger extends LitElement {
   }
 
   private _onBlur() {
-    this._rootContext?.onClose();
+    this._rootContext?.onClose(true);
   }
 
   private _onKeyDown(event: KeyboardEvent) {
     // Close on Escape
     if (event.key === "Escape") {
-      this._rootContext?.onClose();
+      this._rootContext?.onClose(true);
     }
   }
 
   private _onClick() {
     // Close on click (already handled by pointerdown, but safety)
-    this._rootContext?.onClose();
+    this._rootContext?.onClose(true);
   }
 
   protected render() {

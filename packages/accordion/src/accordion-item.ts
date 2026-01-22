@@ -1,37 +1,87 @@
 import { LitElement, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { ContextConsumer } from "@lit/context";
-import { AccordionContext, accordionContext } from "./accordion-context";
+import { consume, provide } from "@lit/context";
+import { accordionRootContext, accordionItemContext, generateId } from "./context";
+import type { AccordionContextValue, AccordionItemContextValue } from "./types";
 
+/**
+ * Container for a single accordion item (header + content pair).
+ *
+ * @element accordion-item
+ *
+ * @example
+ * ```html
+ * <accordion-item value="section-1">
+ *   <accordion-header>
+ *     <accordion-trigger>Click to expand</accordion-trigger>
+ *   </accordion-header>
+ *   <accordion-content>Hidden content here</accordion-content>
+ * </accordion-item>
+ * ```
+ */
 @customElement("accordion-item")
 export class AccordionItem extends LitElement {
-  _consumer = new ContextConsumer(this, {
-    context: accordionContext,
-    subscribe: true,
-    callback: (e) =>
-      requestAnimationFrame(() => this.listenToAccContextUpdates(e)),
-  });
+  /**
+   * Unique value identifying this item. Required for state management.
+   */
+  @property({ type: String, reflect: true })
+  value = "";
 
-  @property({ type: String, attribute: "value", reflect: true })
-  value?: string;
+  /**
+   * Whether this specific item is disabled
+   */
+  @property({ type: Boolean })
+  disabled = false;
 
-  // @property()
-  // disabled?: boolean;
+  /** Consume root context for state access */
+  @consume({ context: accordionRootContext, subscribe: true })
+  private _rootContext?: AccordionContextValue;
 
-  render() {
-    return html`<slot></slot>`;
+  /** Generated IDs for ARIA relationships */
+  private _triggerId = generateId("accordion-trigger");
+  private _contentId = generateId("accordion-content");
+
+  /** Provide item context to children (trigger, content) */
+  @provide({ context: accordionItemContext })
+  private _itemContext: AccordionItemContextValue = {
+    value: this.value,
+    disabled: this.disabled,
+    triggerId: this._triggerId,
+    contentId: this._contentId,
+  };
+
+  protected willUpdate(changed: Map<string, unknown>) {
+    // Keep item context in sync with properties
+    if (changed.has("value") || changed.has("disabled")) {
+      this._itemContext = {
+        ...this._itemContext,
+        value: this.value,
+        disabled: this.disabled,
+      };
+    }
+
+    // Update data-state based on root context
+    this._updateDataState();
   }
 
-  private listenToAccContextUpdates(context: AccordionContext) {
-    if (!this.value) {
-      console.warn("primitives item has no value");
-      return;
-    }
-    const { value } = context;
-    if (this.value && value.includes(this.value)) {
-      this.setAttribute("data-state", "open");
-    } else {
-      this.setAttribute("data-state", "closed");
-    }
+  private _updateDataState() {
+    if (!this._rootContext || !this.value) return;
+
+    const isExpanded = this._rootContext.isExpanded(this.value);
+    this.setAttribute("data-state", isExpanded ? "open" : "closed");
+
+    // Also set disabled state from root or local
+    const isDisabled = this.disabled || this._rootContext.disabled;
+    this.toggleAttribute("data-disabled", isDisabled);
+  }
+
+  protected render() {
+    return html`<slot></slot>`;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "accordion-item": AccordionItem;
   }
 }

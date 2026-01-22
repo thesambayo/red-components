@@ -53,6 +53,7 @@ export class TooltipRoot extends LitElement {
   /**
    * When true, tooltip closes immediately when leaving trigger.
    * When false (default), user can hover the content.
+   * @default false
    */
   @property({ type: Boolean, attribute: "disable-hoverable-content" })
   disableHoverableContent = false;
@@ -72,8 +73,11 @@ export class TooltipRoot extends LitElement {
   /** Unique ID for content */
   private _contentId = generateId("tooltip-content");
 
-  /** Delay timer */
+  /** Delay timer for opening */
   private _openTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** Delay timer for closing (when hoverable content is enabled) */
+  private _closeTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Consume provider context (optional) */
   @consume({ context: tooltipProviderContext, subscribe: true })
@@ -117,7 +121,8 @@ export class TooltipRoot extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this._clearTimer();
+    this._clearOpenTimer();
+    this._clearCloseTimer();
   }
 
   protected willUpdate(changed: Map<string, unknown>) {
@@ -152,15 +157,24 @@ export class TooltipRoot extends LitElement {
     this.context = this._createContext();
   }
 
-  private _clearTimer() {
+  private _clearOpenTimer() {
     if (this._openTimer) {
       clearTimeout(this._openTimer);
       this._openTimer = null;
     }
   }
 
+  private _clearCloseTimer() {
+    if (this._closeTimer) {
+      clearTimeout(this._closeTimer);
+      this._closeTimer = null;
+    }
+  }
+
   private _handleOpen(instant = false) {
-    this._clearTimer();
+    // Clear any pending timers
+    this._clearOpenTimer();
+    this._clearCloseTimer();
 
     // Check if we should skip delay
     const provider = this._providerContext ?? defaultProviderContext;
@@ -179,9 +193,25 @@ export class TooltipRoot extends LitElement {
     }
   }
 
-  private _handleClose() {
-    this._clearTimer();
-    this._setOpen(false);
+  private _handleClose(instant = false) {
+    // Clear any pending open timer
+    this._clearOpenTimer();
+
+    // If hoverable content is enabled and not instant, delay the close
+    if (!instant && !this.disableHoverableContent) {
+      // Clear any existing close timer
+      this._clearCloseTimer();
+
+      // Delay close to give user time to move pointer to content
+      this._closeTimer = setTimeout(() => {
+        this._setOpen(false);
+        this._closeTimer = null;
+      }, 300); // 300ms grace period
+    } else {
+      // Close immediately
+      this._clearCloseTimer();
+      this._setOpen(false);
+    }
   }
 
   private _setOpen(value: boolean) {

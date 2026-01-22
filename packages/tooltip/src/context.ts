@@ -27,12 +27,65 @@ export function generateId(prefix: string): string {
 }
 
 /**
- * Default provider context values (used when no provider exists)
+ * Global tooltip configuration
  */
-export const defaultProviderContext: TooltipProviderContextValue = {
-  isOpenDelayed: true,
+interface TooltipGlobalConfig {
+  delayDuration: number;
+  skipDelayDuration: number;
+}
+
+/**
+ * Internal global configuration state
+ */
+let globalConfig: TooltipGlobalConfig = {
   delayDuration: 500,
   skipDelayDuration: 300,
+};
+
+/**
+ * Configure global tooltip defaults
+ * Call this once at app startup to set defaults for all tooltips
+ *
+ * @example
+ * ```ts
+ * import { configureTooltips } from '@red-elements/tooltip';
+ *
+ * configureTooltips({
+ *   delayDuration: 700,
+ *   skipDelayDuration: 400
+ * });
+ * ```
+ */
+export function configureTooltips(config: Partial<TooltipGlobalConfig>): void {
+  if (config.delayDuration !== undefined) {
+    globalConfig.delayDuration = config.delayDuration;
+  }
+  if (config.skipDelayDuration !== undefined) {
+    globalConfig.skipDelayDuration = config.skipDelayDuration;
+  }
+}
+
+/**
+ * Get current global tooltip configuration
+ */
+export function getTooltipConfig(): Readonly<TooltipGlobalConfig> {
+  return { ...globalConfig };
+}
+
+/**
+ * Default provider context values (used when no provider exists)
+ * Uses global configuration set via configureTooltips()
+ */
+export const defaultProviderContext: TooltipProviderContextValue = {
+  get isOpenDelayed() {
+    return true;
+  },
+  get delayDuration() {
+    return globalConfig.delayDuration;
+  },
+  get skipDelayDuration() {
+    return globalConfig.skipDelayDuration;
+  },
   onOpen: () => {},
   onClose: () => {},
 };

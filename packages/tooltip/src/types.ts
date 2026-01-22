@@ -48,7 +48,7 @@ export interface TooltipRootContextValue {
   /** Open the tooltip */
   onOpen: (instant?: boolean) => void;
   /** Close the tooltip */
-  onClose: () => void;
+  onClose: (instant?: boolean) => void;
   /** Called when trigger element mounts */
   onTriggerMount: (el: HTMLElement) => void;
   /** Called when trigger element unmounts */

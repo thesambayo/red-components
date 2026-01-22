@@ -251,3 +251,74 @@ export const DifferentPlacements: Story = {
     </div>
   `,
 };
+
+export const AsChild: Story = {
+  render: () => html`
+    ${styles}
+    <style>
+      .as-child-demo {
+        padding: 100px;
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+      }
+
+      .custom-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        color: white;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+
+      .custom-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .custom-button:focus {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+      }
+
+      .custom-button[data-state="open"] {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      }
+    </style>
+    <div class="as-child-demo">
+      <dropdown-root>
+        <dropdown-trigger as-child>
+          <button class="custom-button">
+            Custom Button
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="currentColor"
+            >
+              <path
+                d="M2.5 4.5L6 8L9.5 4.5"
+                stroke="currentColor"
+                stroke-width="1.5"
+                fill="none"
+              />
+            </svg>
+          </button>
+        </dropdown-trigger>
+        <dropdown-content side="bottom" align="start">
+          <dropdown-item value="profile">Profile</dropdown-item>
+          <dropdown-item value="settings">Settings</dropdown-item>
+          <dropdown-separator></dropdown-separator>
+          <dropdown-item value="logout">Log out</dropdown-item>
+        </dropdown-content>
+      </dropdown-root>
+    </div>
+  `,
+};

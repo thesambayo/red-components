@@ -219,7 +219,9 @@ export const InstantOpen: Story = {
     ${tooltipStyles}
     <div class="tooltip-demo">
       <div style="text-align: center;">
-        <p class="info-text">This tooltip has no delay - it appears instantly.</p>
+        <p class="info-text">
+          This tooltip has no delay - it appears instantly.
+        </p>
         <tooltip-root delay-duration="0">
           <tooltip-trigger>
             <button class="trigger-button">Instant tooltip</button>
@@ -491,4 +493,64 @@ export const LongContent: Story = {
       </tooltip-root>
     </div>
   `,
+};
+
+export const JavaScriptConfiguration: Story = {
+  render: () => {
+    // Import the configuration API
+    import("./context").then(({ configureTooltips }) => {
+      // Configure global defaults
+      configureTooltips({
+        delayDuration: 200, // Fast delay for this demo
+        skipDelayDuration: 500,
+      });
+    });
+
+    return html`
+      ${tooltipStyles}
+      <div class="tooltip-demo">
+        <div style="text-align: center;">
+          <p class="info-text">
+            This demo uses JavaScript configuration API to set global defaults.<br />
+            <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 12px;">
+              configureTooltips({ delayDuration: 200 })
+            </code>
+            <br /><br />
+            All tooltips below use the configured 200ms delay without needing a provider wrapper.
+          </p>
+          <div class="tooltip-demo-row">
+            <tooltip-root>
+              <tooltip-trigger>
+                <button class="trigger-button">First tooltip</button>
+              </tooltip-trigger>
+              <tooltip-content side="top" side-offset="8">
+                <tooltip-arrow></tooltip-arrow>
+                Uses global config (200ms delay)
+              </tooltip-content>
+            </tooltip-root>
+
+            <tooltip-root>
+              <tooltip-trigger>
+                <button class="trigger-button">Second tooltip</button>
+              </tooltip-trigger>
+              <tooltip-content side="top" side-offset="8">
+                <tooltip-arrow></tooltip-arrow>
+                Also uses global config
+              </tooltip-content>
+            </tooltip-root>
+
+            <tooltip-root delay-duration="0">
+              <tooltip-trigger>
+                <button class="trigger-button">Override to instant</button>
+              </tooltip-trigger>
+              <tooltip-content side="top" side-offset="8">
+                <tooltip-arrow></tooltip-arrow>
+                This one overrides with delay-duration="0"
+              </tooltip-content>
+            </tooltip-root>
+          </div>
+        </div>
+      </div>
+    `;
+  },
 };

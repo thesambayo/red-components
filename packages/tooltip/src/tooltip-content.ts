@@ -149,7 +149,8 @@ export class TooltipContent extends LitElement {
   }
 
   private _onPointerLeave() {
-    this._rootContext?.onClose();
+    // Close immediately when leaving content
+    this._rootContext?.onClose(true);
   }
 
   private _getPlacement(): Placement {

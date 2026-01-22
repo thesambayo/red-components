@@ -19,11 +19,6 @@ type Align = "start" | "center" | "end";
  * @element dropdown-content
  * @slot - Menu items (dropdown-item, dropdown-label, dropdown-separator)
  *
- * @cssprop --dropdown-content-bg - Background color
- * @cssprop --dropdown-content-border - Border style
- * @cssprop --dropdown-content-radius - Border radius
- * @cssprop --dropdown-content-shadow - Box shadow
- * @cssprop --dropdown-content-padding - Content padding
  * @cssprop --dropdown-trigger-width - Width of trigger (set automatically)
  * @cssprop --dropdown-trigger-height - Height of trigger (set automatically)
  * @cssprop --dropdown-available-width - Available width (set automatically)
@@ -78,6 +73,7 @@ export class DropdownContent extends LitElement {
     // Set popover attribute for light dismiss
     this.setAttribute("popover", "auto");
     this.setAttribute("role", "menu");
+    this.setAttribute("data-state", "closed");
 
     // Listen for toggle to position content
     this.addEventListener("toggle", this._handleToggle as EventListener);
@@ -92,12 +88,17 @@ export class DropdownContent extends LitElement {
 
   private _handleToggle = (event: ToggleEvent) => {
     if (event.newState === "open") {
+      this.setAttribute("data-state", "open");
       this._positionContent();
       this._updateItems();
       // Focus first item after positioning
       requestAnimationFrame(() => {
         this._items[0]?.focus();
       });
+    } else {
+      this.setAttribute("data-state", "closed");
+      this.removeAttribute("data-side");
+      this.removeAttribute("data-align");
     }
   };
 
@@ -169,7 +170,7 @@ export class DropdownContent extends LitElement {
 
   private _updateItems() {
     this._items = Array.from(
-      this.querySelectorAll("dropdown-item:not([disabled])")
+      this.querySelectorAll("dropdown-item:not([data-disabled])")
     ) as HTMLElement[];
   }
 

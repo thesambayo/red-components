@@ -1,30 +1,63 @@
 import { LitElement, html } from "lit";
-import { ContextConsumer } from "@lit/context";
 import { customElement } from "lit/decorators.js";
-import { AccordionContext, accordionContext } from "./accordion-context";
+import { consume } from "@lit/context";
+import { accordionRootContext, accordionItemContext } from "./context";
+import type { AccordionContextValue, AccordionItemContextValue } from "./types";
 
+/**
+ * Contains the collapsible content for an accordion item.
+ *
+ * @element accordion-content
+ *
+ * @example
+ * ```html
+ * <accordion-content>
+ *   <p>This content is shown when the item is expanded.</p>
+ * </accordion-content>
+ * ```
+ */
 @customElement("accordion-content")
 export class AccordionContent extends LitElement {
+  @consume({ context: accordionRootContext, subscribe: true })
+  private _rootContext?: AccordionContextValue;
 
-  _consumer = new ContextConsumer(this, {
-    context: accordionContext,
-    subscribe: true,
-    callback: (e) => window.requestAnimationFrame(() => this.listenToAccContextUpdates(e)),
-  });
+  @consume({ context: accordionItemContext, subscribe: true })
+  private _itemContext?: AccordionItemContextValue;
 
-  render() {
-    return html` <slot></slot> `;
+  connectedCallback() {
+    super.connectedCallback();
+    // Set region role for accessibility
+    this.setAttribute("role", "region");
   }
 
-  private listenToAccContextUpdates(context: AccordionContext) {
-    const { value } = context;
-    const accValue = this.parentElement?.getAttribute("value");
-    if (accValue && value.includes(accValue)) {
-      this.setAttribute("data-state", "open");
-      this.removeAttribute("hidden");
-    } else {
-      this.setAttribute("data-state", "closed");
-      this.toggleAttribute("hidden", true);
-    }
+  protected willUpdate() {
+    this._updateAttributes();
+  }
+
+  private _updateAttributes() {
+    if (!this._rootContext || !this._itemContext) return;
+
+    const isExpanded = this._rootContext.isExpanded(this._itemContext.value);
+
+    // Set ARIA attributes
+    this.setAttribute("id", this._itemContext.contentId);
+    this.setAttribute("aria-labelledby", this._itemContext.triggerId);
+
+    // Set data attributes for styling
+    this.setAttribute("data-state", isExpanded ? "open" : "closed");
+    this.setAttribute("data-orientation", this._rootContext.orientation);
+
+    // Control visibility via hidden attribute
+    this.toggleAttribute("hidden", !isExpanded);
+  }
+
+  protected render() {
+    return html`<slot></slot>`;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "accordion-content": AccordionContent;
   }
 }

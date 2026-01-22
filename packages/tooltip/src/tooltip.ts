@@ -21,6 +21,9 @@ export { TooltipTrigger } from "./tooltip-trigger";
 export { TooltipContent } from "./tooltip-content";
 export { TooltipArrow } from "./tooltip-arrow";
 
+// Re-export configuration API
+export { configureTooltips, getTooltipConfig } from "./context";
+
 // Re-export types
 export type {
   TooltipSide,

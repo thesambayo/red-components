@@ -1,11 +1,11 @@
 import { ChevronDown } from "lucide-react";
 import {
-  NewAccordionContent as AccordionContent,
-  NewAccordionItem as AccordionItem,
-  NewAccordionRoot as AccordionRoot,
-  NewAccordionTrigger as AccordionTrigger,
-  NewAccordionHeader,
-} from "@red-elements/new-accordion";
+  AccordionContent,
+  AccordionItem,
+  AccordionRoot,
+  AccordionTrigger,
+  AccordionHeader,
+} from "@red-elements/accordion";
 import { useState } from "react";
 
 export function Accordion() {
@@ -48,12 +48,12 @@ export function Accordion() {
             value={accordionItem.value}
             className="flex flex-col border-b focus-visible:outline-0"
           >
-            <NewAccordionHeader>
+            <AccordionHeader>
               <AccordionTrigger className="cursor-pointer flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180 data-[state=open]:text-red-600">
                 {accordionItem.title}
                 <ChevronDown className="size-4 shrink-0 transition-transform duration-200" />
               </AccordionTrigger>
-            </NewAccordionHeader>
+            </AccordionHeader>
             <AccordionContent className="overflow-hidden text-sm transition-all">
               <div className="pb-4 pt-0">{accordionItem.content}</div>
             </AccordionContent>

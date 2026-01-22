@@ -8,17 +8,17 @@ import type { AccordionContextValue } from "./types";
  * Wraps the trigger element. Renders as an h3 by default for proper heading structure.
  * Following WAI-ARIA Accordion Pattern.
  *
- * @element new-accordion-header
+ * @element accordion-header
  *
  * @example
  * ```html
- * <new-accordion-header>
- *   <new-accordion-trigger>Section Title</new-accordion-trigger>
- * </new-accordion-header>
+ * <accordion-header>
+ *   <accordion-trigger>Section Title</accordion-trigger>
+ * </accordion-header>
  * ```
  */
-@customElement("new-accordion-header")
-export class NewAccordionHeader extends LitElement {
+@customElement("accordion-header")
+export class AccordionHeader extends LitElement {
   @consume({ context: accordionRootContext, subscribe: true })
   private _rootContext?: AccordionContextValue;
 
@@ -43,6 +43,6 @@ export class NewAccordionHeader extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "new-accordion-header": NewAccordionHeader;
+    "accordion-header": AccordionHeader;
   }
 }
