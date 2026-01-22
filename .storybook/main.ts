@@ -5,9 +5,8 @@ const config: StorybookConfig = {
   stories: ["../packages/**/**/*.stories.ts"],
   addons: [
     "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-actions",
     "@chromatic-com/storybook",
+    "@storybook/addon-docs"
   ],
   framework: {
     name: "@storybook/web-components-vite",
