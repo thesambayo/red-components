@@ -29,7 +29,7 @@ export function Tabs() {
           className="block mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <div className="rounded-lg border bg-card text-card-foreground shadow p-6">
-            content-1
+            account content-1
           </div>
         </TabContent>
         <TabContent
@@ -37,7 +37,7 @@ export function Tabs() {
           className="block mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <div className="rounded-lg border bg-card text-card-foreground shadow p-6">
-            content-2
+            password content-2
           </div>
         </TabContent>
         <TabContent
@@ -45,7 +45,7 @@ export function Tabs() {
           className="block mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <div className="rounded-lg border bg-card text-card-foreground shadow p-6">
-            content-3
+            delete content-3
           </div>
         </TabContent>
       </TabsRoot>

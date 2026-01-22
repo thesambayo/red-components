@@ -8,6 +8,8 @@ import { X } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { useState } from "react";
 import { Dropdown } from "./primitives/dropdown.tsx";
+import { Avatar } from "./primitives/avatar.tsx";
+import { Tabs } from "./primitives/tabs.tsx";
 
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -47,8 +49,8 @@ function App() {
 
       <div className="space-y-10">
         <Accordion />
-        {/* <Avatar /> */}
-        {/* <Tabs /> */}
+        <Avatar />
+        <Tabs />
         <Tooltip />
         <Dropdown />
 
