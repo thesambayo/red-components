@@ -45,12 +45,14 @@ export class TooltipContent extends LitElement {
   static styles = css`
     :host {
       position: fixed;
-      z-index: 9999;
-      pointer-events: auto;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
     }
 
-    :host([data-state="closed"]) {
-      display: none !important;
+    :host(:not(:popover-open)) {
+      display: none;
     }
   `;
 
@@ -102,12 +104,18 @@ export class TooltipContent extends LitElement {
   /** Reference to arrow element if present */
   private _arrowElement: HTMLElement | null = null;
 
+  /** Track current popover state */
+  private _isPopoverOpen = false;
+
   /** Stored handler for hoverable content */
   private _handlePointerEnter = this._onPointerEnter.bind(this);
   private _handlePointerLeave = this._onPointerLeave.bind(this);
 
   connectedCallback() {
     super.connectedCallback();
+
+    // Set popover attribute for manual control (no light dismiss)
+    this.setAttribute("popover", "manual");
 
     // Set accessibility attributes
     this.setAttribute("role", "tooltip");
@@ -206,6 +214,12 @@ export class TooltipContent extends LitElement {
     // Set ID for aria-describedby
     if (this._rootContext?.contentId) {
       this.setAttribute("id", this._rootContext.contentId);
+    }
+
+    // Show popover first (enters top-layer)
+    if (!this._isPopoverOpen) {
+      this.showPopover();
+      this._isPopoverOpen = true;
     }
 
     // Find arrow element if present
@@ -308,6 +322,10 @@ export class TooltipContent extends LitElement {
   }
 
   private _hide() {
+    if (this._isPopoverOpen) {
+      this.hidePopover();
+      this._isPopoverOpen = false;
+    }
     this.setAttribute("data-state", "closed");
     this.removeAttribute("data-side");
     this.removeAttribute("data-align");

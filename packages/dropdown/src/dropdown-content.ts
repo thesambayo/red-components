@@ -1,336 +1,230 @@
-import { _$LE, css, html, LitElement, PropertyValues } from "lit";
+import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import {
+  computePosition,
+  flip,
   shift,
   offset,
-  flip,
   size,
-  computePosition,
-  ComputePositionConfig,
   Placement,
-  Middleware,
 } from "@floating-ui/dom";
-import {
-  DROPDOWN_ATTRIBUTES,
-  DROPDOWN_EVENTS_RECORD,
-} from "./dropdown.context";
 
-const SIDE_OPTIONS = ["top", "right", "bottom", "left"] as const;
-const ALIGN_OPTIONS = ["start", "center", "end"] as const;
-type Side = (typeof SIDE_OPTIONS)[number];
-type Align = (typeof ALIGN_OPTIONS)[number];
+type Side = "top" | "right" | "bottom" | "left";
+type Align = "start" | "center" | "end";
 
+/**
+ * Dropdown menu content container.
+ * Uses Popover API for top-layer rendering and floating-ui for positioning.
+ *
+ * @element dropdown-content
+ * @slot - Menu items (dropdown-item, dropdown-label, dropdown-separator)
+ *
+ * @cssprop --dropdown-content-bg - Background color
+ * @cssprop --dropdown-content-border - Border style
+ * @cssprop --dropdown-content-radius - Border radius
+ * @cssprop --dropdown-content-shadow - Box shadow
+ * @cssprop --dropdown-content-padding - Content padding
+ * @cssprop --dropdown-trigger-width - Width of trigger (set automatically)
+ * @cssprop --dropdown-trigger-height - Height of trigger (set automatically)
+ * @cssprop --dropdown-available-width - Available width (set automatically)
+ * @cssprop --dropdown-available-height - Available height (set automatically)
+ */
 @customElement("dropdown-content")
 export class DropdownContent extends LitElement {
   static styles = css`
     :host {
       position: fixed;
-      pointer-events: auto;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      outline: none;
     }
 
-    :host([data-state="closed"]) {
-      display: none !important;
+    :host(:not(:popover-open)) {
+      display: none;
     }
   `;
 
   /**
-   * The side of the trigger to display the content
-   * @defaultvalue top
-   * */
+   * Side of trigger to display content
+   */
   @property({ type: String })
-  side: Side = "top";
+  side: Side = "bottom";
 
   /**
-   * The distance in pixels from the trigger.
-   * @defaultvalue 0
-   * */
+   * Distance from trigger in pixels
+   */
   @property({ type: Number, attribute: "side-offset" })
-  sideOffset = 0;
+  sideOffset = 4;
 
   /**
-   * The alignment of the content relative to the trigger
-   * @defaultvalue center
-   * */
+   * Alignment relative to trigger
+   */
   @property({ type: String })
-  align: Align = "center";
+  align: Align = "start";
 
   /**
-   * An offset in pixels from the "start" or "end" alignment options.
-   * @defaultvalue 0
-   * */
+   * Offset along alignment axis
+   */
   @property({ type: Number, attribute: "align-offset" })
   alignOffset = 0;
 
-  private focusableItems: HTMLElement[] = [];
+  private _items: HTMLElement[] = [];
 
   connectedCallback() {
     super.connectedCallback();
-    this.setAttribute("tabindex", "0");
+
+    // Set popover attribute for light dismiss
+    this.setAttribute("popover", "auto");
     this.setAttribute("role", "menu");
-    this.setAttribute("data-state", "closed");
 
-    requestAnimationFrame(() => {
-      if (this.hasAttribute(DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY)) {
-        this.showContent();
-        this.addEventListener("keydown", this.handleKeyDown);
-        document.addEventListener("click", this.clickOutsideHandler);
-        // window.addEventListener("resize", (e) => {
-        //   // console.log(e);
-        //   this.showContent();
-        // });
-      }
-    });
-  }
-
-  protected willUpdate(_changedProperties: PropertyValues): void {
-    // console.log("willUpdate", _changedProperties);
-    // const open = this._consumer.value?.isOpen;
-    // if (open) {
-    //   this.showContent();
-    // }
+    // Listen for toggle to position content
+    this.addEventListener("toggle", this._handleToggle as EventListener);
+    this.addEventListener("keydown", this._handleKeydown);
   }
 
   disconnectedCallback() {
-    this.hideContent();
     super.disconnectedCallback();
-    this.removeEventListener("keydown", this.handleKeyDown);
-    document.removeEventListener("click", this.clickOutsideHandler);
-    // document.removeEventListener("scroll", () => this.showContent);
-    // window.removeEventListener("resize", (e) => {
-    //   // console.log(e);
-    //   this.showContent();
-    // });
+    this.removeEventListener("toggle", this._handleToggle as EventListener);
+    this.removeEventListener("keydown", this._handleKeydown);
   }
 
-  protected render() {
-    return html` <slot></slot> `;
-  }
-
-  private clickOutsideHandler = (event: MouseEvent) => {
-    if (
-      !this.contains(event.target as Node) &&
-      this.hasAttribute(DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY)
-    ) {
-      requestAnimationFrame(() => this.closeDropdownEvent());
+  private _handleToggle = (event: ToggleEvent) => {
+    if (event.newState === "open") {
+      this._positionContent();
+      this._updateItems();
+      // Focus first item after positioning
+      requestAnimationFrame(() => {
+        this._items[0]?.focus();
+      });
     }
   };
 
-  private closeDropdownEvent() {
-    this.dispatchEvent(
-      DROPDOWN_EVENTS_RECORD.CLOSE({
-        dropdownDataId: this.getAttribute(DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY),
-      })
-    );
-  }
-
-  transformOrigin = (options: {
-    arrowWidth: number;
-    arrowHeight: number;
-  }): Middleware => {
-    function getSideAndAlignFromPlacement(placement: Placement) {
-      const [side, align = "center"] = placement.split("-");
-      return [side as Side, align as Align] as const;
-    }
-    return {
-      name: "transformOrigin",
-      options,
-      fn(data) {
-        const { placement, rects, middlewareData } = data;
-
-        const cannotCenterArrow = middlewareData.arrow?.centerOffset !== 0;
-        const isArrowHidden = cannotCenterArrow;
-        const arrowWidth = isArrowHidden ? 0 : options.arrowWidth;
-        const arrowHeight = isArrowHidden ? 0 : options.arrowHeight;
-        const [placedSide, placedAlign] =
-          getSideAndAlignFromPlacement(placement);
-        const noArrowAlign = { start: "0%", center: "50%", end: "100%" }[
-          placedAlign
-        ];
-
-        const arrowXCenter = (middlewareData.arrow?.x ?? 0) + arrowWidth / 2;
-        const arrowYCenter = (middlewareData.arrow?.y ?? 0) + arrowHeight / 2;
-
-        let x = "";
-        let y = "";
-
-        if (placedSide === "bottom") {
-          x = isArrowHidden ? noArrowAlign : `${arrowXCenter}px`;
-          y = `${-arrowHeight}px`;
-        } else if (placedSide === "top") {
-          x = isArrowHidden ? noArrowAlign : `${arrowXCenter}px`;
-          y = `${rects.floating.height + arrowHeight}px`;
-        } else if (placedSide === "right") {
-          x = `${-arrowHeight}px`;
-          y = isArrowHidden ? noArrowAlign : `${arrowYCenter}px`;
-        } else if (placedSide === "left") {
-          x = `${rects.floating.width + arrowHeight}px`;
-          y = isArrowHidden ? noArrowAlign : `${arrowYCenter}px`;
-        }
-        return { data: { x, y } };
-      },
-    };
-  };
-
-  private async showContent() {
+  private async _positionContent() {
+    const dropdownId = this.getAttribute("data-dropdown-id");
     const trigger = document.querySelector(
-      `dropdown-trigger[${DROPDOWN_ATTRIBUTES.DATA_ID_KEY}="${this.getAttribute(
-        DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY
-      )}"]`
+      `dropdown-trigger[data-dropdown-id="${dropdownId}"]`
     );
+
     if (!trigger) return;
-    this.style.cssText = "";
-    this.setAttribute("data-state", "open");
 
-    let initialPlacement: ComputePositionConfig["placement"];
-    if (this.align.trim().length) {
-      initialPlacement =
-        this.align === "center" ? `${this.side}` : `${this.side}-${this.align}`;
-    } else {
-      initialPlacement = this.side;
-    }
+    const placement = this._getPlacement();
 
-    // Robust positioning
-    const computedPosition = await computePosition(trigger, this, {
-      strategy: "fixed",
-      placement: initialPlacement,
-      middleware: [
-        offset({
-          mainAxis: this.sideOffset,
-          crossAxis: this.alignOffset,
-        }),
-        shift(),
-        flip({
-          fallbackAxisSideDirection: "start",
-          crossAxis: false,
-        }),
-        size({
-          apply: ({ availableHeight, availableWidth, rects, elements }) => {
-            const { width: anchorWidth, height: anchorHeight } =
-              rects.reference;
-            elements.floating.style.setProperty(
-              "--dropdown-trigger-width",
-              `${anchorWidth}px`
-            );
-            elements.floating.style.setProperty(
-              "--dropdown-trigger-height",
-              `${anchorHeight}px`
-            );
-            elements.floating.style.setProperty(
-              "--dropdown-content-available-width",
-              `${availableWidth}px`
-            );
-            elements.floating.style.setProperty(
-              "--dropdown-content-available-height",
-              `${availableHeight}px`
-            );
-          },
-        }),
-        this.transformOrigin({ arrowHeight: 0, arrowWidth: 0 }),
-      ],
-    });
-
-    const { x, y, placement, middlewareData } = computedPosition;
-    this.style.setProperty(
-      "--dropdown-content-transform-origin",
-      [
-        middlewareData.transformOrigin?.x,
-        middlewareData.transformOrigin?.y,
-      ].join(" ")
+    const { x, y, placement: finalPlacement } = await computePosition(
+      trigger,
+      this,
+      {
+        strategy: "fixed",
+        placement,
+        middleware: [
+          offset({
+            mainAxis: this.sideOffset,
+            crossAxis: this.alignOffset,
+          }),
+          flip({
+            fallbackAxisSideDirection: "start",
+          }),
+          shift({ padding: 8 }),
+          size({
+            padding: 8,
+            apply: ({ availableWidth, availableHeight, rects }) => {
+              this.style.setProperty(
+                "--dropdown-trigger-width",
+                `${rects.reference.width}px`
+              );
+              this.style.setProperty(
+                "--dropdown-trigger-height",
+                `${rects.reference.height}px`
+              );
+              this.style.setProperty(
+                "--dropdown-available-width",
+                `${availableWidth}px`
+              );
+              this.style.setProperty(
+                "--dropdown-available-height",
+                `${availableHeight}px`
+              );
+            },
+          }),
+        ],
+      }
     );
-    this.style.top = `${y}px`;
+
     this.style.left = `${x}px`;
-    this.setAttribute("data-state", "open");
-    trigger.setAttribute("data-state", "open");
-    const [side, align] = placement.split("-");
+    this.style.top = `${y}px`;
+
+    // Set data attributes for styling
+    const [side, align] = finalPlacement.split("-");
     this.setAttribute("data-side", side);
-    this.setAttribute("data-align", align ?? "center");
-    requestAnimationFrame(() => {
-      this.focus();
-    });
+    this.setAttribute("data-align", align || "center");
   }
 
-  hideContent() {
-    const trigger = document.querySelector(
-      `dropdown-trigger[${DROPDOWN_ATTRIBUTES.DATA_ID_KEY}="${this.getAttribute(
-        DROPDOWN_ATTRIBUTES.PORTALLED_ID_KEY
-      )}"]`
-    );
-    this.style.cssText = "";
-    this.setAttribute("data-state", "closed");
-    this.removeAttribute("data-side");
-    this.removeAttribute("data-align");
-    trigger?.setAttribute("data-state", "closed");
-    trigger?.setAttribute("aria-expanded", "false");
+  private _getPlacement(): Placement {
+    if (this.align === "center") {
+      return this.side;
+    }
+    return `${this.side}-${this.align}`;
   }
 
-  handleKeyDown(event: KeyboardEvent) {
-    // Update focusable items
-    this.focusableItems = Array.from(
-      this.querySelectorAll("dropdown-item")
+  private _updateItems() {
+    this._items = Array.from(
+      this.querySelectorAll("dropdown-item:not([disabled])")
     ) as HTMLElement[];
+  }
 
+  private _handleKeydown = (event: KeyboardEvent) => {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
-        this.focusNextItem();
+        this._focusNext();
         break;
       case "ArrowUp":
         event.preventDefault();
-        this.focusPreviousItem();
+        this._focusPrevious();
+        break;
+      case "Home":
+        event.preventDefault();
+        this._items[0]?.focus();
+        break;
+      case "End":
+        event.preventDefault();
+        this._items[this._items.length - 1]?.focus();
         break;
       case "Escape":
         event.preventDefault();
-        this.closeDropdownEvent();
+        this.hidePopover();
         break;
     }
-  }
+  };
 
-  private focusNextItem() {
-    const currentIndex = this.focusableItems.findIndex(
+  private _focusNext() {
+    const currentIndex = this._items.findIndex(
       (item) => item === document.activeElement
     );
-
-    let nextIndex;
-    if (currentIndex === -1) {
-      // No item focused, focus first item
-      nextIndex = 0;
-    } else {
-      // Focus next item, or wrap to first
-      nextIndex =
-        currentIndex === this.focusableItems.length - 1 ? 0 : currentIndex + 1;
-    }
-
-    this.setFocusableItemTabIndex(this.focusableItems, nextIndex);
-    // this.focusableItems[nextIndex]?.focus();
+    const nextIndex =
+      currentIndex === -1 || currentIndex === this._items.length - 1
+        ? 0
+        : currentIndex + 1;
+    this._items[nextIndex]?.focus();
   }
 
-  private focusPreviousItem() {
-    const currentIndex = this.focusableItems.findIndex(
+  private _focusPrevious() {
+    const currentIndex = this._items.findIndex(
       (item) => item === document.activeElement
     );
-
-    let previousIndex;
-    if (currentIndex === -1) {
-      // No item focused, focus last item
-      previousIndex = this.focusableItems.length - 1;
-    } else {
-      // Focus previous item, or wrap to last
-      previousIndex =
-        currentIndex === 0 ? this.focusableItems.length - 1 : currentIndex - 1;
-    }
-
-    this.setFocusableItemTabIndex(this.focusableItems, previousIndex);
-    // this.focusableItems[previousIndex]?.focus();
+    const prevIndex =
+      currentIndex <= 0 ? this._items.length - 1 : currentIndex - 1;
+    this._items[prevIndex]?.focus();
   }
 
-  private setFocusableItemTabIndex(items: HTMLElement[], activeIndex: number) {
-    items[activeIndex]?.focus();
-    // items.forEach((item, index) => {
-    //   const isActive = index === activeIndex;
-    //   item.setAttribute("tabindex", isActive ? "0" : "-1");
-    //   isActive
-    //     ? item.setAttribute("data-highlighted", "")
-    //     : item.removeAttribute("data-highlighted");
-    // });
+  protected render() {
+    return html`<slot></slot>`;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "dropdown-content": DropdownContent;
   }
 }

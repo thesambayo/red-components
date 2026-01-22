@@ -1,54 +1,62 @@
-import { html, LitElement } from "lit";
+import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import {
-  DROPDOWN_ATTRIBUTES,
-  DROPDOWN_EVENTS_RECORD,
-} from "./dropdown.context";
 
+/**
+ * Trigger button for opening the dropdown.
+ *
+ * @element dropdown-trigger
+ * @slot - Button content
+ */
 @customElement("dropdown-trigger")
 export class DropdownTrigger extends LitElement {
   connectedCallback() {
     super.connectedCallback();
-    this.setAttribute("aria-haspopup", "menu");
-    this.setAttribute("tabindex", "0");
 
-    // Handle click for toggle behavior
-    this.addEventListener("click", this.clickHandler);
-    // Handle keyboard events
-    this.addEventListener("keydown", this.keyDownHandler);
+    // Accessibility
+    this.setAttribute("role", "button");
+    this.setAttribute("aria-haspopup", "menu");
+    this.setAttribute("aria-expanded", "false");
+
+    // Make focusable
+    if (!this.hasAttribute("tabindex")) {
+      this.setAttribute("tabindex", "0");
+    }
+
+    this.addEventListener("click", this._handleClick);
+    this.addEventListener("keydown", this._handleKeydown);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener("click", this.clickHandler);
-    this.removeEventListener("keydown", this.keyDownHandler);
+    this.removeEventListener("click", this._handleClick);
+    this.removeEventListener("keydown", this._handleKeydown);
   }
 
-  protected render() {
-    return html`<slot></slot>`;
+  private _getContent(): HTMLElement | null {
+    const dropdownId = this.getAttribute("data-dropdown-id");
+    if (!dropdownId) return null;
+    return document.getElementById(`${dropdownId}-content`);
   }
 
-  private clickHandler = () => {
-    this.openDropdownEvent();
-    // maybe toggle
-  };
-
-  private keyDownHandler = (event: KeyboardEvent) => {
-    // toggle for SPACE and ENTER key
-    if (event.key === " " || event.key === "Enter") {
-      event.preventDefault(); // Prevent page scroll on spacebar
-      this.openDropdownEvent();
+  private _handleClick = () => {
+    const content = this._getContent();
+    if (content && "togglePopover" in content) {
+      content.togglePopover();
     }
   };
 
-  private openDropdownEvent() {
-    this.dispatchEvent(
-      DROPDOWN_EVENTS_RECORD.OPEN({
-        dropdownDataId: this.getAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY),
-      })
-    );
-    this.setAttribute("aria-expanded", "true");
-    this.setAttribute("data-state", "open");
+  private _handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === " " || event.key === "Enter" || event.key === "ArrowDown") {
+      event.preventDefault();
+      const content = this._getContent();
+      if (content && "showPopover" in content) {
+        content.showPopover();
+      }
+    }
+  };
+
+  protected render() {
+    return html`<slot></slot>`;
   }
 }
 
