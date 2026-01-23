@@ -25,12 +25,36 @@ export const comboboxRootContext = createContext<ComboboxContextValue>("combobox
  */
 @customElement("combobox-root")
 export class ComboboxRoot extends LitElement {
+  static formAssociated = true;
+
+  private _internals: ElementInternals;
+
+  // Form integration
+  @property({ type: String })
+  name?: string;
+
   // Controlled mode
   @property({ type: String, attribute: false })
   value?: string | string[];
 
   // Uncontrolled mode
-  @property({ attribute: "default-value" })
+  @property({
+    attribute: "default-value",
+    converter: {
+      fromAttribute: (value: string | null) => {
+        if (!value) return undefined;
+        // Try to parse as JSON array
+        if (value.startsWith("[")) {
+          try {
+            return JSON.parse(value);
+          } catch {
+            return value;
+          }
+        }
+        return value;
+      },
+    },
+  })
   defaultValue?: string | string[];
 
   @property({ type: Boolean })
@@ -100,6 +124,11 @@ export class ComboboxRoot extends LitElement {
   @property({ attribute: false })
   context: ComboboxContextValue = this._createContext();
 
+  constructor() {
+    super();
+    this._internals = this.attachInternals();
+  }
+
   connectedCallback() {
     super.connectedCallback();
 
@@ -109,6 +138,7 @@ export class ComboboxRoot extends LitElement {
         ? [...this.defaultValue]
         : this.defaultValue;
       this._hasInitialized = true;
+      this._updateFormValue();
     }
 
     // Initialize with default open state
@@ -133,6 +163,7 @@ export class ComboboxRoot extends LitElement {
         ? [...this.defaultValue]
         : this.defaultValue;
       this._hasInitialized = true;
+      this._updateFormValue();
     }
 
     // Handle late initialization of defaultOpen
@@ -159,12 +190,14 @@ export class ComboboxRoot extends LitElement {
       if (firstItem && !firstItem.disabled) {
         this._value = firstValue;
         this._hasInitialized = true;
+        this._updateFormValue();
       }
     }
 
     // Handle controlled value
     if (changed.has("value") && this.value !== undefined) {
       this._value = Array.isArray(this.value) ? [...this.value] : this.value;
+      this._updateFormValue();
     }
 
     // Handle controlled open
@@ -291,10 +324,12 @@ export class ComboboxRoot extends LitElement {
       const currentValue = Array.isArray(this._value) ? this._value : [];
       if (!currentValue.includes(value)) {
         this._value = [...currentValue, value];
+        this._updateFormValue();
         this._dispatchValueChange();
       }
     } else {
       this._value = value;
+      this._updateFormValue();
       this._dispatchValueChange();
 
       // Close after single selection
@@ -313,6 +348,7 @@ export class ComboboxRoot extends LitElement {
 
     if (this.multiple && Array.isArray(this._value)) {
       this._value = this._value.filter((v) => v !== value);
+      this._updateFormValue();
       this._dispatchValueChange();
     }
   }
@@ -412,6 +448,65 @@ export class ComboboxRoot extends LitElement {
         composed: true,
       })
     );
+  }
+
+  // Form integration
+  private _updateFormValue() {
+    if (!this.name) {
+      // No name means not participating in form
+      return;
+    }
+
+    if (this._value === undefined || this._value === null) {
+      this._internals.setFormValue(null);
+      return;
+    }
+
+    if (Array.isArray(this._value)) {
+      if (this._value.length === 0) {
+        this._internals.setFormValue(null);
+        return;
+      }
+      // Multiple values: create FormData with multiple entries
+      const formData = new FormData();
+      this._value.forEach((v) => formData.append(this.name!, v));
+      this._internals.setFormValue(formData);
+    } else {
+      // Single value: just pass the string
+      this._internals.setFormValue(this._value);
+    }
+  }
+
+  // Form lifecycle callbacks
+  formResetCallback() {
+    // Reset to defaultValue or undefined
+    if (this.defaultValue !== undefined) {
+      this._value = Array.isArray(this.defaultValue)
+        ? [...this.defaultValue]
+        : this.defaultValue;
+    } else {
+      this._value = undefined;
+    }
+    this._updateFormValue();
+    this._dispatchValueChange();
+  }
+
+  formDisabledCallback(disabled: boolean) {
+    this.disabled = disabled;
+  }
+
+  formStateRestoreCallback(state: string | File | FormData | null, _mode: "restore" | "autocomplete") {
+    if (state instanceof FormData) {
+      // Multiple values from FormData
+      const values = state.getAll(this.name!);
+      this._value = values.map(String);
+    } else if (typeof state === "string") {
+      // Single value
+      this._value = state;
+    } else {
+      this._value = undefined;
+    }
+    this._updateFormValue();
   }
 }
 

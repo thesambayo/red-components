@@ -690,6 +690,203 @@ export const WithAnchor: Story = {
   `,
 };
 
+export const FormIntegration: Story = {
+  render: () => {
+    const handleSubmit = (e: Event) => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+
+      // Log all form data
+      console.log("=== Form Submitted ===");
+      const data: Record<string, any> = {};
+
+      // Get all entries (handles multiple values correctly)
+      for (const [key, value] of formData.entries()) {
+        if (data[key]) {
+          // Convert to array if multiple values exist
+          data[key] = Array.isArray(data[key])
+            ? [...data[key], value]
+            : [data[key], value];
+        } else {
+          data[key] = value;
+        }
+      }
+
+      console.log("Form data:", data);
+      console.log("FormData entries:", Array.from(formData.entries()));
+
+      // Show alert with the data
+      alert(
+        `Form submitted!\n\n${JSON.stringify(
+          data,
+          null,
+          2
+        )}\n\nCheck console for full details.`
+      );
+    };
+
+    const handleReset = () => {
+      console.log("Form reset");
+    };
+
+    return html`
+      ${styles}
+      <style>
+        .form-demo {
+          padding: 100px;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        .form-demo h3 {
+          margin-top: 0;
+          margin-bottom: 8px;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .form-demo p {
+          margin-top: 0;
+          margin-bottom: 24px;
+          font-size: 14px;
+          color: #64748b;
+        }
+
+        .form-field {
+          margin-bottom: 20px;
+        }
+
+        .form-field label {
+          display: block;
+          margin-bottom: 8px;
+          font-size: 14px;
+          font-weight: 500;
+          color: #1e293b;
+        }
+
+        .form-actions {
+          display: flex;
+          gap: 12px;
+          margin-top: 32px;
+        }
+
+        .form-actions button {
+          padding: 10px 20px;
+          font-size: 14px;
+          font-weight: 500;
+          border-radius: 6px;
+          cursor: pointer;
+          border: none;
+          outline: none;
+        }
+
+        .form-actions button[type="submit"] {
+          background: #3b82f6;
+          color: white;
+        }
+
+        .form-actions button[type="submit"]:hover {
+          background: #2563eb;
+        }
+
+        .form-actions button[type="reset"] {
+          background: #e2e8f0;
+          color: #475569;
+        }
+
+        .form-actions button[type="reset"]:hover {
+          background: #cbd5e1;
+        }
+
+        .form-demo combobox-root {
+          display: block;
+        }
+      </style>
+      <div class="form-demo">
+        <h3>Form Integration</h3>
+        <p>
+          Combobox participates in forms using ElementInternals API. Single
+          values submit as strings, multiple values submit like native
+          &lt;select multiple&gt;.
+        </p>
+
+        <form @submit=${handleSubmit} @reset=${handleReset}>
+          <div class="form-field">
+            <label for="favorite-fruit">Favorite Fruit (single)</label>
+            <combobox-root name="favorite_fruit" default-value="apple">
+              <combobox-input
+                id="favorite-fruit"
+                placeholder="Search fruits..."
+              ></combobox-input>
+              <combobox-content>
+                ${fruits
+                  .slice(0, 10)
+                  .map(
+                    (fruit) => html`
+                      <combobox-item value=${fruit.toLowerCase()}>
+                        ${fruit}
+                      </combobox-item>
+                    `
+                  )}
+                <combobox-empty>No fruits found</combobox-empty>
+              </combobox-content>
+            </combobox-root>
+          </div>
+
+          <div class="form-field">
+            <label for="selected-fruits">Selected Fruits (multiple)</label>
+            <combobox-root
+              name="selected_fruits"
+              default-value='["banana", "mango"]'
+              multiple
+            >
+              <combobox-input
+                id="selected-fruits"
+                placeholder="Search and select multiple..."
+              ></combobox-input>
+              <combobox-content>
+                ${fruits
+                  .slice(0, 10)
+                  .map(
+                    (fruit) => html`
+                      <combobox-item value=${fruit.toLowerCase()}>
+                        ${fruit}
+                      </combobox-item>
+                    `
+                  )}
+                <combobox-empty>No fruits found</combobox-empty>
+              </combobox-content>
+            </combobox-root>
+          </div>
+
+          <div class="form-field">
+            <label for="country">Country</label>
+            <combobox-root name="country" default-value="us">
+              <combobox-input
+                id="country"
+                placeholder="Select country..."
+              ></combobox-input>
+              <combobox-content>
+                <combobox-item value="us">United States</combobox-item>
+                <combobox-item value="uk">United Kingdom</combobox-item>
+                <combobox-item value="ca">Canada</combobox-item>
+                <combobox-item value="au">Australia</combobox-item>
+                <combobox-item value="de">Germany</combobox-item>
+                <combobox-item value="fr">France</combobox-item>
+                <combobox-empty>No countries found</combobox-empty>
+              </combobox-content>
+            </combobox-root>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit">Submit Form</button>
+            <button type="reset">Reset Form</button>
+          </div>
+        </form>
+      </div>
+    `;
+  },
+};
+
 export const LargeList: Story = {
   render: () => {
     const countries = [

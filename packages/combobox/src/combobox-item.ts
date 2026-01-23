@@ -83,6 +83,14 @@ export class ComboboxItem extends LitElement {
     }
   }
 
+  protected updated() {
+    // Always update selection, visibility, and highlight state after render
+    // This ensures we catch any changes to context properties
+    this._updateSelectionState();
+    this._updateVisibility();
+    this._updateHighlightState();
+  }
+
   private _updateDisabledState() {
     if (this.disabled) {
       this.setAttribute("data-disabled", "");
