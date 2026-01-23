@@ -6,7 +6,7 @@ const config: StorybookConfig = {
   addons: [
     "@storybook/addon-links",
     "@chromatic-com/storybook",
-    "@storybook/addon-docs"
+    "@storybook/addon-docs",
   ],
   framework: {
     name: "@storybook/web-components-vite",
@@ -30,6 +30,9 @@ const config: StorybookConfig = {
         ),
         "import.meta.env.VITE_AVATAR_URL": JSON.stringify(
           getPackageImportURL("AVATAR", configType)
+        ),
+        "import.meta.env.VITE_COMBOBOX_URL": JSON.stringify(
+          getPackageImportURL("COMBOBOX", configType)
         ),
         "import.meta.env.VITE_DIALOG_URL": JSON.stringify(
           getPackageImportURL("DIALOG", configType)

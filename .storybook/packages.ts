@@ -11,6 +11,10 @@ const PACKAGES = {
     dev: "./avatar",
     prod: "https://unpkg.com/@red-elements/avatar@0.0.3/dist/avatar.mjs",
   },
+  COMBOBOX: {
+    dev: "./combobox",
+    prod: "https://unpkg.com/@red-elements/combobox@0.0.1/dist/combobox.mjs",
+  },
   DIALOG: {
     dev: "./dialog",
     prod: "https://unpkg.com/@red-elements/dialog@0.0.1/dist/dialog.mjs",
