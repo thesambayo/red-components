@@ -2,29 +2,27 @@ import { provide } from "@lit/context";
 import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
-  ComboboxContextValue,
-  ComboboxItemData,
-  COMBOBOX_EVENTS,
+  SelectContextValue,
+  SelectItemData,
+  SELECT_EVENTS,
   generateId,
-} from "./combobox-context";
-import { createContext } from "@lit/context";
-
-export const comboboxRootContext = createContext<ComboboxContextValue>("combobox-root");
+  selectRootContext,
+} from "./select-context";
 
 /**
- * Root container for combobox component.
- * Manages state, filtering, and provides context to children.
+ * Root container for select component.
+ * Manages state, provides context to children, and integrates with forms.
  *
- * @element combobox-root
- * @slot - Contains combobox-input and combobox-content
+ * @element select-root
+ * @slot - Contains select-trigger and select-content
  *
- * @fires combobox:value-change - When selected value changes
- * @fires combobox:search-change - When search term changes
- * @fires combobox:open - When combobox opens
- * @fires combobox:close - When combobox closes
+ * @fires select:value-change - When selected value changes
+ * @fires select:open-change - When open state changes
+ * @fires select:open - When select opens
+ * @fires select:close - When select closes
  */
-@customElement("combobox-root")
-export class ComboboxRoot extends LitElement {
+@customElement("select-root")
+export class SelectRoot extends LitElement {
   static formAssociated = true;
 
   private _internals: ElementInternals;
@@ -36,6 +34,9 @@ export class ComboboxRoot extends LitElement {
   // Controlled mode
   @property({ type: String, attribute: false })
   value?: string | string[];
+
+  @property({ type: Boolean, attribute: false })
+  open?: boolean;
 
   // Uncontrolled mode
   @property({
@@ -57,9 +58,6 @@ export class ComboboxRoot extends LitElement {
   })
   defaultValue?: string | string[];
 
-  @property({ type: Boolean })
-  open?: boolean;
-
   @property({ type: Boolean, attribute: "default-open" })
   defaultOpen = false;
 
@@ -70,59 +68,40 @@ export class ComboboxRoot extends LitElement {
   @property({ type: Boolean })
   disabled = false;
 
-  @property({ attribute: "filter-mode" })
-  filterMode: "client" | "manual" = "client";
-
-  // Behavior
-  @property({ type: Boolean, attribute: "reset-search-on-blur" })
-  resetSearchTermOnBlur = true;
-
-  @property({ type: Boolean, attribute: "reset-search-on-select" })
-  resetSearchTermOnSelect = true;
-
-  @property({ type: Boolean, attribute: "open-on-focus" })
-  openOnFocus = false;
-
-  @property({ type: Boolean, attribute: "open-on-click" })
-  openOnClick = true;
+  @property({ type: Boolean })
+  required = false;
 
   // Internal state
   @state()
   private _value?: string | string[];
 
   @state()
-  private _searchTerm = "";
-
-  @state()
   private _isOpen = false;
-
-  @state()
-  private _filteredItems = new Set<string>();
 
   @state()
   private _highlightedValue?: string;
 
   @state()
-  private _items = new Map<string, ComboboxItemData>();
+  private _items = new Map<string, SelectItemData>();
 
   // IDs for accessibility
-  private _inputId = generateId("combobox-input");
-  private _contentId = generateId("combobox-content");
+  private _triggerId = generateId("select-trigger");
+  private _contentId = generateId("select-content");
+  private _valueId = generateId("select-value");
 
   // References
-  private _inputElement: HTMLInputElement | null = null;
-  private _contentElement: HTMLElement | null = null;
-  private _anchorElement: HTMLElement | null = null;
   private _triggerElement: HTMLElement | null = null;
+  private _contentElement: HTMLElement | null = null;
+  private _valueElement: HTMLElement | null = null;
 
   // Initialization tracking
   private _hasInitialized = false;
   private _hasInitializedOpen = false;
 
   // Context provided to children
-  @provide({ context: comboboxRootContext })
+  @provide({ context: selectRootContext })
   @property({ attribute: false })
-  context: ComboboxContextValue = this._createContext();
+  context: SelectContextValue = this._createContext();
 
   constructor() {
     super();
@@ -152,7 +131,7 @@ export class ComboboxRoot extends LitElement {
   }
 
   protected willUpdate(changed: Map<string, unknown>) {
-    // Handle late initialization of defaultValue (React)
+    // Handle late initialization of defaultValue
     if (
       changed.has("defaultValue") &&
       !this._hasInitialized &&
@@ -170,28 +149,10 @@ export class ComboboxRoot extends LitElement {
     if (
       changed.has("defaultOpen") &&
       !this._hasInitializedOpen &&
-      this.defaultOpen !== undefined &&
-      this._isOpen === undefined
+      this.defaultOpen !== undefined
     ) {
       this._isOpen = this.defaultOpen;
       this._hasInitializedOpen = true;
-    }
-
-    // Auto-select first item if no value set (optional behavior)
-    if (
-      this._value === undefined &&
-      !this._hasInitialized &&
-      this._items.size === 1 &&
-      !this.multiple
-    ) {
-      const [firstValue] = this._items.keys();
-      const firstItem = this._items.get(firstValue);
-      // Only auto-select if not disabled
-      if (firstItem && !firstItem.disabled) {
-        this._value = firstValue;
-        this._hasInitialized = true;
-        this._updateFormValue();
-      }
     }
 
     // Handle controlled value
@@ -205,26 +166,14 @@ export class ComboboxRoot extends LitElement {
       this._isOpen = this.open;
     }
 
-    // Update filtered items when items or search term changes
-    if (
-      changed.has("_items") ||
-      changed.has("_searchTerm") ||
-      changed.has("filterMode")
-    ) {
-      this._filterItems();
-    }
-
     // Update context when state changes
     if (
       changed.has("_value") ||
-      changed.has("_searchTerm") ||
       changed.has("_isOpen") ||
-      changed.has("_filteredItems") ||
       changed.has("_highlightedValue") ||
       changed.has("_items") ||
       changed.has("multiple") ||
-      changed.has("disabled") ||
-      changed.has("filterMode")
+      changed.has("disabled")
     ) {
       this._updateContext();
     }
@@ -234,37 +183,32 @@ export class ComboboxRoot extends LitElement {
     return html`<slot></slot>`;
   }
 
-  private _createContext(): ComboboxContextValue {
+  private _createContext(): SelectContextValue {
     return {
       // State
       selectedValue: this._value,
-      searchTerm: this._searchTerm,
       isOpen: this._isOpen,
-      filteredItems: this._filteredItems,
-      highlightedValue: this._highlightedValue,
-
-      // Configuration
       multiple: this.multiple,
       disabled: this.disabled,
-      filterMode: this.filterMode,
+      highlightedValue: this._highlightedValue,
 
       // IDs for accessibility
-      inputId: this._inputId,
+      triggerId: this._triggerId,
       contentId: this._contentId,
+      valueId: this._valueId,
 
       // References
-      inputElement: this._inputElement,
-      contentElement: this._contentElement,
-      anchorElement: this._anchorElement,
       triggerElement: this._triggerElement,
+      contentElement: this._contentElement,
+      valueElement: this._valueElement,
 
       // Item management
       items: this._items,
 
       // Methods
-      onInputChange: this._handleInputChange.bind(this),
       onSelect: this._handleSelect.bind(this),
       onDeselect: this._handleDeselect.bind(this),
+      onToggle: this._handleToggle.bind(this),
       onOpen: this._handleOpen.bind(this),
       onClose: this._handleClose.bind(this),
       registerItem: this._registerItem.bind(this),
@@ -275,46 +219,6 @@ export class ComboboxRoot extends LitElement {
 
   private _updateContext() {
     this.context = this._createContext();
-  }
-
-  private _filterItems() {
-    if (this.filterMode === "manual") {
-      this._filteredItems = new Set(this._items.keys());
-      return;
-    }
-
-    if (!this._searchTerm) {
-      this._filteredItems = new Set(this._items.keys());
-      return;
-    }
-
-    // Locale-aware, case-insensitive search
-    const searchLower = this._searchTerm.toLowerCase();
-    const filtered = new Set<string>();
-
-    for (const [value, data] of this._items.entries()) {
-      const text = data.textContent.toLowerCase();
-      if (text.includes(searchLower)) {
-        filtered.add(value);
-      }
-    }
-
-    this._filteredItems = filtered;
-
-    // If highlighted item is no longer in filtered results, highlight first non-disabled item
-    if (this._highlightedValue && !filtered.has(this._highlightedValue)) {
-      const firstValue = this._getFirstEnabledItem(Array.from(filtered));
-      this._highlightedValue = firstValue;
-    }
-  }
-
-  private _getFirstEnabledItem(values: string[]): string | undefined {
-    return values.find((value) => !this._items.get(value)?.disabled);
-  }
-
-  private _handleInputChange(value: string) {
-    this._searchTerm = value;
-    this._dispatchSearchChange();
   }
 
   private _handleSelect(value: string) {
@@ -335,12 +239,6 @@ export class ComboboxRoot extends LitElement {
       // Close after single selection
       this._handleClose();
     }
-
-    // Reset search term if configured
-    if (this.resetSearchTermOnSelect) {
-      this._searchTerm = "";
-      this._filterItems();
-    }
   }
 
   private _handleDeselect(value: string) {
@@ -353,30 +251,31 @@ export class ComboboxRoot extends LitElement {
     }
   }
 
+  private _handleToggle() {
+    if (this._isOpen) {
+      this._handleClose();
+    } else {
+      this._handleOpen();
+    }
+  }
+
   private _handleOpen() {
     if (this.disabled) return;
     this._isOpen = true;
     this._dispatchOpen();
+    this._dispatchOpenChange();
   }
 
   private _handleClose() {
     this._isOpen = false;
-
-    // Reset search term if configured
-    if (this.resetSearchTermOnBlur) {
-      this._searchTerm = "";
-      this._filterItems();
-    }
-
-    // Clear highlighted value when closing
     this._highlightedValue = undefined;
-
     this._dispatchClose();
+    this._dispatchOpenChange();
 
-    // Return focus to input when closing
-    if (this._inputElement) {
+    // Return focus to trigger when closing
+    if (this._triggerElement) {
       requestAnimationFrame(() => {
-        this._inputElement?.focus();
+        this._triggerElement?.focus();
       });
     }
   }
@@ -385,81 +284,35 @@ export class ComboboxRoot extends LitElement {
     this._highlightedValue = value;
   }
 
-  private _registerItem(value: string, data: ComboboxItemData) {
+  private _registerItem(value: string, data: SelectItemData) {
     this._items = new Map(this._items).set(value, data);
-    this._filterItems(); // Re-filter when items change
   }
 
   private _unregisterItem(value: string) {
     const newItems = new Map(this._items);
     newItems.delete(value);
     this._items = newItems;
-    this._filterItems();
   }
 
   // Public API for setting references
   // Note: We don't call _updateContext() here because these are just
   // references used internally for positioning/focus management.
   // Updating context would trigger re-renders in all consumers unnecessarily.
-  setInputElement(element: HTMLInputElement | null) {
-    this._inputElement = element;
+  setTriggerElement(element: HTMLElement | null) {
+    this._triggerElement = element;
   }
 
   setContentElement(element: HTMLElement | null) {
     this._contentElement = element;
   }
 
-  setAnchorElement(element: HTMLElement | null) {
-    this._anchorElement = element;
-  }
-
-  setTriggerElement(element: HTMLElement | null) {
-    this._triggerElement = element;
-  }
-
-  // Event dispatchers
-  private _dispatchValueChange() {
-    this.dispatchEvent(
-      new CustomEvent(COMBOBOX_EVENTS.VALUE_CHANGE, {
-        bubbles: true,
-        composed: true,
-        detail: { value: this._value },
-      })
-    );
-  }
-
-  private _dispatchSearchChange() {
-    this.dispatchEvent(
-      new CustomEvent(COMBOBOX_EVENTS.SEARCH_CHANGE, {
-        bubbles: true,
-        composed: true,
-        detail: { searchTerm: this._searchTerm },
-      })
-    );
-  }
-
-  private _dispatchOpen() {
-    this.dispatchEvent(
-      new CustomEvent(COMBOBOX_EVENTS.OPEN, {
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private _dispatchClose() {
-    this.dispatchEvent(
-      new CustomEvent(COMBOBOX_EVENTS.CLOSE, {
-        bubbles: true,
-        composed: true,
-      })
-    );
+  setValueElement(element: HTMLElement | null) {
+    this._valueElement = element;
   }
 
   // Form integration
   private _updateFormValue() {
     if (!this.name) {
-      // No name means not participating in form
       return;
     }
 
@@ -473,19 +326,15 @@ export class ComboboxRoot extends LitElement {
         this._internals.setFormValue(null);
         return;
       }
-      // Multiple values: create FormData with multiple entries
       const formData = new FormData();
       this._value.forEach((v) => formData.append(this.name!, v));
       this._internals.setFormValue(formData);
     } else {
-      // Single value: just pass the string
       this._internals.setFormValue(this._value);
     }
   }
 
-  // Form lifecycle callbacks
   formResetCallback() {
-    // Reset to defaultValue or undefined
     if (this.defaultValue !== undefined) {
       this._value = Array.isArray(this.defaultValue)
         ? [...this.defaultValue]
@@ -501,23 +350,63 @@ export class ComboboxRoot extends LitElement {
     this.disabled = disabled;
   }
 
-  formStateRestoreCallback(state: string | File | FormData | null, _mode: "restore" | "autocomplete") {
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: "restore" | "autocomplete"
+  ) {
     if (state instanceof FormData) {
-      // Multiple values from FormData
       const values = state.getAll(this.name!);
       this._value = values.map(String);
     } else if (typeof state === "string") {
-      // Single value
       this._value = state;
     } else {
       this._value = undefined;
     }
     this._updateFormValue();
   }
+
+  // Event dispatchers
+  private _dispatchValueChange() {
+    this.dispatchEvent(
+      new CustomEvent(SELECT_EVENTS.VALUE_CHANGE, {
+        bubbles: true,
+        composed: true,
+        detail: { value: this._value },
+      })
+    );
+  }
+
+  private _dispatchOpenChange() {
+    this.dispatchEvent(
+      new CustomEvent(SELECT_EVENTS.OPEN_CHANGE, {
+        bubbles: true,
+        composed: true,
+        detail: { open: this._isOpen },
+      })
+    );
+  }
+
+  private _dispatchOpen() {
+    this.dispatchEvent(
+      new CustomEvent(SELECT_EVENTS.OPEN, {
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private _dispatchClose() {
+    this.dispatchEvent(
+      new CustomEvent(SELECT_EVENTS.CLOSE, {
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "combobox-root": ComboboxRoot;
+    "select-root": SelectRoot;
   }
 }

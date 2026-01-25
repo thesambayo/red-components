@@ -112,45 +112,45 @@ export class DropdownContent extends LitElement {
 
     const placement = this._getPlacement();
 
-    const { x, y, placement: finalPlacement } = await computePosition(
-      trigger,
-      this,
-      {
-        strategy: "fixed",
-        placement,
-        middleware: [
-          offset({
-            mainAxis: this.sideOffset,
-            crossAxis: this.alignOffset,
-          }),
-          flip({
-            fallbackAxisSideDirection: "start",
-          }),
-          shift({ padding: 8 }),
-          size({
-            padding: 8,
-            apply: ({ availableWidth, availableHeight, rects }) => {
-              this.style.setProperty(
-                "--dropdown-trigger-width",
-                `${rects.reference.width}px`
-              );
-              this.style.setProperty(
-                "--dropdown-trigger-height",
-                `${rects.reference.height}px`
-              );
-              this.style.setProperty(
-                "--dropdown-available-width",
-                `${availableWidth}px`
-              );
-              this.style.setProperty(
-                "--dropdown-available-height",
-                `${availableHeight}px`
-              );
-            },
-          }),
-        ],
-      }
-    );
+    const {
+      x,
+      y,
+      placement: finalPlacement,
+    } = await computePosition(trigger, this, {
+      strategy: "fixed",
+      placement,
+      middleware: [
+        offset({
+          mainAxis: this.sideOffset,
+          crossAxis: this.alignOffset,
+        }),
+        flip({
+          fallbackAxisSideDirection: "start",
+        }),
+        shift({ padding: 8 }),
+        size({
+          padding: 8,
+          apply: ({ availableWidth, availableHeight, rects }) => {
+            this.style.setProperty(
+              "--dropdown-trigger-width",
+              `${rects.reference.width}px`
+            );
+            this.style.setProperty(
+              "--dropdown-trigger-height",
+              `${rects.reference.height}px`
+            );
+            this.style.setProperty(
+              "--dropdown-available-width",
+              `${availableWidth}px`
+            );
+            this.style.setProperty(
+              "--dropdown-available-height",
+              `${availableHeight}px`
+            );
+          },
+        }),
+      ],
+    });
 
     this.style.left = `${x}px`;
     this.style.top = `${y}px`;

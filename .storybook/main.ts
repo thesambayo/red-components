@@ -43,6 +43,9 @@ const config: StorybookConfig = {
         "import.meta.env.VITE_TABS_URL": JSON.stringify(
           getPackageImportURL("TABS", configType)
         ),
+        "import.meta.env.VITE_SELECT_URL": JSON.stringify(
+          getPackageImportURL("SELECT", configType)
+        ),
         "import.meta.env.VITE_TOAST_URL": JSON.stringify(
           getPackageImportURL("TOAST", configType)
         ),

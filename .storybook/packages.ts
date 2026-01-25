@@ -23,6 +23,10 @@ const PACKAGES = {
     dev: "./dropdown",
     prod: "https://unpkg.com/@red-elements/dropdown@0.0.3/dist/dropdown.mjs",
   },
+  SELECT: {
+    dev: "./select",
+    prod: "https://unpkg.com/@red-elements/select@0.0.4/dist/select.mjs",
+  },
   TABS: {
     dev: "./tabs",
     prod: "https://unpkg.com/@red-elements/tabs@0.0.4/dist/tabs.mjs",
