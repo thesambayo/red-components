@@ -1,0 +1,60 @@
+---
+import { Code } from 'astro:components';
+
+interface Props {
+  code: string;
+  lang?: string;
+  title?: string;
+  showLineNumbers?: boolean;
+}
+
+const { code, lang = 'typescript', title, showLineNumbers = false } = Astro.props;
+---
+
+<div class="relative group rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] overflow-hidden my-4">
+  {title && (
+    <div class="flex items-center justify-between px-4 py-2 border-b border-[color:light-dark(var(--color-border),var(--color-border-dark))] bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
+      <span class="text-sm font-medium text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))]">
+        {title}
+      </span>
+    </div>
+  )}
+  <div class="relative">
+    <button
+      class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center justify-center rounded-md text-sm font-medium h-8 px-3 bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] border border-[color:light-dark(var(--color-border),var(--color-border-dark))] cursor-pointer"
+      data-code={code}
+      onclick="
+        const btn = this;
+        const code = btn.getAttribute('data-code');
+        navigator.clipboard.writeText(code);
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = originalText, 2000);
+      "
+    >
+      Copy
+    </button>
+    <div class="overflow-x-auto">
+      <Code
+        code={code.trim()}
+        lang={lang}
+        theme="github-dark"
+        class="text-sm"
+      />
+    </div>
+  </div>
+</div>
+
+<style>
+  div :global(pre) {
+    margin: 0 !important;
+    padding: 1rem !important;
+    background-color: transparent !important;
+  }
+
+  div :global(code) {
+    background-color: transparent !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+  }
+</style>

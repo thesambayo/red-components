@@ -1,0 +1,772 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../components/CodeBlock.astro';
+---
+
+<DocsLayout
+  title="Combobox - Red Elements"
+  description="An accessible combobox component with search and filtering capabilities."
+>
+  <div class="space-y-6">
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-bold tracking-tight">Combobox</h1>
+      <p class="text-lg text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mt-2">
+        An accessible combobox component with search and filtering capabilities.
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+        Demo
+      </h2>
+      <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6">
+        <combobox-root class="w-full max-w-sm">
+          <combobox-input
+            placeholder="Search fruits..."
+            class="w-full px-3 py-2 text-sm border border-[color:light-dark(var(--color-border),var(--color-border-dark))] rounded-md outline-none focus:border-[color:light-dark(var(--color-primary),var(--color-primary-dark))] focus:ring-2 focus:ring-[color:light-dark(#3b82f6,#3b82f6)]/10"
+          ></combobox-input>
+          <combobox-content class="min-w-[200px] max-h-[300px] bg-[color:light-dark(var(--color-background),var(--color-background-dark))] border border-[color:light-dark(var(--color-border),var(--color-border-dark))] rounded-lg shadow-lg p-1 overflow-y-auto">
+            <combobox-item value="apple" class="block px-3 py-2 text-sm rounded cursor-pointer hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[highlighted]:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[selected]:bg-[color:light-dark(#dbeafe,#1e3a8a)] data-[selected]:text-[color:light-dark(#1e40af,#93c5fd)] outline-none">Apple</combobox-item>
+            <combobox-item value="banana" class="block px-3 py-2 text-sm rounded cursor-pointer hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[highlighted]:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[selected]:bg-[color:light-dark(#dbeafe,#1e3a8a)] data-[selected]:text-[color:light-dark(#1e40af,#93c5fd)] outline-none">Banana</combobox-item>
+            <combobox-item value="cherry" class="block px-3 py-2 text-sm rounded cursor-pointer hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[highlighted]:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[selected]:bg-[color:light-dark(#dbeafe,#1e3a8a)] data-[selected]:text-[color:light-dark(#1e40af,#93c5fd)] outline-none">Cherry</combobox-item>
+            <combobox-item value="grape" class="block px-3 py-2 text-sm rounded cursor-pointer hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[highlighted]:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[selected]:bg-[color:light-dark(#dbeafe,#1e3a8a)] data-[selected]:text-[color:light-dark(#1e40af,#93c5fd)] outline-none">Grape</combobox-item>
+            <combobox-item value="orange" class="block px-3 py-2 text-sm rounded cursor-pointer hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[highlighted]:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] data-[selected]:bg-[color:light-dark(#dbeafe,#1e3a8a)] data-[selected]:text-[color:light-dark(#1e40af,#93c5fd)] outline-none">Orange</combobox-item>
+            <combobox-empty class="block px-3 py-4 text-sm text-center text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">No fruits found</combobox-empty>
+          </combobox-content>
+        </combobox-root>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+        Installation
+      </h2>
+      <tabs-root default-value="npm" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            npm
+          </tab-trigger>
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            pnpm
+          </tab-trigger>
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            yarn
+          </tab-trigger>
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            bun
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="npm" class="mt-4">
+          <CodeBlock
+            code="npm install @red-elements/combobox"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="pnpm" class="mt-4">
+          <CodeBlock
+            code="pnpm add @red-elements/combobox"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="yarn" class="mt-4">
+          <CodeBlock
+            code="yarn add @red-elements/combobox"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="bun" class="mt-4">
+          <CodeBlock
+            code="bun add @red-elements/combobox"
+            lang="bash"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+        Usage
+      </h2>
+
+      <tabs-root default-value="html" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            HTML/JS
+          </tab-trigger>
+          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            React
+          </tab-trigger>
+          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Vue
+          </tab-trigger>
+          <tab-trigger value="svelte" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Svelte
+          </tab-trigger>
+          <tab-trigger value="angular" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Angular
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="html" class="mt-4">
+          <CodeBlock
+            code={`import '@red-elements/combobox';
+
+// Add to your HTML
+document.body.innerHTML = \`
+  <combobox-root>
+    <combobox-anchor>
+      <combobox-trigger>
+        <combobox-input placeholder="Search..." />
+      </combobox-trigger>
+    </combobox-anchor>
+    <combobox-content>
+      <combobox-item value="apple">Apple</combobox-item>
+      <combobox-item value="banana">Banana</combobox-item>
+      <combobox-item value="orange">Orange</combobox-item>
+      <combobox-empty>No results found</combobox-empty>
+    </combobox-content>
+  </combobox-root>
+\`;
+
+// Listen to events
+const combobox = document.querySelector('combobox-root');
+combobox.addEventListener('value-change', (e) => {
+  console.log('Selected:', e.detail.value);
+});`}
+            lang="javascript"
+          />
+        </tab-content>
+
+        <tab-content value="react" class="mt-4">
+          <CodeBlock
+            code={`import {
+  ComboboxRoot,
+  ComboboxAnchor,
+  ComboboxTrigger,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxItem,
+  ComboboxEmpty
+} from '@red-elements/combobox';
+
+export function FruitCombobox() {
+  const [value, setValue] = React.useState('');
+
+  return (
+    <ComboboxRoot onValueChange={(e) => setValue(e.detail.value)}>
+      <ComboboxAnchor>
+        <ComboboxTrigger>
+          <ComboboxInput placeholder="Search fruits..." />
+        </ComboboxTrigger>
+      </ComboboxAnchor>
+      <ComboboxContent>
+        <ComboboxItem value="apple">Apple</ComboboxItem>
+        <ComboboxItem value="banana">Banana</ComboboxItem>
+        <ComboboxItem value="orange">Orange</ComboboxItem>
+        <ComboboxEmpty>No results found</ComboboxEmpty>
+      </ComboboxContent>
+    </ComboboxRoot>
+  );
+}`}
+            lang="tsx"
+          />
+        </tab-content>
+
+        <tab-content value="vue" class="mt-4">
+          <CodeBlock
+            code={`<script setup>
+import '@red-elements/combobox';
+import { ref } from 'vue';
+
+const value = ref('');
+
+const handleValueChange = (e) => {
+  value.value = e.detail.value;
+};
+</script>
+
+<template>
+  <combobox-root @value-change="handleValueChange">
+    <combobox-anchor>
+      <combobox-trigger>
+        <combobox-input placeholder="Search fruits..." />
+      </combobox-trigger>
+    </combobox-anchor>
+    <combobox-content>
+      <combobox-item value="apple">Apple</combobox-item>
+      <combobox-item value="banana">Banana</combobox-item>
+      <combobox-item value="orange">Orange</combobox-item>
+      <combobox-empty>No results found</combobox-empty>
+    </combobox-content>
+  </combobox-root>
+</template>`}
+            lang="vue"
+          />
+        </tab-content>
+
+        <tab-content value="svelte" class="mt-4">
+          <CodeBlock
+            code={`<script>
+  import '@red-elements/combobox';
+  let value = '';
+
+  function handleValueChange(e) {
+    value = e.detail.value;
+  }
+</script>
+
+<combobox-root on:value-change={handleValueChange}>
+  <combobox-anchor>
+    <combobox-trigger>
+      <combobox-input placeholder="Search fruits..." />
+    </combobox-trigger>
+  </combobox-anchor>
+  <combobox-content>
+    <combobox-item value="apple">Apple</combobox-item>
+    <combobox-item value="banana">Banana</combobox-item>
+    <combobox-item value="orange">Orange</combobox-item>
+    <combobox-empty>No results found</combobox-empty>
+  </combobox-content>
+</combobox-root>`}
+            lang="svelte"
+          />
+        </tab-content>
+
+        <tab-content value="angular" class="mt-4">
+          <CodeBlock
+            code={`// app.component.ts
+import { Component } from '@angular/core';
+import '@red-elements/combobox';
+
+@Component({
+  selector: 'app-root',
+  template: \`
+    <combobox-root (value-change)="onValueChange($event)">
+      <combobox-anchor>
+        <combobox-trigger>
+          <combobox-input placeholder="Search fruits..."></combobox-input>
+        </combobox-trigger>
+      </combobox-anchor>
+      <combobox-content>
+        <combobox-item value="apple">Apple</combobox-item>
+        <combobox-item value="banana">Banana</combobox-item>
+        <combobox-item value="orange">Orange</combobox-item>
+        <combobox-empty>No results found</combobox-empty>
+      </combobox-content>
+    </combobox-root>
+  \`
+})
+export class AppComponent {
+  onValueChange(event: any) {
+    console.log('Selected:', event.detail.value);
+  }
+}`}
+            lang="typescript"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+        Server-Side Usage
+      </h2>
+      <p class="leading-7">
+        Red Elements work great with server-side frameworks. Here are examples:
+      </p>
+
+      <tabs-root default-value="nextjs" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+          <tab-trigger value="nextjs" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Next.js
+          </tab-trigger>
+          <tab-trigger value="remix" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Remix
+          </tab-trigger>
+          <tab-trigger value="astro" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Astro
+          </tab-trigger>
+          <tab-trigger value="sveltekit" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            SvelteKit
+          </tab-trigger>
+          <tab-trigger value="php" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            PHP
+          </tab-trigger>
+          <tab-trigger value="rails" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Ruby/Rails
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="nextjs" class="mt-4">
+          <CodeBlock
+            code={`// app/page.tsx (App Router)
+'use client';
+
+import {
+  ComboboxRoot,
+  ComboboxAnchor,
+  ComboboxTrigger,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxItem,
+} from '@red-elements/combobox';
+
+export default function Page() {
+  return (
+    <ComboboxRoot>
+      <ComboboxAnchor>
+        <ComboboxTrigger>
+          <ComboboxInput placeholder="Search..." />
+        </ComboboxTrigger>
+      </ComboboxAnchor>
+      <ComboboxContent>
+        <ComboboxItem value="item1">Item 1</ComboboxItem>
+        <ComboboxItem value="item2">Item 2</ComboboxItem>
+      </ComboboxContent>
+    </ComboboxRoot>
+  );
+}`}
+            lang="tsx"
+          />
+        </tab-content>
+
+        <tab-content value="remix" class="mt-4">
+          <CodeBlock
+            code={`// app/routes/index.tsx
+import '@red-elements/combobox';
+
+export default function Index() {
+  return (
+    <combobox-root>
+      <combobox-anchor>
+        <combobox-trigger>
+          <combobox-input placeholder="Search..." />
+        </combobox-trigger>
+      </combobox-anchor>
+      <combobox-content>
+        <combobox-item value="item1">Item 1</combobox-item>
+        <combobox-item value="item2">Item 2</combobox-item>
+      </combobox-content>
+    </combobox-root>
+  );
+}`}
+            lang="tsx"
+          />
+        </tab-content>
+
+        <tab-content value="astro" class="mt-4">
+          <CodeBlock
+            code={`---
+// src/pages/index.astro
+---
+<script>
+  import '@red-elements/combobox';
+</script>
+
+<combobox-root>
+  <combobox-anchor>
+    <combobox-trigger>
+      <combobox-input placeholder="Search..." />
+    </combobox-trigger>
+  </combobox-anchor>
+  <combobox-content>
+    <combobox-item value="item1">Item 1</combobox-item>
+    <combobox-item value="item2">Item 2</combobox-item>
+  </combobox-content>
+</combobox-root>`}
+            lang="astro"
+          />
+        </tab-content>
+
+        <tab-content value="sveltekit" class="mt-4">
+          <CodeBlock
+            code={`<!-- src/routes/+page.svelte -->
+<script>
+  import '@red-elements/combobox';
+</script>
+
+<combobox-root>
+  <combobox-anchor>
+    <combobox-trigger>
+      <combobox-input placeholder="Search..." />
+    </combobox-trigger>
+  </combobox-anchor>
+  <combobox-content>
+    <combobox-item value="item1">Item 1</combobox-item>
+    <combobox-item value="item2">Item 2</combobox-item>
+  </combobox-content>
+</combobox-root>`}
+            lang="svelte"
+          />
+        </tab-content>
+
+        <tab-content value="php" class="mt-4">
+          <CodeBlock
+            code={`<!-- index.php -->
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="module">
+    import '@red-elements/combobox';
+  </script>
+</head>
+<body>
+  <combobox-root>
+    <combobox-anchor>
+      <combobox-trigger>
+        <combobox-input placeholder="Search..." />
+      </combobox-trigger>
+    </combobox-anchor>
+    <combobox-content>
+      <?php foreach ($items as $item): ?>
+        <combobox-item value="<?= $item['value'] ?>">
+          <?= $item['label'] ?>
+        </combobox-item>
+      <?php endforeach; ?>
+    </combobox-content>
+  </combobox-root>
+</body>
+</html>`}
+            lang="php"
+          />
+        </tab-content>
+
+        <tab-content value="rails" class="mt-4">
+          <CodeBlock
+            code={`<!-- app/views/pages/index.html.erb -->
+<%= javascript_importmap_tags %>
+
+<combobox-root>
+  <combobox-anchor>
+    <combobox-trigger>
+      <combobox-input placeholder="Search..." />
+    </combobox-trigger>
+  </combobox-anchor>
+  <combobox-content>
+    <% @items.each do |item| %>
+      <combobox-item value="<%= item.value %>">
+        <%= item.label %>
+      </combobox-item>
+    <% end %>
+  </combobox-content>
+</combobox-root>`}
+            lang="erb"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+        API Reference
+      </h2>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          ComboboxRoot
+        </h3>
+        <p class="leading-7">
+          The root component that manages the combobox state.
+        </p>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+            <thead>
+              <tr class="bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
+                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Prop</th>
+                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Type</th>
+                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Default</th>
+                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>value</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">string</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">-</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">The controlled value of the combobox</td>
+              </tr>
+              <tr>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>open</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">boolean</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">false</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">The controlled open state</td>
+              </tr>
+              <tr>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>disabled</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">boolean</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">false</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">When true, prevents user interaction</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 class="scroll-m-20 text-xl font-semibold tracking-tight mt-4">
+          Events
+        </h4>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+            <thead>
+              <tr class="bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
+                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Event</th>
+                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Detail</th>
+                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>value-change</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>{'{ value: string }'}</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Emitted when the value changes</td>
+              </tr>
+              <tr>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>open</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">-</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Emitted when the combobox opens</td>
+              </tr>
+              <tr>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>close</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">-</td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Emitted when the combobox closes</td>
+              </tr>
+              <tr>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>search-change</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>{'{ search: string }'}</code></td>
+                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Emitted when the search query changes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          Other Components
+        </h3>
+        <ul class="ml-6 list-disc space-y-2">
+          <li><code>ComboboxAnchor</code> - Wraps the trigger element</li>
+          <li><code>ComboboxTrigger</code> - The button that opens the combobox</li>
+          <li><code>ComboboxInput</code> - The input element for searching</li>
+          <li><code>ComboboxContent</code> - The container for combobox items</li>
+          <li><code>ComboboxItem</code> - An individual item in the list</li>
+          <li><code>ComboboxEmpty</code> - Displayed when no items match the search</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+        Styling Examples
+      </h2>
+      <p class="leading-7">
+        Here are some examples of how to style the combobox:
+      </p>
+
+      <tabs-root default-value="css" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+          <tab-trigger value="css" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            CSS
+          </tab-trigger>
+          <tab-trigger value="tailwind" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            Tailwind
+          </tab-trigger>
+          <tab-trigger value="cssinjs" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+            CSS-in-JS
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="css" class="mt-4">
+          <CodeBlock
+            code={`combobox-root {
+  position: relative;
+  width: 300px;
+}
+
+combobox-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+combobox-trigger:hover {
+  border-color: #9ca3af;
+}
+
+combobox-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+combobox-content {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+
+combobox-item {
+  display: block;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+combobox-item[data-highlighted] {
+  background-color: #f3f4f6;
+}
+
+combobox-item[data-selected] {
+  background-color: #3b82f6;
+  color: white;
+}
+
+combobox-empty {
+  display: block;
+  padding: 12px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}`}
+            lang="css"
+          />
+        </tab-content>
+
+        <tab-content value="tailwind" class="mt-4">
+          <CodeBlock
+            code={`<combobox-root class="relative w-[300px]">
+  <combobox-anchor>
+    <combobox-trigger class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white hover:border-gray-400 cursor-pointer">
+      <combobox-input
+        class="flex-1 border-none outline-none text-sm"
+        placeholder="Search..."
+      />
+    </combobox-trigger>
+  </combobox-anchor>
+  <combobox-content class="absolute top-full mt-1 left-0 right-0 max-h-[300px] overflow-y-auto border border-gray-300 rounded-md bg-white shadow-lg z-50">
+    <combobox-item
+      value="apple"
+      class="block px-3 py-2 cursor-pointer text-sm data-[highlighted]:bg-gray-100 data-[selected]:bg-blue-500 data-[selected]:text-white"
+    >
+      Apple
+    </combobox-item>
+    <combobox-empty class="block p-3 text-center text-gray-500 text-sm">
+      No results
+    </combobox-empty>
+  </combobox-content>
+</combobox-root>`}
+            lang="html"
+          />
+        </tab-content>
+
+        <tab-content value="cssinjs" class="mt-4">
+          <CodeBlock
+            code={`import styled from 'styled-components';
+import {
+  ComboboxRoot,
+  ComboboxTrigger,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxItem
+} from '@red-elements/combobox';
+
+const StyledRoot = styled(ComboboxRoot)\`
+  position: relative;
+  width: 300px;
+\`;
+
+const StyledTrigger = styled(ComboboxTrigger)\`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #9ca3af;
+  }
+\`;
+
+const StyledInput = styled(ComboboxInput)\`
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+\`;
+
+const StyledContent = styled(ComboboxContent)\`
+  position: absolute;
+  top: calc(100% + 4px);
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+\`;
+
+const StyledItem = styled(ComboboxItem)\`
+  display: block;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+
+  &[data-highlighted] {
+    background-color: #f3f4f6;
+  }
+
+  &[data-selected] {
+    background-color: #3b82f6;
+    color: white;
+  }
+\`;
+
+export function StyledCombobox() {
+  return (
+    <StyledRoot>
+      <StyledTrigger>
+        <StyledInput placeholder="Search..." />
+      </StyledTrigger>
+      <StyledContent>
+        <StyledItem value="apple">Apple</StyledItem>
+        <StyledItem value="banana">Banana</StyledItem>
+      </StyledContent>
+    </StyledRoot>
+  );
+}`}
+            lang="tsx"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+        Accessibility
+      </h2>
+      <p class="leading-7">
+        The combobox component follows WAI-ARIA guidelines:
+      </p>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7">Full keyboard navigation support (Arrow keys, Enter, Escape)</li>
+        <li class="leading-7">Screen reader support with proper ARIA attributes</li>
+        <li class="leading-7">Focus management</li>
+        <li class="leading-7">Automatic scrolling to keep highlighted items visible</li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

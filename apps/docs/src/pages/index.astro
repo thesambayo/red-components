@@ -1,17 +1,156 @@
 ---
-
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import CodeBlock from '../components/CodeBlock.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+  <div class="flex min-h-screen flex-col">
+    <Header />
+    <main class="flex-1">
+      <section class="container flex flex-col items-center gap-6 pb-8 pt-6 md:py-10 max-w-screen-2xl px-4 md:px-8">
+        <div class="flex max-w-[980px] flex-col items-center gap-4 text-center">
+          <h1 class="text-3xl font-bold leading-tight tracking-tighter md:text-6xl lg:leading-[1.1]">
+            Web Component Primitives for Building Design Systems
+          </h1>
+          <p class="max-w-[750px] text-lg text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] sm:text-xl">
+            Unstyled, accessible components that work with any framework. Build your own design system or enhance your existing applications.
+          </p>
+          <div class="flex gap-4 mt-4">
+            <a
+              href="/docs/introduction"
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-11 px-8 bg-[color:light-dark(var(--color-primary),var(--color-primary-dark))] text-[color:light-dark(var(--color-primary-dark),var(--color-primary))] hover:opacity-90 no-underline"
+            >
+              Get Started
+            </a>
+            <a
+              href="/docs/components/combobox"
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-11 px-8 border border-[color:light-dark(var(--color-border),var(--color-border-dark))] bg-transparent hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] no-underline"
+            >
+              Components
+            </a>
+          </div>
+        </div>
+
+        <div class="w-full max-w-[980px] mt-12">
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6 space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                </svg>
+                <h3 class="font-bold">Unstyled</h3>
+              </div>
+              <p class="text-sm text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+                No CSS opinions. Style components with CSS, Tailwind, CSS-in-JS, or any styling solution you prefer.
+              </p>
+            </div>
+
+            <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6 space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <h3 class="font-bold">Accessible</h3>
+              </div>
+              <p class="text-sm text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+                Built with accessibility in mind, following WAI-ARIA guidelines. Full keyboard navigation and screen reader support.
+              </p>
+            </div>
+
+            <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6 space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+                </svg>
+                <h3 class="font-bold">Framework Agnostic</h3>
+              </div>
+              <p class="text-sm text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+                Works with React, Vue, Svelte, Angular, or vanilla JavaScript. Use the same components everywhere.
+              </p>
+            </div>
+
+            <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6 space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                <h3 class="font-bold">Composable</h3>
+              </div>
+              <p class="text-sm text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+                Build complex components from simple primitives. Full control over the structure and behavior.
+              </p>
+            </div>
+
+            <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6 space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <h3 class="font-bold">Lightweight</h3>
+              </div>
+              <p class="text-sm text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+                Small bundle sizes with tree-shaking support. Only ship what you use.
+              </p>
+            </div>
+
+            <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6 space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                </svg>
+                <h3 class="font-bold">Type Safe</h3>
+              </div>
+              <p class="text-sm text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
+                Written in TypeScript with full type definitions for a better developer experience.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full max-w-[980px] mt-12">
+          <h2 class="text-2xl font-bold mb-6 text-center">Quick Example</h2>
+          <CodeBlock
+            code={`import '@red-elements/combobox';
+
+// Use directly in your HTML
+<combobox-root>
+  <combobox-trigger>
+    <combobox-input placeholder="Select a fruit..." />
+  </combobox-trigger>
+  <combobox-content>
+    <combobox-item value="apple">Apple</combobox-item>
+    <combobox-item value="banana">Banana</combobox-item>
+    <combobox-item value="orange">Orange</combobox-item>
+  </combobox-content>
+</combobox-root>`}
+            lang="javascript"
+          />
+        </div>
+
+        <div class="w-full max-w-[980px] mt-12">
+          <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">Ready to get started?</h2>
+            <p class="text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mb-6">
+              Check out the documentation to learn how to use Red Elements in your projects.
+            </p>
+            <a
+              href="/docs/introduction"
+              class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors h-11 px-8 bg-[color:light-dark(var(--color-primary),var(--color-primary-dark))] text-[color:light-dark(var(--color-primary-dark),var(--color-primary))] hover:opacity-90 no-underline"
+            >
+              Read the docs
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-[color:light-dark(var(--color-border),var(--color-border-dark))] py-6 md:py-0">
+      <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row max-w-screen-2xl px-4 md:px-8">
+        <p class="text-center text-sm leading-loose text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] md:text-left">
+          Built by <a href="https://twitter.com/sambayo__" target="_blank" rel="noreferrer" class="font-medium underline underline-offset-4">Samuel Adebayo</a>. The source code is available on <a href="https://github.com/thesambayo/red-components" target="_blank" rel="noreferrer" class="font-medium underline underline-offset-4">GitHub</a>.
+        </p>
+      </div>
+    </footer>
+  </div>
+</BaseLayout>
