@@ -7,23 +7,23 @@ import CodeBlock from '../../../components/CodeBlock.astro';
   title="Avatar - Red Elements"
   description="An image element with a fallback for representing a user or entity."
 >
-  <div class="space-y-6">
+  <div class="space-y-8">
     <div>
-      <h1 class="scroll-m-20 text-4xl font-bold tracking-tight">Avatar</h1>
-      <p class="text-lg text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mt-2">
+      <h1 class="scroll-m-20 text-4xl font-extrabold lg:text-5xl tracking-tight">Avatar</h1>
+      <p class="text-lg text-muted-foreground mt-2">
         An image element with a fallback for representing a user or entity.
       </p>
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Demo
       </h2>
-      <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6">
+      <div class="relative rounded-xl border border-border bg-background shadow-sm p-6 md:p-8">
         <div class="flex gap-4 items-center">
           <avatar-root class="relative flex h-12 w-12 shrink-0 overflow-hidden rounded-full">
             <avatar-image src="https://github.com/thesambayo.png" alt="Samuel Adebayo" class="aspect-square h-full w-full object-cover" />
-            <avatar-fallback class="flex h-full w-full items-center justify-center rounded-full bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
+            <avatar-fallback class="flex h-full w-full items-center justify-center rounded-full bg-muted">
               SA
             </avatar-fallback>
           </avatar-root>
@@ -36,7 +36,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
           </avatar-root>
 
           <avatar-root class="relative flex h-14 w-14 shrink-0 overflow-hidden rounded-full">
-            <avatar-fallback class="flex h-full w-full items-center justify-center rounded-full bg-[color:light-dark(var(--color-primary),var(--color-primary-dark))] text-[color:light-dark(var(--color-primary-dark),var(--color-primary))] font-bold">
+            <avatar-fallback class="flex h-full w-full items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
               JD
             </avatar-fallback>
           </avatar-root>
@@ -45,21 +45,21 @@ import CodeBlock from '../../../components/CodeBlock.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Installation
       </h2>
       <tabs-root default-value="npm" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             npm
           </tab-trigger>
-          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             pnpm
           </tab-trigger>
-          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             yarn
           </tab-trigger>
-          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             bun
           </tab-trigger>
         </tabs-list>
@@ -91,19 +91,19 @@ import CodeBlock from '../../../components/CodeBlock.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Usage
       </h2>
 
       <tabs-root default-value="html" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             HTML/JS
           </tab-trigger>
-          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             React
           </tab-trigger>
-          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             Vue
           </tab-trigger>
         </tabs-list>
@@ -161,7 +161,7 @@ import '@red-elements/avatar';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         API Reference
       </h2>
 
@@ -170,21 +170,21 @@ import '@red-elements/avatar';
           AvatarRoot
         </h3>
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse border border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+          <table class="w-full border-collapse border border-border">
             <thead>
-              <tr class="bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Prop</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Type</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Default</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Description</th>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Prop</th>
+                <th class="border border-border px-4 py-2 text-left">Type</th>
+                <th class="border border-border px-4 py-2 text-left">Default</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>delay-ms</code></td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">number</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">0</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Delay before showing fallback (prevents flash)</td>
+                <td class="border border-border px-4 py-2"><code>delay-ms</code></td>
+                <td class="border border-border px-4 py-2">number</td>
+                <td class="border border-border px-4 py-2">0</td>
+                <td class="border border-border px-4 py-2">Delay before showing fallback (prevents flash)</td>
               </tr>
             </tbody>
           </table>

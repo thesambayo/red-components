@@ -7,19 +7,19 @@ import CodeBlock from '../../../components/CodeBlock.astro';
   title="Alert Dialog - Red Elements"
   description="A modal dialog that interrupts the user with important content and requires explicit action."
 >
-  <div class="space-y-6">
+  <div class="space-y-8">
     <div>
-      <h1 class="scroll-m-20 text-4xl font-bold tracking-tight">Alert Dialog</h1>
-      <p class="text-lg text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mt-2">
+      <h1 class="scroll-m-20 text-4xl font-extrabold lg:text-5xl tracking-tight">Alert Dialog</h1>
+      <p class="text-lg text-muted-foreground mt-2">
         A modal dialog that interrupts the user with important content and requires explicit user action.
       </p>
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Demo
       </h2>
-      <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6">
+      <div class="relative rounded-xl border border-border bg-background shadow-sm p-6 md:p-8">
         <alert-dialog-root>
           <alert-dialog-trigger as-child>
             <button class="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 bg-red-600 text-white hover:bg-red-700 cursor-pointer border-none">
@@ -27,14 +27,14 @@ import CodeBlock from '../../../components/CodeBlock.astro';
             </button>
           </alert-dialog-trigger>
 
-          <dialog class="backdrop:backdrop-blur-sm left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-[color:light-dark(var(--color-border),var(--color-border-dark))] bg-[color:light-dark(var(--color-background),var(--color-background-dark))] p-6 shadow-lg rounded-lg">
+          <dialog class="backdrop:backdrop-blur-sm left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-border bg-background p-6 shadow-lg rounded-lg">
             <h2 data-dialog-title class="text-lg font-semibold mb-2">Are you absolutely sure?</h2>
-            <p data-dialog-description class="text-sm text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mb-6">
+            <p data-dialog-description class="text-sm text-muted-foreground mb-6">
               This action cannot be undone. This will permanently delete your account and remove your data from our servers.
             </p>
             <div class="flex justify-end gap-2">
               <alert-dialog-cancel as-child>
-                <button class="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 border border-[color:light-dark(var(--color-border),var(--color-border-dark))] hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] cursor-pointer bg-transparent">
+                <button class="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 border border-border hover:bg-accent cursor-pointer bg-transparent">
                   Cancel
                 </button>
               </alert-dialog-cancel>
@@ -50,21 +50,21 @@ import CodeBlock from '../../../components/CodeBlock.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Installation
       </h2>
       <tabs-root default-value="npm" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             npm
           </tab-trigger>
-          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             pnpm
           </tab-trigger>
-          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             yarn
           </tab-trigger>
-          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             bun
           </tab-trigger>
         </tabs-list>
@@ -84,19 +84,19 @@ import CodeBlock from '../../../components/CodeBlock.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Usage
       </h2>
 
       <tabs-root default-value="html" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             HTML/JS
           </tab-trigger>
-          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             React
           </tab-trigger>
-          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             Vue
           </tab-trigger>
         </tabs-list>
@@ -198,7 +198,7 @@ import '@red-elements/alert-dialog';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         API Reference
       </h2>
 
@@ -207,27 +207,27 @@ import '@red-elements/alert-dialog';
           AlertDialogRoot
         </h3>
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse border border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+          <table class="w-full border-collapse border border-border">
             <thead>
-              <tr class="bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Prop</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Type</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Default</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Description</th>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Prop</th>
+                <th class="border border-border px-4 py-2 text-left">Type</th>
+                <th class="border border-border px-4 py-2 text-left">Default</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>open</code></td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">boolean</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">-</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Controlled open state</td>
+                <td class="border border-border px-4 py-2"><code>open</code></td>
+                <td class="border border-border px-4 py-2">boolean</td>
+                <td class="border border-border px-4 py-2">-</td>
+                <td class="border border-border px-4 py-2">Controlled open state</td>
               </tr>
               <tr>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>default-open</code></td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">boolean</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">false</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Default open state (uncontrolled)</td>
+                <td class="border border-border px-4 py-2"><code>default-open</code></td>
+                <td class="border border-border px-4 py-2">boolean</td>
+                <td class="border border-border px-4 py-2">false</td>
+                <td class="border border-border px-4 py-2">Default open state (uncontrolled)</td>
               </tr>
             </tbody>
           </table>
@@ -245,7 +245,7 @@ import '@red-elements/alert-dialog';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Accessibility
       </h2>
       <ul class="ml-6 list-disc space-y-2">
@@ -258,7 +258,7 @@ import '@red-elements/alert-dialog';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Alert Dialog vs Dialog
       </h2>
       <p class="leading-7">

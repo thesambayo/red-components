@@ -1,0 +1,385 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../components/CodeBlock.astro';
+---
+
+<DocsLayout
+  title="Toast - Red Elements"
+  description="A succinct message that is displayed temporarily."
+>
+  <div class="space-y-8">
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold lg:text-5xl tracking-tight">Toast</h1>
+      <p class="text-lg text-muted-foreground mt-2">
+        A succinct message that is displayed temporarily.
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Demo
+      </h2>
+      <div class="relative rounded-xl border border-border bg-background shadow-sm p-6 md:p-8">
+        <button
+          onclick="window.toaster.add({ content: 'This is a toast notification!', duration: 3000 })"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium bg-primary text-white rounded-md hover:opacity-90 cursor-pointer"
+        >
+          Show Toast
+        </button>
+        <toast-root></toast-root>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Installation
+      </h2>
+      <tabs-root default-value="npm" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            npm
+          </tab-trigger>
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            pnpm
+          </tab-trigger>
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            yarn
+          </tab-trigger>
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            bun
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="npm" class="mt-4">
+          <CodeBlock
+            code="npm install @red-elements/toast"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="pnpm" class="mt-4">
+          <CodeBlock
+            code="pnpm add @red-elements/toast"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="yarn" class="mt-4">
+          <CodeBlock
+            code="yarn add @red-elements/toast"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="bun" class="mt-4">
+          <CodeBlock
+            code="bun add @red-elements/toast"
+            lang="bash"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Usage
+      </h2>
+
+      <tabs-root default-value="html" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            HTML/JS
+          </tab-trigger>
+          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            React
+          </tab-trigger>
+          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            Vue
+          </tab-trigger>
+          <tab-trigger value="svelte" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            Svelte
+          </tab-trigger>
+          <tab-trigger value="angular" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            Angular
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="html" class="mt-4">
+          <CodeBlock
+            code={`import '@red-elements/toast';
+
+// Add toast container to your HTML
+<toast-root></toast-root>
+
+// Show a toast notification
+<button onclick="window.toaster.add({
+  content: 'Hello, world!',
+  duration: 3000
+})">
+  Show Toast
+</button>
+
+// Show a success toast
+<button onclick="window.toaster.success({
+  content: 'Action completed successfully!'
+})">
+  Show Success
+</button>
+
+// Remove a specific toast
+const toastId = window.toaster.add({ content: 'Message' });
+window.toaster.remove(toastId);
+
+// Dismiss all toasts
+window.toaster.dismissAll();`}
+            lang="javascript"
+          />
+        </tab-content>
+
+        <tab-content value="react" class="mt-4">
+          <CodeBlock
+            code={`import { ToastRoot, toaster } from '@red-elements/toast';
+
+export function ToastDemo() {
+  const showToast = () => {
+    toaster.add({
+      content: 'Hello, world!',
+      duration: 3000
+    });
+  };
+
+  const showSuccess = () => {
+    toaster.success({
+      content: 'Action completed successfully!'
+    });
+  };
+
+  return (
+    <>
+      <ToastRoot />
+      <button onClick={showToast}>Show Toast</button>
+      <button onClick={showSuccess}>Show Success</button>
+    </>
+  );
+}`}
+            lang="tsx"
+          />
+        </tab-content>
+
+        <tab-content value="vue" class="mt-4">
+          <CodeBlock
+            code={`<script setup>
+import '@red-elements/toast';
+
+const showToast = () => {
+  window.toaster.add({
+    content: 'Hello, world!',
+    duration: 3000
+  });
+};
+
+const showSuccess = () => {
+  window.toaster.success({
+    content: 'Action completed successfully!'
+  });
+};
+</script>
+
+<template>
+  <toast-root></toast-root>
+  <button @click="showToast">Show Toast</button>
+  <button @click="showSuccess">Show Success</button>
+</template>`}
+            lang="vue"
+          />
+        </tab-content>
+
+        <tab-content value="svelte" class="mt-4">
+          <CodeBlock
+            code={`<script>
+  import '@red-elements/toast';
+
+  function showToast() {
+    window.toaster.add({
+      content: 'Hello, world!',
+      duration: 3000
+    });
+  }
+
+  function showSuccess() {
+    window.toaster.success({
+      content: 'Action completed successfully!'
+    });
+  }
+</script>
+
+<toast-root></toast-root>
+<button on:click={showToast}>Show Toast</button>
+<button on:click={showSuccess}>Show Success</button>`}
+            lang="svelte"
+          />
+        </tab-content>
+
+        <tab-content value="angular" class="mt-4">
+          <CodeBlock
+            code={`// app.component.ts
+import { Component } from '@angular/core';
+import '@red-elements/toast';
+
+declare global {
+  interface Window {
+    toaster: any;
+  }
+}
+
+@Component({
+  selector: 'app-root',
+  template: \`
+    <toast-root></toast-root>
+    <button (click)="showToast()">Show Toast</button>
+    <button (click)="showSuccess()">Show Success</button>
+  \`
+})
+export class AppComponent {
+  showToast() {
+    window.toaster.add({
+      content: 'Hello, world!',
+      duration: 3000
+    });
+  }
+
+  showSuccess() {
+    window.toaster.success({
+      content: 'Action completed successfully!'
+    });
+  }
+}`}
+            lang="typescript"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        API Reference
+      </h2>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          toaster
+        </h3>
+        <p class="leading-7">
+          Global API for managing toast notifications.
+        </p>
+
+        <h4 class="scroll-m-20 text-xl font-semibold tracking-tight mt-4">
+          Methods
+        </h4>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-border">
+            <thead>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Method</th>
+                <th class="border border-border px-4 py-2 text-left">Parameters</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>add(options)</code></td>
+                <td class="border border-border px-4 py-2">ToastOptions</td>
+                <td class="border border-border px-4 py-2">Add a toast notification. Returns toast ID.</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>success(options)</code></td>
+                <td class="border border-border px-4 py-2">ToastOptions</td>
+                <td class="border border-border px-4 py-2">Add a success toast. Returns toast ID.</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>remove(id)</code></td>
+                <td class="border border-border px-4 py-2">string</td>
+                <td class="border border-border px-4 py-2">Remove a specific toast by ID</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>dismissAll()</code></td>
+                <td class="border border-border px-4 py-2">-</td>
+                <td class="border border-border px-4 py-2">Dismiss all visible toasts</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          ToastOptions
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-border">
+            <thead>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Property</th>
+                <th class="border border-border px-4 py-2 text-left">Type</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>content</code></td>
+                <td class="border border-border px-4 py-2">string</td>
+                <td class="border border-border px-4 py-2">Toast message content</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>duration</code></td>
+                <td class="border border-border px-4 py-2">number</td>
+                <td class="border border-border px-4 py-2">Duration in milliseconds</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>type</code></td>
+                <td class="border border-border px-4 py-2">"success" | "error" | "info"</td>
+                <td class="border border-border px-4 py-2">Toast type for styling</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          ToastRoot
+        </h3>
+        <p class="leading-7">
+          Container component for displaying toast notifications.
+        </p>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-border">
+            <thead>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Prop</th>
+                <th class="border border-border px-4 py-2 text-left">Type</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>offset</code></td>
+                <td class="border border-border px-4 py-2">number | string | object</td>
+                <td class="border border-border px-4 py-2">Offset from viewport edges</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Accessibility
+      </h2>
+      <p class="leading-7">
+        The toast component follows accessibility best practices:
+      </p>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7">Uses ARIA live regions for screen reader announcements</li>
+        <li class="leading-7">Can be dismissed with keyboard</li>
+        <li class="leading-7">Appropriate timeout durations</li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

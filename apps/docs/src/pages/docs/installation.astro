@@ -10,7 +10,7 @@ import CodeBlock from '../../components/CodeBlock.astro';
   <div class="space-y-6">
     <div>
       <h1 class="scroll-m-20 text-4xl font-bold tracking-tight">Installation</h1>
-      <p class="text-lg text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mt-2">
+      <p class="text-lg text-muted-foreground mt-2">
         How to install and use Red Elements in your project.
       </p>
     </div>
@@ -24,17 +24,17 @@ import CodeBlock from '../../components/CodeBlock.astro';
       </p>
 
       <tabs-root default-value="npm" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             npm
           </tab-trigger>
-          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             pnpm
           </tab-trigger>
-          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             yarn
           </tab-trigger>
-          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             bun
           </tab-trigger>
         </tabs-list>
@@ -74,17 +74,17 @@ import CodeBlock from '../../components/CodeBlock.astro';
       </p>
 
       <tabs-root default-value="html" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             HTML/JS
           </tab-trigger>
-          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             React
           </tab-trigger>
-          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             Vue
           </tab-trigger>
-          <tab-trigger value="svelte" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="svelte" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             Svelte
           </tab-trigger>
         </tabs-list>

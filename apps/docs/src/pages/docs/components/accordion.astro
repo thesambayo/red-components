@@ -7,21 +7,30 @@ import CodeBlock from '../../../components/CodeBlock.astro';
   title="Accordion - Red Elements"
   description="A vertically stacked set of interactive headings that each reveal a section of content."
 >
-  <div class="space-y-6">
-    <div>
-      <h1 class="scroll-m-20 text-4xl font-bold tracking-tight">Accordion</h1>
-      <p class="text-lg text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mt-2">
+  <div class="space-y-8">
+    <!-- Breadcrumb -->
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Accordion</span>
+    </div>
+
+    <div class="space-y-2">
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Accordion</h1>
+      <p class="text-lg text-muted-foreground">
         A vertically stacked set of interactive headings that each reveal a section of content.
       </p>
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
         Demo
       </h2>
-      <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-6">
+      <div class="relative rounded-xl border border-border bg-background shadow-sm p-6 md:p-8">
         <accordion-root class="w-full">
-          <accordion-item value="item-1" class="border-b border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+          <accordion-item value="item-1" class="border-b border-border">
             <accordion-header>
               <accordion-trigger class="flex w-full items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
                 Is it accessible?
@@ -37,7 +46,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
             </accordion-content>
           </accordion-item>
 
-          <accordion-item value="item-2" class="border-b border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+          <accordion-item value="item-2" class="border-b border-border">
             <accordion-header>
               <accordion-trigger class="flex w-full items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
                 Is it unstyled?
@@ -53,7 +62,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
             </accordion-content>
           </accordion-item>
 
-          <accordion-item value="item-3" class="border-b border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+          <accordion-item value="item-3" class="border-b border-border">
             <accordion-header>
               <accordion-trigger class="flex w-full items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
                 Can it be animated?
@@ -73,21 +82,21 @@ import CodeBlock from '../../../components/CodeBlock.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Installation
       </h2>
       <tabs-root default-value="npm" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             npm
           </tab-trigger>
-          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             pnpm
           </tab-trigger>
-          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             yarn
           </tab-trigger>
-          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             bun
           </tab-trigger>
         </tabs-list>
@@ -119,25 +128,25 @@ import CodeBlock from '../../../components/CodeBlock.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Usage
       </h2>
 
       <tabs-root default-value="html" class="w-full">
-        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] p-1 text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))]">
-          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             HTML/JS
           </tab-trigger>
-          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             React
           </tab-trigger>
-          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             Vue
           </tab-trigger>
-          <tab-trigger value="svelte" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="svelte" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             Svelte
           </tab-trigger>
-          <tab-trigger value="angular" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-[color:light-dark(var(--color-background),var(--color-background-dark))] data-[state=active]:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] data-[state=active]:shadow-sm">
+          <tab-trigger value="angular" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
             Angular
           </tab-trigger>
         </tabs-list>
@@ -308,7 +317,7 @@ export class AppComponent {}`}
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         API Reference
       </h2>
 
@@ -320,33 +329,33 @@ export class AppComponent {}`}
           The root component that manages accordion state.
         </p>
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse border border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
+          <table class="w-full border-collapse border border-border">
             <thead>
-              <tr class="bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Prop</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Type</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Default</th>
-                <th class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2 text-left">Description</th>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Prop</th>
+                <th class="border border-border px-4 py-2 text-left">Type</th>
+                <th class="border border-border px-4 py-2 text-left">Default</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>type</code></td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">"single" | "multiple"</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">"single"</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Whether multiple items can be open at once</td>
+                <td class="border border-border px-4 py-2"><code>type</code></td>
+                <td class="border border-border px-4 py-2">"single" | "multiple"</td>
+                <td class="border border-border px-4 py-2">"single"</td>
+                <td class="border border-border px-4 py-2">Whether multiple items can be open at once</td>
               </tr>
               <tr>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>collapsible</code></td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">boolean</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">false</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">Whether an item can be collapsed after being opened</td>
+                <td class="border border-border px-4 py-2"><code>collapsible</code></td>
+                <td class="border border-border px-4 py-2">boolean</td>
+                <td class="border border-border px-4 py-2">false</td>
+                <td class="border border-border px-4 py-2">Whether an item can be collapsed after being opened</td>
               </tr>
               <tr>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2"><code>disabled</code></td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">boolean</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">false</td>
-                <td class="border border-[color:light-dark(var(--color-border),var(--color-border-dark))] px-4 py-2">When true, prevents user interaction</td>
+                <td class="border border-border px-4 py-2"><code>disabled</code></td>
+                <td class="border border-border px-4 py-2">boolean</td>
+                <td class="border border-border px-4 py-2">false</td>
+                <td class="border border-border px-4 py-2">When true, prevents user interaction</td>
               </tr>
             </tbody>
           </table>
@@ -367,7 +376,7 @@ export class AppComponent {}`}
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Data Attributes
       </h2>
       <p class="leading-7">
@@ -380,7 +389,7 @@ export class AppComponent {}`}
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Accessibility
       </h2>
       <p class="leading-7">

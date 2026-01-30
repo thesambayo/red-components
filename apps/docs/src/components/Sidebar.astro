@@ -20,23 +20,23 @@ const gettingStarted = [
 ];
 ---
 
-<aside class="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block border-r border-[color:light-dark(var(--color-border),var(--color-border-dark))]">
-  <div class="h-full py-6 pr-6 lg:py-8 overflow-y-auto">
-    <nav class="space-y-6 text-sm">
+<aside class="fixed top-16 z-30 hidden h-[calc(100vh-4rem)] w-full shrink-0 md:sticky md:block border-r border-border">
+  <div class="h-full py-8 pr-6 lg:py-10 overflow-y-auto">
+    <nav class="space-y-8 text-sm">
       <div>
-        <h4 class="mb-2 font-semibold text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))]">
+        <h4 class="mb-3 px-2 text-sm font-semibold text-foreground">
           Getting Started
         </h4>
-        <ul class="space-y-2 list-none p-0 m-0">
+        <ul class="space-y-0.5 list-none p-0 m-0">
           {gettingStarted.map((item) => (
             <li>
               <a
                 href={item.href}
                 class:list={[
-                  "block py-1 px-2 rounded-md transition-colors no-underline",
+                  "block py-2 px-2 rounded-md transition-colors no-underline text-sm",
                   currentPath === item.href
-                    ? "bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] font-medium"
-                    : "text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] hover:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))]"
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 ]}
               >
                 {item.name}
@@ -47,19 +47,19 @@ const gettingStarted = [
       </div>
 
       <div>
-        <h4 class="mb-2 font-semibold text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))]">
+        <h4 class="mb-3 px-2 text-sm font-semibold text-foreground">
           Components
         </h4>
-        <ul class="space-y-2 list-none p-0 m-0">
+        <ul class="space-y-0.5 list-none p-0 m-0">
           {components.map((item) => (
             <li>
               <a
                 href={item.href}
                 class:list={[
-                  "block py-1 px-2 rounded-md transition-colors no-underline",
+                  "block py-2 px-2 rounded-md transition-colors no-underline text-sm",
                   currentPath === item.href
-                    ? "bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] font-medium"
-                    : "text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] hover:text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))]"
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 ]}
               >
                 {item.name}

@@ -11,17 +11,17 @@ interface Props {
 const { code, lang = 'typescript', title, showLineNumbers = false } = Astro.props;
 ---
 
-<div class="relative group rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] overflow-hidden my-4">
+<div class="relative group rounded-lg border border-border overflow-hidden my-4">
   {title && (
-    <div class="flex items-center justify-between px-4 py-2 border-b border-[color:light-dark(var(--color-border),var(--color-border-dark))] bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))]">
-      <span class="text-sm font-medium text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))]">
+    <div class="flex items-center justify-between px-4 py-2 border-b border-border bg-muted">
+      <span class="text-sm font-medium text-foreground">
         {title}
       </span>
     </div>
   )}
   <div class="relative">
     <button
-      class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center justify-center rounded-md text-sm font-medium h-8 px-3 bg-[color:light-dark(var(--color-muted),var(--color-muted-dark))] hover:bg-[color:light-dark(var(--color-accent),var(--color-accent-dark))] text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] border border-[color:light-dark(var(--color-border),var(--color-border-dark))] cursor-pointer"
+      class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center justify-center rounded-md text-sm font-medium h-8 px-3 bg-muted hover:bg-accent text-foreground border border-border cursor-pointer"
       data-code={code}
       onclick="
         const btn = this;

@@ -6,16 +6,23 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
   title="Introduction - Red Elements"
   description="An open-source UI web component library for building unstyled, high-quality, accessible design systems and web apps."
 >
-  <div class="space-y-6">
+  <div class="space-y-8">
     <div>
-      <h1 class="scroll-m-20 text-4xl font-bold tracking-tight">Introduction</h1>
-      <p class="text-lg text-[color:light-dark(var(--color-muted-foreground),var(--color-muted-foreground-dark))] mt-2">
+      <div class="flex items-center space-x-1 text-sm text-muted-foreground mb-4">
+        <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-foreground font-medium">Introduction</span>
+      </div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Introduction</h1>
+      <p class="text-lg text-muted-foreground mt-2">
         Unstyled, accessible web components for building high-quality design systems and web applications.
       </p>
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         What is Red Elements?
       </h2>
       <p class="leading-7">
@@ -27,7 +34,7 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Key Features
       </h2>
       <ul class="ml-6 list-disc space-y-2">
@@ -53,28 +60,31 @@ import DocsLayout from '../../layouts/DocsLayout.astro';
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Components
       </h2>
       <p class="leading-7">
         Red Elements includes the following components:
       </p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         {['Accordion', 'Alert Dialog', 'Avatar', 'Combobox', 'Dialog', 'Dropdown', 'Select', 'Tabs', 'Toast', 'Tooltip'].map((component) => (
-          <div class="rounded-lg border border-[color:light-dark(var(--color-border),var(--color-border-dark))] p-3">
-            <a
-              href={`/docs/components/${component.toLowerCase().replace(' ', '-')}`}
-              class="font-medium text-[color:light-dark(var(--color-foreground),var(--color-foreground-dark))] hover:underline"
-            >
-              {component}
-            </a>
-          </div>
+          <a
+            href={`/docs/components/${component.toLowerCase().replace(' ', '-')}`}
+            class="group rounded-xl border border-border bg-card p-4 font-medium text-foreground hover:shadow-md transition-all no-underline shadow-sm"
+          >
+            <div class="flex items-center justify-between">
+              <span>{component}</span>
+              <svg class="size-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
         ))}
       </div>
     </div>
 
     <div class="space-y-4">
-      <h2 class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
         Getting Started
       </h2>
       <p class="leading-7">

@@ -1,0 +1,360 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../components/CodeBlock.astro';
+---
+
+<DocsLayout
+  title="Tabs - Red Elements"
+  description="A set of layered sections of content that are displayed one at a time."
+>
+  <div class="space-y-8">
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold lg:text-5xl tracking-tight">Tabs</h1>
+      <p class="text-lg text-muted-foreground mt-2">
+        A set of layered sections of content that are displayed one at a time.
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Demo
+      </h2>
+      <div class="relative rounded-xl border border-border bg-background shadow-sm p-6 md:p-8">
+        <tabs-root default-value="tab1" class="w-full">
+          <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+            <tab-trigger value="tab1" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+              Account
+            </tab-trigger>
+            <tab-trigger value="tab2" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+              Password
+            </tab-trigger>
+            <tab-trigger value="tab3" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+              Settings
+            </tab-trigger>
+          </tabs-list>
+          <tab-content value="tab1" class="mt-4">
+            <div class="rounded-md border border-border p-4">
+              <h3 class="text-lg font-semibold">Account Information</h3>
+              <p class="text-sm text-muted-foreground mt-2">
+                Manage your account details and preferences.
+              </p>
+            </div>
+          </tab-content>
+          <tab-content value="tab2" class="mt-4">
+            <div class="rounded-md border border-border p-4">
+              <h3 class="text-lg font-semibold">Password Settings</h3>
+              <p class="text-sm text-muted-foreground mt-2">
+                Change your password and security settings.
+              </p>
+            </div>
+          </tab-content>
+          <tab-content value="tab3" class="mt-4">
+            <div class="rounded-md border border-border p-4">
+              <h3 class="text-lg font-semibold">General Settings</h3>
+              <p class="text-sm text-muted-foreground mt-2">
+                Configure your application preferences.
+              </p>
+            </div>
+          </tab-content>
+        </tabs-root>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Installation
+      </h2>
+      <tabs-root default-value="npm" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            npm
+          </tab-trigger>
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            pnpm
+          </tab-trigger>
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            yarn
+          </tab-trigger>
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            bun
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="npm" class="mt-4">
+          <CodeBlock
+            code="npm install @red-elements/tabs"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="pnpm" class="mt-4">
+          <CodeBlock
+            code="pnpm add @red-elements/tabs"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="yarn" class="mt-4">
+          <CodeBlock
+            code="yarn add @red-elements/tabs"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="bun" class="mt-4">
+          <CodeBlock
+            code="bun add @red-elements/tabs"
+            lang="bash"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Usage
+      </h2>
+
+      <tabs-root default-value="html" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="html" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            HTML/JS
+          </tab-trigger>
+          <tab-trigger value="react" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            React
+          </tab-trigger>
+          <tab-trigger value="vue" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            Vue
+          </tab-trigger>
+          <tab-trigger value="svelte" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            Svelte
+          </tab-trigger>
+          <tab-trigger value="angular" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            Angular
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="html" class="mt-4">
+          <CodeBlock
+            code={`import '@red-elements/tabs';
+
+// Use directly in your HTML
+<tabs-root default-value="tab1">
+  <tabs-list>
+    <tab-trigger value="tab1">Tab 1</tab-trigger>
+    <tab-trigger value="tab2">Tab 2</tab-trigger>
+    <tab-trigger value="tab3">Tab 3</tab-trigger>
+  </tabs-list>
+  <tab-content value="tab1">Content 1</tab-content>
+  <tab-content value="tab2">Content 2</tab-content>
+  <tab-content value="tab3">Content 3</tab-content>
+</tabs-root>`}
+            lang="javascript"
+          />
+        </tab-content>
+
+        <tab-content value="react" class="mt-4">
+          <CodeBlock
+            code={`import {
+  TabsRoot,
+  TabsList,
+  TabTrigger,
+  TabContent
+} from '@red-elements/tabs';
+
+export function TabsDemo() {
+  return (
+    <TabsRoot defaultValue="tab1">
+      <TabsList>
+        <TabTrigger value="tab1">Tab 1</TabTrigger>
+        <TabTrigger value="tab2">Tab 2</TabTrigger>
+        <TabTrigger value="tab3">Tab 3</TabTrigger>
+      </TabsList>
+      <TabContent value="tab1">Content 1</TabContent>
+      <TabContent value="tab2">Content 2</TabContent>
+      <TabContent value="tab3">Content 3</TabContent>
+    </TabsRoot>
+  );
+}`}
+            lang="tsx"
+          />
+        </tab-content>
+
+        <tab-content value="vue" class="mt-4">
+          <CodeBlock
+            code={`<script setup>
+import '@red-elements/tabs';
+</script>
+
+<template>
+  <tabs-root default-value="tab1">
+    <tabs-list>
+      <tab-trigger value="tab1">Tab 1</tab-trigger>
+      <tab-trigger value="tab2">Tab 2</tab-trigger>
+      <tab-trigger value="tab3">Tab 3</tab-trigger>
+    </tabs-list>
+    <tab-content value="tab1">Content 1</tab-content>
+    <tab-content value="tab2">Content 2</tab-content>
+    <tab-content value="tab3">Content 3</tab-content>
+  </tabs-root>
+</template>`}
+            lang="vue"
+          />
+        </tab-content>
+
+        <tab-content value="svelte" class="mt-4">
+          <CodeBlock
+            code={`<script>
+  import '@red-elements/tabs';
+</script>
+
+<tabs-root default-value="tab1">
+  <tabs-list>
+    <tab-trigger value="tab1">Tab 1</tab-trigger>
+    <tab-trigger value="tab2">Tab 2</tab-trigger>
+    <tab-trigger value="tab3">Tab 3</tab-trigger>
+  </tabs-list>
+  <tab-content value="tab1">Content 1</tab-content>
+  <tab-content value="tab2">Content 2</tab-content>
+  <tab-content value="tab3">Content 3</tab-content>
+</tabs-root>`}
+            lang="svelte"
+          />
+        </tab-content>
+
+        <tab-content value="angular" class="mt-4">
+          <CodeBlock
+            code={`// app.component.ts
+import { Component } from '@angular/core';
+import '@red-elements/tabs';
+
+@Component({
+  selector: 'app-root',
+  template: \`
+    <tabs-root default-value="tab1">
+      <tabs-list>
+        <tab-trigger value="tab1">Tab 1</tab-trigger>
+        <tab-trigger value="tab2">Tab 2</tab-trigger>
+        <tab-trigger value="tab3">Tab 3</tab-trigger>
+      </tabs-list>
+      <tab-content value="tab1">Content 1</tab-content>
+      <tab-content value="tab2">Content 2</tab-content>
+      <tab-content value="tab3">Content 3</tab-content>
+    </tabs-root>
+  \`
+})
+export class AppComponent {}`}
+            lang="typescript"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        API Reference
+      </h2>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          TabsRoot
+        </h3>
+        <p class="leading-7">
+          The root component that manages tabs state.
+        </p>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-border">
+            <thead>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Prop</th>
+                <th class="border border-border px-4 py-2 text-left">Type</th>
+                <th class="border border-border px-4 py-2 text-left">Default</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>default-value</code></td>
+                <td class="border border-border px-4 py-2">string</td>
+                <td class="border border-border px-4 py-2">-</td>
+                <td class="border border-border px-4 py-2">Default active tab value</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>orientation</code></td>
+                <td class="border border-border px-4 py-2">"horizontal" | "vertical"</td>
+                <td class="border border-border px-4 py-2">"horizontal"</td>
+                <td class="border border-border px-4 py-2">Orientation of the tabs</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>loop</code></td>
+                <td class="border border-border px-4 py-2">boolean</td>
+                <td class="border border-border px-4 py-2">false</td>
+                <td class="border border-border px-4 py-2">Enable keyboard navigation looping</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>activation-mode</code></td>
+                <td class="border border-border px-4 py-2">"automatic" | "manual"</td>
+                <td class="border border-border px-4 py-2">"automatic"</td>
+                <td class="border border-border px-4 py-2">How tabs are activated on focus</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>unmount-on-hide</code></td>
+                <td class="border border-border px-4 py-2">boolean</td>
+                <td class="border border-border px-4 py-2">false</td>
+                <td class="border border-border px-4 py-2">Remove inactive tab content from DOM</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          Other Components
+        </h3>
+        <ul class="ml-6 list-disc space-y-2">
+          <li><code>TabsList</code> - Container for tab triggers</li>
+          <li><code>TabTrigger</code> - Button that activates a tab</li>
+          <li><code>TabContent</code> - Content panel for a tab</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Data Attributes
+      </h2>
+      <p class="leading-7">
+        The following data attributes are automatically applied for styling:
+      </p>
+      <ul class="ml-6 list-disc space-y-2">
+        <li><code>data-state="active|inactive"</code> - Current state on trigger and content</li>
+        <li><code>data-orientation="horizontal|vertical"</code> - Orientation on root and list</li>
+      </ul>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Keyboard Navigation
+      </h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li><code>Tab</code> - Move focus to the next focusable element</li>
+        <li><code>ArrowLeft/ArrowRight</code> - Navigate between tabs (horizontal)</li>
+        <li><code>ArrowUp/ArrowDown</code> - Navigate between tabs (vertical)</li>
+        <li><code>Home</code> - Jump to first tab</li>
+        <li><code>End</code> - Jump to last tab</li>
+        <li><code>Enter/Space</code> - Activate focused tab (manual mode)</li>
+      </ul>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Accessibility
+      </h2>
+      <p class="leading-7">
+        The tabs component follows WAI-ARIA guidelines:
+      </p>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7">Full keyboard navigation support</li>
+        <li class="leading-7">Proper ARIA attributes for screen readers</li>
+        <li class="leading-7">Focus management</li>
+        <li class="leading-7">Automatic and manual activation modes</li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>
