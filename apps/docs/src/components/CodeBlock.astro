@@ -1,9 +1,10 @@
 ---
+import type { CodeLanguage } from 'astro';
 import { Code } from 'astro:components';
 
 interface Props {
   code: string;
-  lang?: string;
+  lang?: CodeLanguage;
   title?: string;
   showLineNumbers?: boolean;
 }
