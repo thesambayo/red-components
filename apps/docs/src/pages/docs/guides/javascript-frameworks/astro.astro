@@ -1,0 +1,102 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+---
+
+<DocsLayout title="Astro - Red Elements" description="How to use Red Elements web components in Astro projects">
+  <div class="space-y-8">
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Astro</span>
+    </div>
+
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Using Red Elements with Astro</h1>
+      <p class="text-lg text-muted-foreground mt-2">Integrate Red Elements web components into your Astro project - perfect match for web components!</p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Node.js" version="18+" required />
+        <PrerequisiteBadge name="Astro" version="4+" required />
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Installation</h2>
+      <CodeBlock code="npm install @red-elements/dialog" lang="bash" />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Usage</h2>
+      <p class="leading-7">Astro natively supports web components! Simply import and use:</p>
+      <ConfigFile
+        filename="src/pages/index.astro"
+        code={`---
+// Import in frontmatter to register components
+import '@red-elements/dialog';
+---
+
+<html lang="en">
+<body>
+  <h1>Astro + Red Elements</h1>
+
+  <dialog-root>
+    <dialog-trigger as-child>
+      <button class="btn-primary">Open Dialog</button>
+    </dialog-trigger>
+
+    <dialog class="rounded-lg p-6 max-w-md">
+      <h2 data-dialog-title class="text-2xl font-bold mb-4">Welcome</h2>
+      <p data-dialog-description class="mb-4">This is a dialog component.</p>
+      <dialog-close as-child>
+        <button class="btn-secondary">Close</button>
+      </dialog-close>
+    </dialog>
+  </dialog-root>
+</body>
+</html>`}
+        lang="astro"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Using with Astro Islands</h2>
+      <p class="leading-7">Web components work seamlessly with Astro's island architecture:</p>
+      <CodeBlock
+        code={`---
+import '@red-elements/dropdown';
+---
+
+<dropdown-root client:load>
+  <dropdown-trigger as-child>
+    <button>Menu</button>
+  </dropdown-trigger>
+  <dropdown-content>
+    <dropdown-item>Profile</dropdown-item>
+    <dropdown-item>Settings</dropdown-item>
+  </dropdown-content>
+</dropdown-root>`}
+        lang="astro"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Next Steps</h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7"><a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a></li>
+        <li class="leading-7"><a href="/docs/components/dropdown" class="font-medium underline underline-offset-4">Dropdown</a></li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

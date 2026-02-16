@@ -1,0 +1,146 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import FrameworkCallout from '../../../../components/FrameworkCallout.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+---
+
+<DocsLayout title="Go - Red Elements" description="How to use Red Elements web components with Go html/template">
+  <div class="space-y-8">
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Go</span>
+    </div>
+
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Using Red Elements with Go</h1>
+      <p class="text-lg text-muted-foreground mt-2">Integrate Red Elements web components into your Go web applications using html/template.</p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Go" version="1.19+" required />
+      </div>
+      <FrameworkCallout type="info" title="Modern Browser Support">
+        This guide uses ES modules with import maps, requiring modern browsers.
+      </FrameworkCallout>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Installation</h2>
+      <p class="leading-7">Use import maps to load Red Elements from a CDN:</p>
+
+      <ConfigFile
+        filename="templates/layout.html"
+        code={`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Title}}</title>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "@red-elements/dialog": "https://cdn.jsdelivr.net/npm/@red-elements/dialog@latest/dist/dialog.js",
+        "@red-elements/dropdown": "https://cdn.jsdelivr.net/npm/@red-elements/dropdown@latest/dist/dropdown.js"
+      }
+    }
+    </script>
+</head>
+<body>
+    {{template "content" .}}
+
+    <script type="module">
+      import '@red-elements/dialog';
+      import '@red-elements/dropdown';
+    </script>
+</body>
+</html>`}
+        lang="html"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Usage in Templates</h2>
+
+      <ConfigFile
+        filename="templates/page.html"
+        code={`{{define "content"}}
+<div class="container">
+    <h1>{{.PageTitle}}</h1>
+
+    <dialog-root>
+      <dialog-trigger as-child>
+        <button type="button">Open Dialog</button>
+      </dialog-trigger>
+
+      <dialog class="rounded-lg p-6 max-w-md">
+        <h2 data-dialog-title>{{.DialogTitle}}</h2>
+        <p data-dialog-description>{{.DialogContent}}</p>
+        <dialog-close as-child>
+          <button type="button">Close</button>
+        </dialog-close>
+      </dialog>
+    </dialog-root>
+</div>
+{{end}}`}
+        lang="html"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Go Handler Example</h2>
+
+      <ConfigFile
+        filename="main.go"
+        code={`package main
+
+import (
+    "html/template"
+    "net/http"
+)
+
+type PageData struct {
+    Title         string
+    PageTitle     string
+    DialogTitle   string
+    DialogContent string
+}
+
+func main() {
+    tmpl := template.Must(template.ParseGlob("templates/*.html"))
+
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        data := PageData{
+            Title:         "My Go App",
+            PageTitle:     "Welcome",
+            DialogTitle:   "Hello",
+            DialogContent: "This is a Red Elements dialog!",
+        }
+        tmpl.ExecuteTemplate(w, "layout.html", data)
+    })
+
+    http.ListenAndServe(":8080", nil)
+}`}
+        lang="go"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Next Steps</h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7"><a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a></li>
+        <li class="leading-7"><a href="/docs/components/dropdown" class="font-medium underline underline-offset-4">Dropdown</a></li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

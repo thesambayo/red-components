@@ -27,7 +27,9 @@
     "story:build": "storybook build",
     "showcase:dev": "pnpm build && pnpm --filter showcase dev",
     "showcase:build": "pnpm build && pnpm --filter showcase build",
-    "showcase:lint": "pnpm --filter showcase lint"
+    "showcase:lint": "pnpm --filter showcase lint",
+    "docs:dev": "pnpm --filter docs dev",
+    "docs:build": "pnpm build && pnpm --filter docs build"
   },
   "dependencies": {
     "@changesets/cli": "^2.29.8",

@@ -1,0 +1,159 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+---
+
+<DocsLayout title="Hono - Red Elements" description="How to use Red Elements web components with Hono framework">
+  <div class="space-y-8">
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Hono</span>
+    </div>
+
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Using Red Elements with Hono</h1>
+      <p class="text-lg text-muted-foreground mt-2">Integrate Red Elements web components into your Hono application with JSX or template strings.</p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Node.js" version="18+" required />
+        <PrerequisiteBadge name="Hono" version="3+" required />
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Installation</h2>
+      <CodeBlock code="npm install hono" lang="bash" />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Usage with Hono JSX</h2>
+
+      <ConfigFile
+        filename="src/index.tsx"
+        code={`import { Hono } from 'hono';
+import { html } from 'hono/html';
+
+const app = new Hono();
+
+const Layout = ({ children }: { children: any }) ${'='}> html\`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hono + Red Elements</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "@red-elements/dialog": "https://cdn.jsdelivr.net/npm/@red-elements/dialog@latest/dist/dialog.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  \${children}
+
+  <script type="module">
+    import '@red-elements/dialog';
+  </script>
+</body>
+</html>
+\`;
+
+app.get('/', (c) ${'='}> {
+  return c.html(
+    <Layout>
+      <h1>Hono + Red Elements</h1>
+
+      <dialog-root>
+        <dialog-trigger as-child>
+          <button>Open Dialog</button>
+        </dialog-trigger>
+
+        <dialog class="rounded-lg p-6 max-w-md">
+          <h2 data-dialog-title>Welcome</h2>
+          <p data-dialog-description>This is a dialog component.</p>
+          <dialog-close as-child>
+            <button>Close</button>
+          </dialog-close>
+        </dialog>
+      </dialog-root>
+    </Layout>
+  );
+});
+
+export default app;`}
+        lang="tsx"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Usage with Template Strings</h2>
+
+      <CodeBlock
+        code={`import { Hono } from 'hono';
+
+const app = new Hono();
+
+app.get('/', (c) ${'='}> {
+  return c.html(\`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Hono + Red Elements</title>
+      <script type="importmap">
+      {
+        "imports": {
+          "@red-elements/dialog": "https://cdn.jsdelivr.net/npm/@red-elements/dialog@latest/dist/dialog.js"
+        }
+      }
+      </script>
+    </head>
+    <body>
+      <h1>Hono + Red Elements</h1>
+
+      <dialog-root>
+        <dialog-trigger as-child>
+          <button>Open Dialog</button>
+        </dialog-trigger>
+        <dialog>
+          <h2 data-dialog-title>Welcome</h2>
+          <p data-dialog-description>This is a dialog.</p>
+          <dialog-close as-child>
+            <button>Close</button>
+          </dialog-close>
+        </dialog>
+      </dialog-root>
+
+      <script type="module">
+        import '@red-elements/dialog';
+      </script>
+    </body>
+    </html>
+  \`);
+});`}
+        lang="typescript"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Next Steps</h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7"><a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a></li>
+        <li class="leading-7"><a href="/docs/components/dropdown" class="font-medium underline underline-offset-4">Dropdown</a></li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

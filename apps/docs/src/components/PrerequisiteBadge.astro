@@ -1,0 +1,15 @@
+---
+interface Props {
+  name: string;
+  version?: string;
+  required?: boolean;
+}
+
+const { name, version, required = false } = Astro.props;
+---
+
+<div class="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium">
+  <span>{name}</span>
+  {version && <span class="text-muted-foreground">{version}</span>}
+  {required && <span class="text-destructive" title="Required">*</span>}
+</div>

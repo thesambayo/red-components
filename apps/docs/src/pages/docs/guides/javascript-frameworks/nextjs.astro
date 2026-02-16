@@ -1,0 +1,379 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import FrameworkCallout from '../../../../components/FrameworkCallout.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+---
+
+<DocsLayout
+  title="Next.js - Red Elements"
+  description="How to use Red Elements web components in Next.js applications"
+>
+  <div class="space-y-8">
+    <!-- Breadcrumb -->
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Next.js</span>
+    </div>
+
+    <!-- Header -->
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Using Red Elements with Next.js
+      </h1>
+      <p class="text-lg text-muted-foreground mt-2">
+        Integrate Red Elements web components into your Next.js application with full TypeScript support and SSR compatibility.
+      </p>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Prerequisites
+      </h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Node.js" version="18+" required />
+        <PrerequisiteBadge name="Next.js" version="13+" required />
+        <PrerequisiteBadge name="React" version="18+" required />
+      </div>
+    </div>
+
+    <!-- Installation -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Installation
+      </h2>
+      <p class="leading-7">
+        Install the Red Elements components you need using your preferred package manager:
+      </p>
+
+      <tabs-root default-value="npm" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="npm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            npm
+          </tab-trigger>
+          <tab-trigger value="pnpm" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            pnpm
+          </tab-trigger>
+          <tab-trigger value="yarn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            yarn
+          </tab-trigger>
+          <tab-trigger value="bun" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            bun
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="npm" class="mt-4">
+          <CodeBlock
+            code="npm install @red-elements/dialog"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="pnpm" class="mt-4">
+          <CodeBlock
+            code="pnpm add @red-elements/dialog"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="yarn" class="mt-4">
+          <CodeBlock
+            code="yarn add @red-elements/dialog"
+            lang="bash"
+          />
+        </tab-content>
+        <tab-content value="bun" class="mt-4">
+          <CodeBlock
+            code="bun add @red-elements/dialog"
+            lang="bash"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <!-- Configuration -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Configuration
+      </h2>
+
+      <FrameworkCallout type="important" title="Client Components Required">
+        Red Elements are client-side web components. When using Next.js App Router with Server Components, you must mark components as Client Components using the <code>'use client'</code> directive.
+      </FrameworkCallout>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        App Router (Next.js 13+)
+      </h3>
+      <p class="leading-7">
+        Create a client component wrapper for Red Elements:
+      </p>
+
+      <ConfigFile
+        filename="components/dialog-demo.tsx"
+        description="Client Component"
+        code={`'use client';
+
+import { DialogRoot, DialogTrigger, DialogContent, DialogClose } from '@red-elements/dialog';
+
+export function DialogDemo() {
+  return (
+    <DialogRoot>
+      <DialogTrigger asChild>
+        <button className="px-4 py-2 bg-primary text-primary-foreground rounded">
+          Open Dialog
+        </button>
+      </DialogTrigger>
+      <dialog className="rounded-lg p-6 max-w-md">
+        <h2 data-dialog-title className="text-2xl font-bold mb-4">
+          Welcome
+        </h2>
+        <p data-dialog-description className="mb-4">
+          This is a dialog component from Red Elements.
+        </p>
+        <DialogClose asChild>
+          <button className="px-4 py-2 bg-muted rounded">Close</button>
+        </DialogClose>
+      </dialog>
+    </DialogRoot>
+  );
+}`}
+        lang="tsx"
+      />
+
+      <p class="leading-7 mt-4">
+        Then use it in your Server Component:
+      </p>
+
+      <ConfigFile
+        filename="app/page.tsx"
+        description="Server Component"
+        code={`import { DialogDemo } from '@/components/dialog-demo';
+
+export default function Page() {
+  return (
+    <main>
+      <h1>My Next.js App</h1>
+      <DialogDemo />
+    </main>
+  );
+}`}
+        lang="tsx"
+      />
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Pages Router (Next.js 12+)
+      </h3>
+      <p class="leading-7">
+        Import components directly in your pages:
+      </p>
+
+      <ConfigFile
+        filename="pages/index.tsx"
+        code={`import { DialogRoot, DialogTrigger, DialogClose } from '@red-elements/dialog';
+
+export default function Home() {
+  return (
+    <div>
+      <h1>My Next.js App</h1>
+      <DialogRoot>
+        <DialogTrigger asChild>
+          <button className="px-4 py-2 bg-primary text-primary-foreground rounded">
+            Open Dialog
+          </button>
+        </DialogTrigger>
+        <dialog className="rounded-lg p-6 max-w-md">
+          <h2 data-dialog-title className="text-2xl font-bold mb-4">
+            Welcome
+          </h2>
+          <p data-dialog-description className="mb-4">
+            This is a dialog component.
+          </p>
+          <DialogClose asChild>
+            <button className="px-4 py-2 bg-muted rounded">Close</button>
+          </DialogClose>
+        </dialog>
+      </DialogRoot>
+    </div>
+  );
+}`}
+        lang="tsx"
+      />
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Transpilation Configuration
+      </h3>
+      <p class="leading-7">
+        Configure Next.js to transpile Red Elements packages:
+      </p>
+
+      <ConfigFile
+        filename="next.config.js"
+        code={`/** @type {import('next').NextConfig} */
+const nextConfig = {
+  transpilePackages: [
+    '@red-elements/dialog',
+    '@red-elements/dropdown',
+    '@red-elements/combobox',
+    // Add other Red Elements packages as needed
+  ],
+};
+
+module.exports = nextConfig;`}
+        lang="javascript"
+      />
+    </div>
+
+    <!-- TypeScript Support -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        TypeScript Support
+      </h2>
+      <p class="leading-7">
+        Red Elements includes full TypeScript definitions. For better type inference with custom elements in JSX, add this to your TypeScript configuration:
+      </p>
+
+      <ConfigFile
+        filename="tsconfig.json"
+        code={`{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "types": ["@red-elements/dialog"]
+  }
+}`}
+        lang="json"
+      />
+    </div>
+
+    <!-- Common Patterns -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Common Patterns
+      </h2>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight">
+        Using with Next.js Forms
+      </h3>
+      <p class="leading-7">
+        Integrate Red Elements with Next.js forms and Server Actions:
+      </p>
+
+      <CodeBlock
+        code={`'use client';
+
+import { ComboboxRoot, ComboboxInput, ComboboxContent, ComboboxItem } from '@red-elements/combobox';
+import { useState } from 'react';
+
+export function FormWithCombobox({ onSubmit }: { onSubmit: (data: FormData) ${'='}> void }) {
+  const [value, setValue] = useState('');
+
+  return (
+    <form action={onSubmit}>
+      <ComboboxRoot
+        value={value}
+        onValueChange={(e) ${'='}> setValue(e.detail.value)}
+      >
+        <ComboboxInput
+          name="category"
+          placeholder="Select category..."
+          className="w-full px-3 py-2 border rounded"
+        />
+        <ComboboxContent className="border rounded-lg shadow-lg p-1">
+          <ComboboxItem value="electronics">Electronics</ComboboxItem>
+          <ComboboxItem value="books">Books</ComboboxItem>
+          <ComboboxItem value="clothing">Clothing</ComboboxItem>
+        </ComboboxContent>
+      </ComboboxRoot>
+      <button type="submit" className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded">
+        Submit
+      </button>
+    </form>
+  );
+}`}
+        lang="tsx"
+      />
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Dynamic Imports
+      </h3>
+      <p class="leading-7">
+        For better code splitting, use dynamic imports:
+      </p>
+
+      <CodeBlock
+        code={`import dynamic from 'next/dynamic';
+
+const DialogDemo = dynamic(() ${'='}> import('@/components/dialog-demo'), {
+  ssr: false,
+  loading: () ${'='}> <p>Loading...</p>,
+});
+
+export default function Page() {
+  return (
+    <main>
+      <DialogDemo />
+    </main>
+  );
+}`}
+        lang="tsx"
+      />
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Troubleshooting
+      </h2>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight">
+        "document is not defined" error
+      </h3>
+      <p class="leading-7">
+        This occurs when components are rendered on the server. Ensure you're using the <code>'use client'</code> directive in App Router, or use dynamic imports with <code>ssr: false</code>.
+      </p>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Custom elements not recognized
+      </h3>
+      <p class="leading-7">
+        Make sure you've imported the component before using it. Red Elements components auto-register when imported.
+      </p>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Hydration mismatch warnings
+      </h3>
+      <p class="leading-7">
+        Web components may cause hydration warnings in development. These are typically harmless but can be avoided by using <code>suppressHydrationWarning</code> on the container element or using <code>ssr: false</code> with dynamic imports.
+      </p>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Next Steps
+      </h2>
+      <p class="leading-7">
+        Explore the component documentation to learn about all available components and their APIs:
+      </p>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7">
+          <a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a>
+        </li>
+        <li class="leading-7">
+          <a href="/docs/components/combobox" class="font-medium underline underline-offset-4">Combobox</a>
+        </li>
+        <li class="leading-7">
+          <a href="/docs/components/dropdown" class="font-medium underline underline-offset-4">Dropdown</a>
+        </li>
+        <li class="leading-7">
+          <a href="/docs/components/accordion" class="font-medium underline underline-offset-4">Accordion</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

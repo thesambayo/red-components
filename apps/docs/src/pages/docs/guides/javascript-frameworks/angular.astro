@@ -1,0 +1,102 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+import FrameworkCallout from '../../../../components/FrameworkCallout.astro';
+---
+
+<DocsLayout title="Angular - Red Elements" description="How to use Red Elements web components in Angular applications">
+  <div class="space-y-8">
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Angular</span>
+    </div>
+
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Using Red Elements with Angular</h1>
+      <p class="text-lg text-muted-foreground mt-2">Integrate Red Elements web components into your Angular application.</p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Node.js" version="18+" required />
+        <PrerequisiteBadge name="Angular" version="15+" required />
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Installation</h2>
+      <CodeBlock code="npm install @red-elements/dialog" lang="bash" />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Configuration</h2>
+
+      <FrameworkCallout type="important" title="Custom Elements Schema">
+        Angular requires <code>CUSTOM_ELEMENTS_SCHEMA</code> to recognize custom elements.
+      </FrameworkCallout>
+
+      <ConfigFile
+        filename="src/app/app.module.ts"
+        code={`import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule],
+  providers: [],
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+})
+export class AppModule {
+  constructor() {
+    // Import components
+    import('@red-elements/dialog');
+  }
+}`}
+        lang="typescript"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Usage</h2>
+      <ConfigFile
+        filename="src/app/app.component.html"
+        code={`<h1>Angular + Red Elements</h1>
+
+<dialog-root>
+  <dialog-trigger as-child>
+    <button class="btn-primary">Open Dialog</button>
+  </dialog-trigger>
+
+  <dialog class="rounded-lg p-6 max-w-md">
+    <h2 data-dialog-title class="text-2xl font-bold mb-4">Welcome</h2>
+    <p data-dialog-description class="mb-4">This is a dialog component.</p>
+    <dialog-close as-child>
+      <button class="btn-secondary">Close</button>
+    </dialog-close>
+  </dialog>
+</dialog-root>`}
+        lang="html"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Next Steps</h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7"><a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a></li>
+        <li class="leading-7"><a href="/docs/components/combobox" class="font-medium underline underline-offset-4">Combobox</a></li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>
