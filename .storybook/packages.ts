@@ -39,6 +39,10 @@ const PACKAGES = {
     dev: "./tooltip",
     prod: "https://unpkg.com/@red-elements/tooltip@0.0.6/dist/tooltip.mjs",
   },
+  SWITCH: {
+    dev: "./switch",
+    prod: "https://unpkg.com/@red-elements/switch@0.0.1/dist/switch.mjs",
+  },
 };
 
 export function getPackageImportURL(

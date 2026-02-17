@@ -52,6 +52,9 @@ const config: StorybookConfig = {
         "import.meta.env.VITE_TOOLTIP_URL": JSON.stringify(
           getPackageImportURL("TOOLTIP", configType)
         ),
+        "import.meta.env.VITE_SWITCH_URL": JSON.stringify(
+          getPackageImportURL("SWITCH", configType)
+        ),
       },
     };
     return newConfig;
