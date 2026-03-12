@@ -1,0 +1,139 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import FrameworkCallout from '../../../../components/FrameworkCallout.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+---
+
+<DocsLayout title="Ruby on Rails - Red Elements" description="How to use Red Elements web components in Rails applications">
+  <div class="space-y-8">
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Rails</span>
+    </div>
+
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Using Red Elements with Rails</h1>
+      <p class="text-lg text-muted-foreground mt-2">Integrate Red Elements web components into your Ruby on Rails application.</p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Ruby" version="3.0+" required />
+        <PrerequisiteBadge name="Rails" version="7+" required />
+      </div>
+      <FrameworkCallout type="info" title="Modern Browser Support">
+        This guide uses ES modules with import maps, compatible with importmap-rails.
+      </FrameworkCallout>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Installation</h2>
+
+      <p class="leading-7 font-semibold">Option 1: Using importmap-rails (Recommended)</p>
+      <CodeBlock code={`./bin/importmap pin @red-elements/dialog --from jsdelivr
+./bin/importmap pin @red-elements/dropdown --from jsdelivr`} lang="bash" />
+
+      <p class="leading-7 font-semibold mt-4">Option 2: Manual import map</p>
+      <ConfigFile
+        filename="config/importmap.rb"
+        code={`pin "@red-elements/dialog", to: "https://cdn.jsdelivr.net/npm/@red-elements/dialog@latest/dist/dialog.js"
+pin "@red-elements/dropdown", to: "https://cdn.jsdelivr.net/npm/@red-elements/dropdown@latest/dist/dropdown.js"`}
+        lang="ruby"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Usage in Views</h2>
+
+      <ConfigFile
+        filename="app/views/layouts/application.html.erb"
+        code={`<!DOCTYPE html>
+<html>
+<head>
+  <title><%= yield :title %></title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= javascript_importmap_tags %>
+</head>
+<body>
+  <%= yield %>
+</body>
+</html>`}
+        lang="erb"
+      />
+
+      <ConfigFile
+        filename="app/views/pages/index.html.erb"
+        code={`<% content_for :title, "My Rails App" %>
+
+<script type="module">
+  import '@red-elements/dialog';
+</script>
+
+<h1>Rails + Red Elements</h1>
+
+<dialog-root>
+  <dialog-trigger as-child>
+    <button type="button" class="btn btn-primary">Open Dialog</button>
+  </dialog-trigger>
+
+  <dialog class="rounded p-6 max-w-md">
+    <h2 data-dialog-title><%= @dialog_title %></h2>
+    <p data-dialog-description><%= @dialog_content %></p>
+    <dialog-close as-child>
+      <button type="button">Close</button>
+    </dialog-close>
+  </dialog>
+</dialog-root>`}
+        lang="erb"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Using with Rails Forms</h2>
+
+      <CodeBlock
+        code={`<%= form_with url: submit_path, method: :post do |form| %>
+  <script type="module">
+    import '@red-elements/combobox';
+  </script>
+
+  <combobox-root default-value="<%= @selected_category %>">
+    <%= form.hidden_field :category, id: "category" %>
+    <combobox-input
+      name="category"
+      placeholder="Select category..."
+      class="form-control"
+    ></combobox-input>
+    <combobox-content class="border rounded shadow p-1">
+      <% @categories.each do |category| %>
+        <combobox-item value="<%= category.id %>"><%= category.name %></combobox-item>
+      <% end %>
+    </combobox-content>
+  </combobox-root>
+
+  <%= form.submit "Submit", class: "btn btn-primary" %>
+<% end %>`}
+        lang="erb"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Next Steps</h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7"><a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a></li>
+        <li class="leading-7"><a href="/docs/components/combobox" class="font-medium underline underline-offset-4">Combobox</a></li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

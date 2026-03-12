@@ -4,65 +4,61 @@ import {
   AccordionItem,
   AccordionRoot,
   AccordionTrigger,
+  AccordionHeader,
 } from "@red-elements/accordion";
 import { useState } from "react";
 
 export function Accordion() {
   const [show, setShow] = useState(false);
+
+  const accordionItems = [
+    {
+      value: "item-1",
+      title: "Is it accessible?",
+      content: "Yes. It adheres to the WAI-ARIA design pattern.",
+    },
+    {
+      value: "item-2",
+      title: "Is it unstyled?",
+      content:
+        "Yes. It's unstyled by default, giving you freedom over the look and feel.",
+    },
+    {
+      value: "item-3",
+      title: "Can it be animated?",
+      content:
+        "Yes! You can use the transition prop to configure the animation.",
+    },
+  ];
+
   return (
     <div className="max-w-md mx-auto">
       <button onClick={() => setShow(!show)}>
         toggle {show ? "single" : "multiple"}
       </button>
       <AccordionRoot
+        className="w-full"
         defaultValue={["item-3"]}
         type={show ? "single" : "multiple"}
-        className="w-full"
+        collapsible
       >
-        <AccordionItem
-          value="item-1"
-          className="flex flex-col border-b focus-visible:outline-0"
-        >
-          <AccordionTrigger className="cursor-pointer flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
-            Is it accessible?
-            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-          </AccordionTrigger>
-          <AccordionContent className="overflow-hidden text-sm transition-all">
-            <div className="pb-4 pt-0">
-              Yes. It adheres to the WAI-ARIA design pattern.
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem
-          value="item-2"
-          className="flex flex-col border-b focus-visible:outline-0"
-        >
-          <AccordionTrigger className="cursor-pointer flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
-            Is it styled?
-            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-          </AccordionTrigger>
-          <AccordionContent className="overflow-hidden text-sm transition-all">
-            <div className="pb-4 pt-0">
-              Yes. It comes with default styles that matches the other
-              components&apos; aesthetic.
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem
-          value="item-3"
-          className="flex flex-col border-b focus-visible:outline-0"
-        >
-          <AccordionTrigger className="cursor-pointer flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180">
-            Is it animated?
-            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-          </AccordionTrigger>
-          <AccordionContent className="overflow-hidden text-sm transition-all">
-            <div className="pb-4 pt-0">
-              Yes. It's animated by default, but you can disable it if you
-              prefer.
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+        {accordionItems.map((accordionItem) => (
+          <AccordionItem
+            key={accordionItem.value}
+            value={accordionItem.value}
+            className="flex flex-col border-b focus-visible:outline-0"
+          >
+            <AccordionHeader>
+              <AccordionTrigger className="cursor-pointer flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180 data-[state=open]:text-red-600">
+                {accordionItem.title}
+                <ChevronDown className="size-4 shrink-0 transition-transform duration-200" />
+              </AccordionTrigger>
+            </AccordionHeader>
+            <AccordionContent className="overflow-hidden text-sm transition-all">
+              <div className="pb-4 pt-0">{accordionItem.content}</div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
       </AccordionRoot>
     </div>
   );

@@ -1,0 +1,102 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+---
+
+<DocsLayout title="Remix - Red Elements" description="How to use Red Elements web components in Remix applications">
+  <div class="space-y-8">
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Remix</span>
+    </div>
+
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Using Red Elements with Remix</h1>
+      <p class="text-lg text-muted-foreground mt-2">Integrate Red Elements web components into your Remix application.</p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Prerequisites</h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Node.js" version="18+" required />
+        <PrerequisiteBadge name="Remix" version="2+" required />
+        <PrerequisiteBadge name="React" version="18+" required />
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Installation</h2>
+      <CodeBlock code="npm install @red-elements/dialog" lang="bash" />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Usage</h2>
+      <ConfigFile
+        filename="app/routes/_index.tsx"
+        code={`import { DialogRoot, DialogTrigger, DialogClose } from '@red-elements/dialog';
+
+export default function Index() {
+  return (
+    <div>
+      <h1>Remix + Red Elements</h1>
+      <DialogRoot>
+        <DialogTrigger asChild>
+          <button className="btn-primary">Open Dialog</button>
+        </DialogTrigger>
+        <dialog className="rounded-lg p-6 max-w-md">
+          <h2 data-dialog-title className="text-2xl font-bold mb-4">Welcome</h2>
+          <p data-dialog-description className="mb-4">This is a dialog component.</p>
+          <DialogClose asChild>
+            <button className="btn-secondary">Close</button>
+          </DialogClose>
+        </dialog>
+      </DialogRoot>
+    </div>
+  );
+}`}
+        lang="tsx"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Using with Remix Forms</h2>
+      <CodeBlock
+        code={`import { Form } from '@remix-run/react';
+import { ComboboxRoot, ComboboxInput, ComboboxContent, ComboboxItem } from '@red-elements/combobox';
+
+export default function FormPage() {
+  return (
+    <Form method="post">
+      <ComboboxRoot>
+        <ComboboxInput name="category" placeholder="Select category..." />
+        <ComboboxContent>
+          <ComboboxItem value="electronics">Electronics</ComboboxItem>
+          <ComboboxItem value="books">Books</ComboboxItem>
+        </ComboboxContent>
+      </ComboboxRoot>
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}`}
+        lang="tsx"
+      />
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">Next Steps</h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7"><a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a></li>
+        <li class="leading-7"><a href="/docs/components/combobox" class="font-medium underline underline-offset-4">Combobox</a></li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>

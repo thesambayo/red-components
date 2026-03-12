@@ -86,6 +86,11 @@
   max-height: var(--tooltip-content-available-height);
 }
 
+.DropdownContent {
+  width: var(--dropdown-trigger-width);
+  max-height: var(--dropdown-available-height);
+}
+
 /*.TooltipContent {*/
 /*  border-radius: 4px;*/
 /*  padding: 10px 15px;*/

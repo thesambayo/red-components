@@ -1,0 +1,95 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+  title="Introduction - Red Elements"
+  description="An open-source UI web component library for building unstyled, high-quality, accessible design systems and web apps."
+>
+  <div class="space-y-8">
+    <div>
+      <div class="flex items-center space-x-1 text-sm text-muted-foreground mb-4">
+        <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-foreground font-medium">Introduction</span>
+      </div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Introduction</h1>
+      <p class="text-lg text-muted-foreground mt-2">
+        Unstyled, accessible web components for building high-quality design systems and web applications.
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        What is Red Elements?
+      </h2>
+      <p class="leading-7">
+        Red Elements is a collection of unstyled, accessible web components that you can use to build your own design system or enhance your existing applications.
+      </p>
+      <p class="leading-7">
+        Built on web standards using Lit, these components work seamlessly across any framework or no framework at all. They provide the functionality and accessibility while giving you complete control over the styling.
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Key Features
+      </h2>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7">
+          <strong>Framework Agnostic</strong> - Works with React, Vue, Svelte, Angular, or vanilla JavaScript
+        </li>
+        <li class="leading-7">
+          <strong>Accessible</strong> - Built with accessibility in mind, following WAI-ARIA guidelines
+        </li>
+        <li class="leading-7">
+          <strong>Unstyled</strong> - No CSS opinions, style them however you want
+        </li>
+        <li class="leading-7">
+          <strong>Composable</strong> - Build complex components from simple primitives
+        </li>
+        <li class="leading-7">
+          <strong>Lightweight</strong> - Small bundle sizes with tree-shaking support
+        </li>
+        <li class="leading-7">
+          <strong>Type Safe</strong> - Written in TypeScript with full type definitions
+        </li>
+      </ul>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Components
+      </h2>
+      <p class="leading-7">
+        Red Elements includes the following components:
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        {['Accordion', 'Alert Dialog', 'Avatar', 'Combobox', 'Dialog', 'Dropdown', 'Select', 'Tabs', 'Toast', 'Tooltip'].map((component) => (
+          <a
+            href={`/docs/components/${component.toLowerCase().replace(' ', '-')}`}
+            class="group rounded-xl border border-border bg-card p-4 font-medium text-foreground hover:shadow-md transition-all no-underline shadow-sm"
+          >
+            <div class="flex items-center justify-between">
+              <span>{component}</span>
+              <svg class="size-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold first:mt-0 tracking-tight">
+        Getting Started
+      </h2>
+      <p class="leading-7">
+        To get started with Red Elements, check out the <a href="/docs/installation" class="font-medium underline underline-offset-4">installation guide</a>.
+      </p>
+    </div>
+  </div>
+</DocsLayout>

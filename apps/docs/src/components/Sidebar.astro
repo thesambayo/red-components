@@ -1,0 +1,128 @@
+---
+const currentPath = Astro.url.pathname;
+
+const gettingStarted = [
+  { name: 'Introduction', href: '/docs/introduction' },
+  { name: 'Installation', href: '/docs/installation' },
+];
+
+const frameworkGuides = [
+  {
+    category: 'JavaScript Frameworks',
+    items: [
+      { name: 'Next.js', href: '/docs/guides/javascript-frameworks/nextjs' },
+      { name: 'Nuxt 3', href: '/docs/guides/javascript-frameworks/nuxt' },
+      { name: 'SvelteKit', href: '/docs/guides/javascript-frameworks/sveltekit' },
+      { name: 'Remix', href: '/docs/guides/javascript-frameworks/remix' },
+      { name: 'Astro', href: '/docs/guides/javascript-frameworks/astro' },
+      { name: 'Angular', href: '/docs/guides/javascript-frameworks/angular' },
+      { name: 'Vite', href: '/docs/guides/javascript-frameworks/vite' },
+    ]
+  },
+  {
+    category: 'Backend Templates',
+    items: [
+      { name: 'Go', href: '/docs/guides/backend-templates/go' },
+      { name: 'Ruby on Rails', href: '/docs/guides/backend-templates/rails' },
+      { name: 'Django', href: '/docs/guides/backend-templates/django' },
+      { name: 'Express', href: '/docs/guides/backend-templates/express' },
+      { name: 'Hono', href: '/docs/guides/backend-templates/hono' },
+    ]
+  }
+];
+
+const components = [
+  { name: 'Accordion', href: '/docs/components/accordion' },
+  { name: 'Alert Dialog', href: '/docs/components/alert-dialog' },
+  { name: 'Avatar', href: '/docs/components/avatar' },
+  { name: 'Combobox', href: '/docs/components/combobox' },
+  { name: 'Dialog', href: '/docs/components/dialog' },
+  { name: 'Dropdown', href: '/docs/components/dropdown' },
+  { name: 'Select', href: '/docs/components/select' },
+  { name: 'Tabs', href: '/docs/components/tabs' },
+  { name: 'Toast', href: '/docs/components/toast' },
+  { name: 'Tooltip', href: '/docs/components/tooltip' },
+];
+---
+
+<aside class="fixed top-16 z-30 hidden h-[calc(100vh-4rem)] w-full shrink-0 md:sticky md:block border-r border-border">
+  <div class="h-full py-8 pr-6 lg:py-10 overflow-y-auto">
+    <nav class="space-y-8 text-sm">
+      <div>
+        <h4 class="mb-3 px-2 text-sm font-semibold text-foreground">
+          Getting Started
+        </h4>
+        <ul class="space-y-0.5 list-none p-0 m-0">
+          {gettingStarted.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[
+                  "block py-2 px-2 rounded-md transition-colors no-underline text-sm",
+                  currentPath === item.href
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                ]}
+              >
+                {item.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="mb-3 px-2 text-sm font-semibold text-foreground">
+          Framework Guides
+        </h4>
+        {frameworkGuides.map((group) => (
+          <div class="mb-4">
+            <h5 class="mb-2 px-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              {group.category}
+            </h5>
+            <ul class="space-y-0.5 list-none p-0 m-0">
+              {group.items.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class:list={[
+                      "block py-2 px-2 rounded-md transition-colors no-underline text-sm",
+                      currentPath === item.href
+                        ? "bg-accent text-accent-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    ]}
+                  >
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div>
+        <h4 class="mb-3 px-2 text-sm font-semibold text-foreground">
+          Components
+        </h4>
+        <ul class="space-y-0.5 list-none p-0 m-0">
+          {components.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[
+                  "block py-2 px-2 rounded-md transition-colors no-underline text-sm",
+                  currentPath === item.href
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                ]}
+              >
+                {item.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
+  </div>
+</aside>

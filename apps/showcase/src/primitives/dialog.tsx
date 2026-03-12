@@ -1,0 +1,41 @@
+import { DialogRoot, DialogTrigger } from "@red-elements/dialog";
+import { X } from "lucide-react";
+
+export function Dialog() {
+  return (
+    <div className="max-w-md mx-auto space-x-5">
+      <DialogRoot modal onOpenChange={(e) => console.log(e)}>
+        <DialogTrigger as-child>
+          <button className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3.5 py-1.5">
+            Open Dialog
+          </button>
+        </DialogTrigger>
+        <dialog className="backdrop:bg-fuchsia-100/70 relative w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 open:animate-in animate-out fade-out-0 open:fade-in-0 sm:rounded-lg">
+          <h2 data-dialog-title>Edit Profile</h2>
+          <p data-dialog-description>Make changes to your profile.</p>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right">
+                Name
+              </label>
+              <input id="name" className="col-span-3 border p-1" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="username" className="text-right">
+                Username
+              </label>
+              <input id="username" className="col-span-3 border p-1" />
+            </div>
+            <button
+              data-dialog-close
+              className="absolute cursor-pointer right-2 top-2 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <X className="size-5" />
+              <span className="sr-only">Close</span>
+            </button>
+          </div>
+        </dialog>
+      </DialogRoot>
+    </div>
+  );
+}

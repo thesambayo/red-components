@@ -1,0 +1,21 @@
+---
+import CodeBlock from './CodeBlock.astro';
+import type { CodeLanguage } from 'astro';
+
+interface Props {
+  filename: string;
+  code: string;
+  lang?: CodeLanguage;
+  description?: string;
+}
+
+const { filename, code, lang = 'typescript', description } = Astro.props;
+---
+
+<div class="my-6">
+  <div class="mb-2 flex items-center gap-2 flex-wrap">
+    <span class="rounded bg-muted px-2 py-1 font-mono text-xs text-foreground border border-border">{filename}</span>
+    {description && <span class="text-sm text-muted-foreground">{description}</span>}
+  </div>
+  <CodeBlock code={code} lang={lang} />
+</div>

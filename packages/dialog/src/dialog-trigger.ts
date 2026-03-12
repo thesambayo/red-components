@@ -1,53 +1,194 @@
-import { html, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
-import { DIALOG_ATTRIBUTES, DIALOG_EVENTS_RECORD } from "./dialog.context";
+import { LitElement, html } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import { consume } from "@lit/context";
+import { dialogRootContext } from "./context";
+import type { DialogRootContextValue } from "./types";
 
+/**
+ * Trigger element that opens the dialog on click.
+ *
+ * With `as-child`, passes behavior to the slotted child element.
+ * Without `as-child`, acts as the trigger itself.
+ *
+ * @element dialog-trigger
+ *
+ * @example
+ * ```html
+ * <!-- With as-child: behavior passed to button -->
+ * <dialog-trigger as-child>
+ *   <button>Open Dialog</button>
+ * </dialog-trigger>
+ *
+ * <!-- Without as-child: component is the trigger -->
+ * <dialog-trigger>Open Dialog</dialog-trigger>
+ * ```
+ */
 @customElement("dialog-trigger")
 export class DialogTrigger extends LitElement {
+  /**
+   * Pass behavior to slotted child instead of rendering wrapper
+   */
+  @property({ type: Boolean, attribute: "as-child" })
+  asChild = false;
+
+  @consume({ context: dialogRootContext, subscribe: true })
+  private _rootContext?: DialogRootContextValue;
+
+  /** Reference to the child element when using as-child */
+  private _childElement: HTMLElement | null = null;
+
+  /** Stored handler references for proper cleanup */
+  private _handleClick = this._onClick.bind(this);
+  private _handleKeyDown = this._onKeyDown.bind(this);
+  private _handleSlotChange = this._onSlotChange.bind(this);
+
   connectedCallback() {
     super.connectedCallback();
-    this.setAttribute("tabindex", "0");
-    this.setAttribute("aria-haspopup", "dialog");
-    // to fix
-    this.setAttribute("aria-controls", "contentId");
-    // dynamic attributes
-    this.setAttribute("aria-expanded", "false");
-    this.setAttribute("data-state", "closed");
 
-    this.addEventListener("click", this.clickHandler);
-    this.addEventListener("keydown", this.keyDownHandler);
+    // Register with root context
+    if (this.asChild) {
+      // Will register child element after slot change
+    } else {
+      this._rootContext?.onTriggerMount(this);
+      this._setupSelfAsTrigger();
+    }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener("click", this.clickHandler);
-    this.removeEventListener("keydown", this.keyDownHandler);
+
+    if (this.asChild) {
+      this._cleanupChildTrigger();
+    } else {
+      this._cleanupSelfAsTrigger();
+    }
+  }
+
+  protected willUpdate() {
+    this._updateAttributes();
+  }
+
+  private _setupSelfAsTrigger() {
+    this.addEventListener("click", this._handleClick);
+    this.addEventListener("keydown", this._handleKeyDown);
+
+    // Make focusable if not already
+    if (!this.hasAttribute("tabindex")) {
+      this.setAttribute("tabindex", "0");
+    }
+
+    // Set accessibility attributes
+    this.setAttribute("aria-haspopup", "dialog");
+  }
+
+  private _cleanupSelfAsTrigger() {
+    this.removeEventListener("click", this._handleClick);
+    this.removeEventListener("keydown", this._handleKeyDown);
+  }
+
+  private _setupChildTrigger(child: HTMLElement) {
+    this._childElement = child;
+
+    // Register child with root context
+    this._rootContext?.onTriggerMount(child);
+
+    // Add event listeners to child
+    child.addEventListener("click", this._handleClick);
+    child.addEventListener("keydown", this._handleKeyDown);
+
+    // Set accessibility attributes on child
+    child.setAttribute("aria-haspopup", "dialog");
+
+    // Update attributes on child
+    this._updateChildAttributes();
+  }
+
+  private _cleanupChildTrigger() {
+    if (this._childElement) {
+      this._childElement.removeEventListener("click", this._handleClick);
+      this._childElement.removeEventListener("keydown", this._handleKeyDown);
+      this._childElement = null;
+    }
+  }
+
+  private _onSlotChange(event: Event) {
+    if (!this.asChild) return;
+
+    const slot = event.target as HTMLSlotElement;
+    const children = slot.assignedElements();
+
+    // Cleanup previous child
+    this._cleanupChildTrigger();
+
+    // Setup new child
+    if (children.length > 0) {
+      const child = children[0] as HTMLElement;
+      this._setupChildTrigger(child);
+    }
+  }
+
+  private _updateAttributes() {
+    if (!this._rootContext) return;
+
+    if (this.asChild) {
+      this._updateChildAttributes();
+    } else {
+      this._updateSelfAttributes();
+    }
+  }
+
+  private _updateSelfAttributes() {
+    if (!this._rootContext) return;
+
+    this.setAttribute(
+      "aria-expanded",
+      this._rootContext.open ? "true" : "false"
+    );
+    this.setAttribute("data-state", this._rootContext.open ? "open" : "closed");
+
+    if (this._rootContext.dialogElement) {
+      const dialogId =
+        this._rootContext.dialogElement.id || this._rootContext.titleId;
+      if (dialogId) {
+        this.setAttribute("aria-controls", dialogId);
+      }
+    }
+  }
+
+  private _updateChildAttributes() {
+    if (!this._rootContext || !this._childElement) return;
+
+    this._childElement.setAttribute(
+      "aria-expanded",
+      this._rootContext.open ? "true" : "false"
+    );
+    this._childElement.setAttribute(
+      "data-state",
+      this._rootContext.open ? "open" : "closed"
+    );
+
+    if (this._rootContext.dialogElement) {
+      const dialogId =
+        this._rootContext.dialogElement.id || this._rootContext.titleId;
+      if (dialogId) {
+        this._childElement.setAttribute("aria-controls", dialogId);
+      }
+    }
+  }
+
+  private _onClick() {
+    this._rootContext?.onOpenChange(true);
+  }
+
+  private _onKeyDown(event: KeyboardEvent) {
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault();
+      this._rootContext?.onOpenChange(true);
+    }
   }
 
   protected render() {
-    return html` <slot></slot> `;
-  }
-
-  private clickHandler = () => {
-    this.openDialogEvent();
-  };
-
-  private keyDownHandler = (event: KeyboardEvent) => {
-    //  trigger with SPACE and ENTER key
-    if (event.key === " " || event.key === "Enter") {
-      event.preventDefault(); // Prevent page scroll on spacebar
-      this.openDialogEvent();
-    }
-  };
-
-  private openDialogEvent() {
-    this.dispatchEvent(
-      DIALOG_EVENTS_RECORD.OPEN({
-        dialogDataId: this.getAttribute(DIALOG_ATTRIBUTES.DATA_ID_KEY),
-      })
-    );
-    this.setAttribute("aria-expanded", "true");
-    this.setAttribute("data-state", "open");
+    return html`<slot @slotchange=${this._handleSlotChange}></slot>`;
   }
 }
 

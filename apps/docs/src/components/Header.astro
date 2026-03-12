@@ -1,0 +1,138 @@
+---
+---
+
+<header class="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+  <div class="container flex h-16 max-w-screen-2xl items-center gap-4 px-4 md:px-8">
+    <div class="mr-2 flex md:mr-4">
+      <a class="flex items-center space-x-2 no-underline" href="/">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <span class="hidden font-bold text-foreground sm:inline-block">Red Elements</span>
+      </a>
+    </div>
+    <nav class="flex items-center gap-4 text-sm md:gap-6">
+      <a
+        href="/docs/introduction"
+        class="transition-colors hover:text-foreground/80 text-foreground/60 no-underline font-medium"
+      >
+        Docs
+      </a>
+      <a
+        href="/docs/components/accordion"
+        class="transition-colors hover:text-foreground/80 text-foreground/60 no-underline font-medium"
+      >
+        Components
+      </a>
+      <a
+        href="/examples"
+        class="transition-colors hover:text-foreground/80 text-foreground/60 no-underline font-medium"
+      >
+        Examples
+      </a>
+    </nav>
+
+    <div class="flex flex-1 items-center justify-end space-x-2">
+      <div class="hidden w-full flex-1 md:flex md:w-auto md:flex-none">
+        <button class="inline-flex items-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input hover:bg-accent hover:text-accent-foreground px-3 py-2 relative h-9 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-64">
+          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <span class="hidden lg:inline-flex">Search documentation...</span>
+          <span class="inline-flex lg:hidden">Search...</span>
+          <kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none items-center gap-1 rounded border border-border bg-background px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+            <span class="text-xs">⌘</span>K
+          </kbd>
+        </button>
+      </div>
+      <nav class="flex items-center gap-1">
+      <!-- Theme Switcher -->
+      <dropdown-root id="theme-dropdown">
+        <dropdown-trigger class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent h-9 w-9 p-0 relative">
+          <svg class="size-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>
+          </svg>
+          <svg class="absolute size-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <span class="sr-only">Toggle theme</span>
+        </dropdown-trigger>
+        <dropdown-content side="bottom" align="end" class="min-w-35 bg-popover border border-border rounded-lg shadow-lg p-1">
+          <dropdown-item value="light" class="block px-3 py-2 text-sm text-foreground rounded cursor-pointer hover:bg-accent/50 outline-none">
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>
+              </svg>
+              Light
+            </div>
+          </dropdown-item>
+          <dropdown-item value="dark" class="block px-3 py-2 text-sm text-foreground rounded cursor-pointer hover:bg-accent/50 outline-none">
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+              Dark
+            </div>
+          </dropdown-item>
+          <dropdown-item value="system" class="block px-3 py-2 text-sm text-foreground rounded cursor-pointer hover:bg-accent/50 outline-none">
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <path d="M8 21h8m-4-4v4"/>
+              </svg>
+              System
+            </div>
+          </dropdown-item>
+        </dropdown-content>
+      </dropdown-root>
+
+      <a
+        href="https://github.com/thesambayo/red-components"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent h-9 py-2 px-3 no-underline text-foreground"
+      >
+        <svg class="size-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Theme switcher logic
+  function initThemeSwitcher() {
+    const themeDropdown = document.getElementById('theme-dropdown');
+    if (!themeDropdown) return;
+
+    // Listen for dropdown item selections
+    themeDropdown.addEventListener('dropdown:item-select', (e) => {
+      const theme = (e as CustomEvent<{dropdownId: string, value: 'light' | 'dark' | 'system'}>).detail.value;
+      setTheme(theme);
+    });
+  }
+
+  function setTheme(theme: string) {
+    const html = document.documentElement;
+
+    if (theme === 'system') {
+      localStorage.removeItem('theme');
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      html.classList[isDark ? 'add' : 'remove']('dark');
+    } else {
+      localStorage.setItem('theme', theme);
+      html.classList[theme === 'dark' ? 'add' : 'remove']('dark');
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initThemeSwitcher);
+
+  // Re-initialize on navigation (for Astro view transitions if enabled)
+  document.addEventListener('astro:page-load', initThemeSwitcher);
+</script>

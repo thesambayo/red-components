@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@lit/react": "^1.0.7"
+    "@lit/react": "^1.0.8"
   },
   "license": "MIT",
   "sideEffects": false,

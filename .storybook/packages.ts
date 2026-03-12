@@ -3,9 +3,17 @@ const PACKAGES = {
     dev: "./accordion",
     prod: "https://unpkg.com/@red-elements/accordion@0.0.4/dist/accordion.mjs",
   },
+  ALERT_DIALOG: {
+    dev: "./alert-dialog",
+    prod: "https://unpkg.com/@red-elements/alert-dialog@0.0.1/dist/alert-dialog.mjs",
+  },
   AVATAR: {
     dev: "./avatar",
     prod: "https://unpkg.com/@red-elements/avatar@0.0.3/dist/avatar.mjs",
+  },
+  COMBOBOX: {
+    dev: "./combobox",
+    prod: "https://unpkg.com/@red-elements/combobox@0.0.1/dist/combobox.mjs",
   },
   DIALOG: {
     dev: "./dialog",
@@ -14,6 +22,10 @@ const PACKAGES = {
   DROPDOWN: {
     dev: "./dropdown",
     prod: "https://unpkg.com/@red-elements/dropdown@0.0.3/dist/dropdown.mjs",
+  },
+  SELECT: {
+    dev: "./select",
+    prod: "https://unpkg.com/@red-elements/select@0.0.4/dist/select.mjs",
   },
   TABS: {
     dev: "./tabs",
@@ -26,6 +38,10 @@ const PACKAGES = {
   TOOLTIP: {
     dev: "./tooltip",
     prod: "https://unpkg.com/@red-elements/tooltip@0.0.6/dist/tooltip.mjs",
+  },
+  SWITCH: {
+    dev: "./switch",
+    prod: "https://unpkg.com/@red-elements/switch@0.0.1/dist/switch.mjs",
   },
 };
 

@@ -3,34 +3,31 @@ import { createComponent, EventName } from "@lit/react";
 import * as accordion from "./accordion";
 
 /**
- * @name AccordionRoot
- * @summary root container for accordions.
- * @documentation https://red-components.vercel.app/?path=/docs/accordion-accordion--docs
- * @status unstable
- * @since 0.0.0
+ * React wrapper for accordion-root
  *
+ * @prop {'single' | 'multiple'} type - Whether one or multiple items can be open
+ * @prop {string[]} defaultValue - Initially expanded item value(s)
+ * @prop {'ltr' | 'rtl'} dir - Reading direction
+ * @prop {'horizontal' | 'vertical'} orientation - Layout orientation
+ * @prop {boolean} disabled - Disable all items
+ * @prop {boolean} collapsible - Allow collapsing all items in single mode
  *
- * @prop {'single' | 'multiple'} type - Determines if multiple items can be open at the same time.
- * @prop {string[]} default-value - primitives item values to be display on default
- *
- *
- * @event {CustomEvent<string[]>} onchange - Emitted when opened primitives items are updated.
+ * @event onChange - Emitted when expanded items change
  */
 export const AccordionRoot = createComponent({
   tagName: "accordion-root",
   elementClass: accordion.AccordionRoot,
   react: React,
   events: {
-    onchange: "change" as EventName<CustomEvent<string[]>>,
+    onChange: "change" as EventName<CustomEvent<string[]>>,
   },
 });
 
 /**
- * @name AccordionItem
- * @status unstable
- * @since 0.0.0
+ * React wrapper for accordion-item
  *
- * @prop {string} value - value that identifies primitives item
+ * @prop {string} value - Unique identifier for this item (required)
+ * @prop {boolean} disabled - Whether this item is disabled
  */
 export const AccordionItem = createComponent({
   tagName: "accordion-item",
@@ -39,10 +36,20 @@ export const AccordionItem = createComponent({
 });
 
 /**
- * @name AccordionTrigger
- * @summary trigger element to open primitives item.
- * @status unstable
- * @since 0.0.0
+ * React wrapper for accordion-header
+ *
+ * Wraps the trigger for proper heading structure.
+ */
+export const AccordionHeader = createComponent({
+  tagName: "accordion-header",
+  elementClass: accordion.AccordionHeader,
+  react: React,
+});
+
+/**
+ * React wrapper for accordion-trigger
+ *
+ * Button that toggles the accordion item.
  */
 export const AccordionTrigger = createComponent({
   tagName: "accordion-trigger",
@@ -51,13 +58,22 @@ export const AccordionTrigger = createComponent({
 });
 
 /**
- * @name AccordionContent
- * @summary element that contains content of primitives item.
- * @status unstable
- * @since 0.0.0
+ * React wrapper for accordion-content
+ *
+ * Contains the collapsible content.
  */
 export const AccordionContent = createComponent({
   tagName: "accordion-content",
   elementClass: accordion.AccordionContent,
   react: React,
 });
+
+// Re-export types
+export type {
+  AccordionType,
+  Direction,
+  Orientation,
+  DataState,
+  AccordionContextValue,
+  AccordionItemContextValue,
+} from "./types";

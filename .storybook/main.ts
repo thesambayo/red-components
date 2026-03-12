@@ -5,9 +5,8 @@ const config: StorybookConfig = {
   stories: ["../packages/**/**/*.stories.ts"],
   addons: [
     "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-actions",
     "@chromatic-com/storybook",
+    "@storybook/addon-docs",
   ],
   framework: {
     name: "@storybook/web-components-vite",
@@ -26,8 +25,14 @@ const config: StorybookConfig = {
         "import.meta.env.VITE_ACCORDION_URL": JSON.stringify(
           getPackageImportURL("ACCORDION", configType)
         ),
+        "import.meta.env.VITE_ALERT_DIALOG_URL": JSON.stringify(
+          getPackageImportURL("ALERT_DIALOG", configType)
+        ),
         "import.meta.env.VITE_AVATAR_URL": JSON.stringify(
           getPackageImportURL("AVATAR", configType)
+        ),
+        "import.meta.env.VITE_COMBOBOX_URL": JSON.stringify(
+          getPackageImportURL("COMBOBOX", configType)
         ),
         "import.meta.env.VITE_DIALOG_URL": JSON.stringify(
           getPackageImportURL("DIALOG", configType)
@@ -38,11 +43,17 @@ const config: StorybookConfig = {
         "import.meta.env.VITE_TABS_URL": JSON.stringify(
           getPackageImportURL("TABS", configType)
         ),
+        "import.meta.env.VITE_SELECT_URL": JSON.stringify(
+          getPackageImportURL("SELECT", configType)
+        ),
         "import.meta.env.VITE_TOAST_URL": JSON.stringify(
           getPackageImportURL("TOAST", configType)
         ),
         "import.meta.env.VITE_TOOLTIP_URL": JSON.stringify(
           getPackageImportURL("TOOLTIP", configType)
+        ),
+        "import.meta.env.VITE_SWITCH_URL": JSON.stringify(
+          getPackageImportURL("SWITCH", configType)
         ),
       },
     };

@@ -1,159 +1,177 @@
+import { LitElement, html } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import { provide } from "@lit/context";
-import { LitElement, html, PropertyValues } from "lit";
-import { customElement, property } from "lit/decorators.js";
-import {
-  AccordionContext,
-  accordionContext,
-  accordionTags,
-} from "./accordion-context";
+import { accordionRootContext } from "./context";
+import type {
+  AccordionType,
+  Direction,
+  Orientation,
+  AccordionContextValue,
+} from "./types";
 
-const ACCORDION_ACTIVATION_KEYS = [" ", "Enter"];
-
+/**
+ * Root container for the accordion component.
+ *
+ * @element accordion-root
+ *
+ * @fires change - Emitted when expanded items change. Detail contains string[] of expanded values.
+ *
+ * @example
+ * ```html
+ * <accordion-root type="single">
+ *   <accordion-item value="item-1">
+ *     <accordion-header>
+ *       <accordion-trigger>Section 1</accordion-trigger>
+ *     </accordion-header>
+ *     <accordion-content>Content 1</accordion-content>
+ *   </accordion-item>
+ * </accordion-root>
+ * ```
+ */
 @customElement("accordion-root")
 export class AccordionRoot extends LitElement {
-  @provide({ context: accordionContext })
-  @property({ type: Object })
-  private _provider: AccordionContext = {
-    value: [],
-    type: "single",
-    direction: "ltr", // does not do anything atm
-    orientation: "horizontal", // does not do anything atm
-  };
+  /**
+   * Single allows one item open at a time, multiple allows many
+   */
+  @property({ type: String })
+  type: AccordionType = "single";
 
-  @property({ attribute: "type" })
-  type: "single" | "multiple" = "single";
-
-  // updates to be done on react for this
+  /**
+   * Default expanded item(s). Use JSON array format for multiple: '["item-1", "item-2"]'
+   */
   @property({
     attribute: "default-value",
     converter: {
       fromAttribute: (value) => {
         if (!value) return [];
-        const parsedValue = value?.replace(/'/g, '"');
-        return JSON.parse(parsedValue) as string[];
+        try {
+          const parsed = JSON.parse(value.replace(/'/g, '"'));
+          return Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+          return [value];
+        }
       },
-      // toAttribute(value: string[]): any {
-      //   return JSON.stringify(value)
-      // }
     },
   })
   defaultValue: string[] = [];
 
-  @property({ attribute: "dir" })
-  direction: AccordionContext["direction"] = "ltr";
+  /**
+   * Reading direction for RTL support
+   */
+  @property({ type: String })
+  dir: Direction = "ltr";
 
-  @property({ attribute: "orientation" })
-  orientation: AccordionContext["orientation"] = "horizontal";
+  /**
+   * Orientation affects keyboard navigation
+   */
+  @property({ type: String })
+  orientation: Orientation = "vertical";
+
+  /**
+   * Disable all accordion items
+   */
+  @property({ type: Boolean })
+  disabled = false;
+
+  /**
+   * Allow collapsing all items in single mode
+   */
+  @property({ type: Boolean })
+  collapsible = false;
+
+  /** Internal state for expanded values */
+  @state()
+  private _expandedValues: string[] = [];
+
+  /** Context value provided to children - used by @provide decorator */
+  @provide({ context: accordionRootContext })
+  @property({ attribute: false })
+  context: AccordionContextValue = this.createContext();
 
   connectedCallback() {
     super.connectedCallback();
-
-    requestAnimationFrame(() => {
-      this.configureAccordionChildren();
-
-      this._provider = {
-        ...this._provider,
-        type: this.type,
-        direction: this.direction,
-        orientation: this.orientation,
-        value: this.defaultValue,
-      };
-    });
-
-    this.addEventListener("keydown", this.handleKeydownEvent);
-    this.addEventListener("click", this.handleClickEvent);
+    // Initialize with default value
+    this._expandedValues = [...this.defaultValue];
+    // Update context with initial values
+    this._updateContext();
   }
 
-  protected shouldUpdate(_changedProperties: PropertyValues<this>): boolean {
-    if (_changedProperties.has("type")) {
-      this._provider.type = this.type ?? "single";
+  protected willUpdate(changed: Map<string, unknown>) {
+    // Update context when any relevant property changes
+    if (
+      changed.has("type") ||
+      changed.has("dir") ||
+      changed.has("orientation") ||
+      changed.has("disabled") ||
+      changed.has("collapsible") ||
+      changed.has("_expandedValues")
+    ) {
+      this._updateContext();
+    }
+  }
+
+  private createContext(): AccordionContextValue {
+    return {
+      value: this._expandedValues,
+      type: this.type,
+      direction: this.dir,
+      orientation: this.orientation,
+      disabled: this.disabled,
+      collapsible: this.collapsible,
+      toggle: this._toggle.bind(this),
+      isExpanded: this._isExpanded.bind(this),
+    };
+  }
+
+  private _updateContext() {
+    this.context = this.createContext();
+  }
+
+  private _toggle(itemValue: string) {
+    if (this.disabled) return;
+
+    const isCurrentlyExpanded = this._expandedValues.includes(itemValue);
+
+    let newValue: string[];
+
+    if (this.type === "single") {
+      if (isCurrentlyExpanded) {
+        // Collapse only if collapsible is true
+        newValue = this.collapsible ? [] : this._expandedValues;
+      } else {
+        newValue = [itemValue];
+      }
+    } else {
+      // Multiple mode - toggle the item
+      newValue = isCurrentlyExpanded
+        ? this._expandedValues.filter((v) => v !== itemValue)
+        : [...this._expandedValues, itemValue];
     }
 
-    return true;
+    // Update state (triggers reactive updates via @state)
+    this._expandedValues = newValue;
+
+    // Dispatch change event
+    this.dispatchEvent(
+      new CustomEvent("change", {
+        bubbles: true,
+        composed: true,
+        detail: newValue,
+      })
+    );
+  }
+
+  private _isExpanded(itemValue: string): boolean {
+    return this._expandedValues.includes(itemValue);
   }
 
   protected render() {
-    return html` <slot></slot> `;
+    return html`<slot></slot>`;
   }
+}
 
-  private configureAccordionChildren() {
-    const prefix = "4";
-    const accItems = this.querySelectorAll<HTMLElement>(accordionTags.ITEM);
-
-    for (let index = 0; index < accItems.length; index++) {
-      const accordionItem = accItems[index];
-      const accordionTrigger = accordionItem.querySelector(
-        accordionTags.TRIGGER,
-      );
-      const accordionContent = accordionItem.querySelector(
-        accordionTags.CONTENT,
-      );
-
-      if (!accordionTrigger || !accordionContent) {
-        console.warn("Accordion Triggers/Contents mismatch");
-        continue;
-      }
-
-      accordionItem.setAttribute(
-        "id",
-        accordionItem.id || `${prefix}-item-${index}`,
-      );
-      const triggerId = accordionTrigger.id || `${prefix}-trigger-${index}`;
-      const contentId = accordionContent.id || `${prefix}-content-${index}`;
-
-      accordionTrigger.setAttribute("id", triggerId);
-      accordionTrigger.setAttribute("aria-controls", contentId);
-      accordionContent.setAttribute("role", "button");
-      accordionContent.setAttribute("id", contentId);
-      accordionContent.setAttribute("aria-labelledBy", triggerId);
-      accordionContent.setAttribute("role", "region");
-    }
-  }
-
-  handleKeydownEvent(event: KeyboardEvent) {
-    if (!ACCORDION_ACTIVATION_KEYS.includes(event.key)) return;
-    const eventTarget = event.target as HTMLElement | null;
-    if (eventTarget?.localName !== "accordion-trigger") return;
-    event.preventDefault();
-    this.activateAccordionItem(eventTarget);
-  }
-
-  handleClickEvent(event: MouseEvent) {
-    const eventTarget = event.target as HTMLElement;
-    if (eventTarget?.localName !== "accordion-trigger") return;
-    event.preventDefault();
-    // eventTarget.focus();
-    this.activateAccordionItem(eventTarget);
-  }
-
-  activateAccordionItem(eventTarget: HTMLElement) {
-    if (eventTarget.localName !== "accordion-trigger") return;
-
-    const accItemValue = eventTarget.parentElement?.getAttribute("value");
-
-    if (!accItemValue) {
-      console.warn("primitives item has no value");
-      return;
-    }
-
-    const updatedValues = this._provider.value.includes(accItemValue)
-      ? this._provider.value.filter((item) => item !== accItemValue)
-      : [
-          ...(this._provider.type === "multiple" ? this._provider.value : []),
-          accItemValue,
-        ];
-
-    this._provider = {
-      ...this._provider,
-      value: updatedValues,
-    };
-
-    const options: CustomEventInit<string[]> = {
-      bubbles: true,
-      composed: true,
-      cancelable: true,
-      detail: updatedValues,
-    };
-    this.dispatchEvent(new CustomEvent("change", options));
+declare global {
+  interface HTMLElementTagNameMap {
+    "accordion-root": AccordionRoot;
   }
 }

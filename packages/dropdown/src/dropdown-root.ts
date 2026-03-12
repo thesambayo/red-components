@@ -1,118 +1,125 @@
-import { LitElement, PropertyValues, html } from "lit";
+import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import {
-  CustomDropdownEvent,
-  DROPDOWN_ATTRIBUTES,
-  DROPDOWN_EVENTS_NAME,
-  DROPDOWN_EVENTS_RECORD,
-  dropdownTags,
-} from "./dropdown.context";
-import { nextId } from "./randomId";
+import { generateDropdownId, DROPDOWN_EVENTS } from "./dropdown.context";
+import type { DropdownTrigger } from "./dropdown-trigger";
 
+/**
+ * Root container for dropdown menu.
+ * Coordinates trigger and content elements.
+ *
+ * @element dropdown-root
+ * @slot - Contains dropdown-trigger and dropdown-content
+ *
+ * @fires dropdown:open - When dropdown opens
+ * @fires dropdown:close - When dropdown closes
+ */
 @customElement("dropdown-root")
 export class DropdownRoot extends LitElement {
+  /** Unique ID for this dropdown instance */
+  @state()
+  private _dropdownId = generateDropdownId();
+
+  /** Current open state */
+  @state()
+  accessor isOpen = false;
+
   /**
-   * The controlled display of tooltip content
-   * @default false
+   * Controlled open state
    */
-  @property({
-    attribute: "open",
-    type: Boolean,
-    converter: {
-      fromAttribute: (attrValue: string | null) => {
-        if (attrValue === null) return false;
-        if (attrValue === "") return true;
-        return attrValue === "true";
-      },
-      toAttribute: (value: boolean | null) => {
-        return value ? "true" : "false";
-      },
-    },
-  })
+  @property({ type: Boolean, reflect: true })
   accessor open = false;
 
-  /**
-    This monitors is dropdown is opened or not.
-    Unlike open (which tracks open attribute from the user/outside environment)
-  */
-  @state()
-  accessor currentDropdownOpenState = false;
+  private _trigger: DropdownTrigger | null = null;
+  private _content: HTMLElement | null = null;
 
-  /**
-    This monitors if the user is controlling the dropdown open state.
-    If true, then the dropdown can only the opened and closed from open attribute changes
-  */
-  @state()
-  accessor isOpenStateControlled = false;
+  get dropdownId() {
+    return this._dropdownId;
+  }
+
+  get trigger() {
+    return this._trigger;
+  }
+
+  get content() {
+    return this._content;
+  }
 
   connectedCallback() {
     super.connectedCallback();
-    this.isOpenStateControlled = this.hasAttribute("open");
+    this._setupChildren();
+  }
 
-    const dropdownID = nextId();
-    this.setAttribute("role", "dropdown");
-    this.setAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY, dropdownID);
-    // expected children => dropdownTags.TRIGGER & dropdownTags.PORTAL
-    Array.from(this.children).map((child) => {
-      child.setAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY, dropdownID);
-    });
+  private _setupChildren() {
+    // Find and configure trigger
+    this._trigger = this.querySelector("dropdown-trigger") as DropdownTrigger;
+    if (this._trigger) {
+      this._trigger.setAttribute("data-dropdown-id", this._dropdownId);
+    }
 
-    document.addEventListener(DROPDOWN_EVENTS_NAME.OPEN, this.handleOpenAction);
-    document.addEventListener(
-      DROPDOWN_EVENTS_NAME.CLOSE,
-      this.handleCloseAction
+    // Find and configure content
+    this._content = this.querySelector("dropdown-content");
+    if (this._content) {
+      this._content.setAttribute("data-dropdown-id", this._dropdownId);
+      this._content.setAttribute("id", `${this._dropdownId}-content`);
+
+      // Listen for toggle events from popover
+      this._content.addEventListener("toggle", this._handleContentToggle as EventListener);
+    }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this._content) {
+      this._content.removeEventListener("toggle", this._handleContentToggle as EventListener);
+    }
+  }
+
+  private _handleContentToggle = (event: ToggleEvent) => {
+    const wasOpen = this.isOpen;
+    this.isOpen = event.newState === "open";
+
+    // Update trigger state (handles as-child internally)
+    this._trigger?.updateState(this.isOpen);
+
+    if (this.isOpen && !wasOpen) {
+      this._dispatchOpen();
+    } else if (!this.isOpen && wasOpen) {
+      this._dispatchClose();
+      // Return focus to the actual trigger element
+      this._trigger?.getTriggerElement()?.focus();
+    }
+  };
+
+  private _dispatchOpen() {
+    this.dispatchEvent(
+      new CustomEvent(DROPDOWN_EVENTS.OPEN, {
+        bubbles: true,
+        composed: true,
+        detail: { dropdownId: this._dropdownId },
+      })
     );
   }
 
-  protected willUpdate(_changedProperties: PropertyValues<this>): void {
-    // console.log(_changedProperties);
-    // console.log(this.open);
-    if (
-      _changedProperties.has("currentDropdownOpenState") &&
-      _changedProperties.get("open") !== this.open
-    ) {
-      this.emitOpenChangeEvent();
+  private _dispatchClose() {
+    this.dispatchEvent(
+      new CustomEvent(DROPDOWN_EVENTS.CLOSE, {
+        bubbles: true,
+        composed: true,
+        detail: { dropdownId: this._dropdownId },
+      })
+    );
+  }
+
+  /** Programmatically close the dropdown */
+  close() {
+    if (this._content && "hidePopover" in this._content) {
+      (this._content as HTMLElement).hidePopover();
     }
   }
 
   protected render() {
     return html`<slot></slot>`;
   }
-
-  emitOpenChangeEvent() {
-    this.dispatchEvent(
-      DROPDOWN_EVENTS_RECORD.STATE_CHANGE({
-        dropdownDataId: this.getAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY),
-        open: this.currentDropdownOpenState,
-      })
-    );
-  }
-
-  private checkSameDropdownId(event: CustomDropdownEvent): boolean {
-    return (
-      this.getAttribute(DROPDOWN_ATTRIBUTES.DATA_ID_KEY) ===
-      event.detail.dropdownDataId
-    );
-  }
-
-  handleOpenAction = (event: Event) => {
-    const dialogEvent = event as CustomDropdownEvent;
-    if (!this.checkSameDropdownId(dialogEvent)) {
-      return;
-    }
-    this.currentDropdownOpenState = true;
-    document.body.style.pointerEvents = "none";
-  };
-
-  handleCloseAction = (event: Event) => {
-    const dialogEvent = event as CustomDropdownEvent;
-    if (!this.checkSameDropdownId(dialogEvent)) {
-      return;
-    }
-    this.currentDropdownOpenState = false;
-    (this.querySelector(dropdownTags.TRIGGER) as HTMLElement).focus();
-    document.body.removeAttribute("style");
-  };
 }
 
 declare global {

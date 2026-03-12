@@ -1,0 +1,371 @@
+---
+import DocsLayout from '../../../../layouts/DocsLayout.astro';
+import CodeBlock from '../../../../components/CodeBlock.astro';
+import PrerequisiteBadge from '../../../../components/PrerequisiteBadge.astro';
+import FrameworkCallout from '../../../../components/FrameworkCallout.astro';
+import ConfigFile from '../../../../components/ConfigFile.astro';
+---
+
+<DocsLayout
+  title="Django - Red Elements"
+  description="How to use Red Elements web components in Django applications"
+>
+  <div class="space-y-8">
+    <!-- Breadcrumb -->
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <a href="/docs/introduction" class="hover:text-foreground transition-colors">Docs</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/docs/installation" class="hover:text-foreground transition-colors">Guides</a>
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-foreground font-medium">Django</span>
+    </div>
+
+    <!-- Header -->
+    <div>
+      <h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Using Red Elements with Django
+      </h1>
+      <p class="text-lg text-muted-foreground mt-2">
+        Integrate Red Elements web components into your Django templates without a build step.
+      </p>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Prerequisites
+      </h2>
+      <div class="flex flex-wrap gap-2">
+        <PrerequisiteBadge name="Python" version="3.8+" required />
+        <PrerequisiteBadge name="Django" version="3.2+" required />
+      </div>
+      <FrameworkCallout type="info" title="Modern Browser Support">
+        This guide uses ES modules with import maps, which requires modern browsers (Chrome 89+, Firefox 108+, Safari 16.4+, Edge 89+).
+      </FrameworkCallout>
+    </div>
+
+    <!-- Installation -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Installation
+      </h2>
+      <p class="leading-7">
+        There are two approaches to using Red Elements in Django:
+      </p>
+
+      <tabs-root default-value="cdn" class="w-full">
+        <tabs-list class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+          <tab-trigger value="cdn" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            CDN (Recommended)
+          </tab-trigger>
+          <tab-trigger value="static" class="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
+            Local Static Files
+          </tab-trigger>
+        </tabs-list>
+        <tab-content value="cdn" class="mt-4 space-y-4">
+          <p class="leading-7">
+            Use import maps to load Red Elements from a CDN:
+          </p>
+          <ConfigFile
+            filename="templates/base.html"
+            code={`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Django App{% endblock %}</title>
+
+    <!-- Import Map for Red Elements -->
+    <script type="importmap">
+    {
+      "imports": {
+        "@red-elements/dialog": "https://cdn.jsdelivr.net/npm/@red-elements/dialog@latest/dist/dialog.js",
+        "@red-elements/dropdown": "https://cdn.jsdelivr.net/npm/@red-elements/dropdown@latest/dist/dropdown.js",
+        "@red-elements/combobox": "https://cdn.jsdelivr.net/npm/@red-elements/combobox@latest/dist/combobox.js"
+      }
+    }
+    </script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <!-- Load components -->
+    <script type="module">
+      import '@red-elements/dialog';
+      import '@red-elements/dropdown';
+      import '@red-elements/combobox';
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>`}
+            lang="html"
+          />
+        </tab-content>
+        <tab-content value="static" class="mt-4 space-y-4">
+          <p class="leading-7">
+            Alternatively, serve Red Elements from Django's static files:
+          </p>
+          <p class="leading-7 font-semibold">Step 1: Install via npm</p>
+          <CodeBlock
+            code="npm install @red-elements/dialog @red-elements/dropdown @red-elements/combobox"
+            lang="bash"
+          />
+          <p class="leading-7 font-semibold mt-4">Step 2: Configure static files</p>
+          <ConfigFile
+            filename="settings.py"
+            code={`STATICFILES_DIRS = [
+    BASE_DIR / "node_modules/@red-elements",
+]`}
+            lang="python"
+          />
+          <p class="leading-7 font-semibold mt-4">Step 3: Use in templates</p>
+          <ConfigFile
+            filename="templates/base.html"
+            code={`{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}My Django App{% endblock %}</title>
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <script type="module" src="{% static 'dialog/dist/dialog.js' %}"></script>
+    <script type="module" src="{% static 'dropdown/dist/dropdown.js' %}"></script>
+</body>
+</html>`}
+            lang="html"
+          />
+        </tab-content>
+      </tabs-root>
+    </div>
+
+    <!-- Usage in Templates -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Usage in Templates
+      </h2>
+      <p class="leading-7">
+        Once imported, use Red Elements web components directly in your Django templates:
+      </p>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Basic Dialog Example
+      </h3>
+      <ConfigFile
+        filename="templates/page.html"
+        code={`{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ page_title }}</h1>
+
+    <dialog-root>
+      <dialog-trigger as-child>
+        <button type="button" class="btn btn-primary">Open Dialog</button>
+      </dialog-trigger>
+
+      <dialog class="rounded-lg p-6 max-w-md">
+        <h2 data-dialog-title class="text-2xl font-bold mb-4">
+          {{ dialog_title }}
+        </h2>
+        <p data-dialog-description class="mb-4">
+          {{ dialog_content }}
+        </p>
+        <dialog-close as-child>
+          <button type="button" class="btn btn-secondary">Close</button>
+        </dialog-close>
+      </dialog>
+    </dialog-root>
+</div>
+{% endblock %}`}
+        lang="html"
+      />
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Combobox with Django Forms
+      </h3>
+      <ConfigFile
+        filename="templates/form.html"
+        code={`{% extends "base.html" %}
+
+{% block content %}
+<form method="post" action="{% url 'submit_form' %}">
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label for="category">Category</label>
+        <combobox-root default-value="{{ form.category.value|default:'' }}">
+          <combobox-input
+            name="category"
+            id="category"
+            placeholder="Select category..."
+            class="form-control"
+          ></combobox-input>
+          <combobox-content class="border rounded-lg shadow-lg p-1 bg-white">
+            {% for category in categories %}
+              <combobox-item value="{{ category.id }}" class="px-3 py-2 cursor-pointer hover:bg-gray-100">
+                {{ category.name }}
+              </combobox-item>
+            {% endfor %}
+            <combobox-empty class="px-3 py-4 text-center text-gray-500">
+              No categories found
+            </combobox-empty>
+          </combobox-content>
+        </combobox-root>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}`}
+        lang="html"
+      />
+    </div>
+
+    <!-- Common Patterns -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Common Patterns
+      </h2>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight">
+        CSRF Protection
+      </h3>
+      <p class="leading-7">
+        Red Elements form components work seamlessly with Django's CSRF protection:
+      </p>
+      <CodeBlock
+        code={`<form method="post" action="{% url 'submit_form' %}">
+    {% csrf_token %}
+
+    <combobox-root>
+      <combobox-input name="field_name" placeholder="Search..."></combobox-input>
+      <combobox-content>
+        <combobox-item value="1">Option 1</combobox-item>
+      </combobox-content>
+    </combobox-root>
+
+    <button type="submit">Submit</button>
+</form>`}
+        lang="html"
+      />
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Dynamic Content with HTMX
+      </h3>
+      <p class="leading-7">
+        Combine Red Elements with HTMX for dynamic content updates:
+      </p>
+      <CodeBlock
+        code={`<dropdown-root>
+  <dropdown-trigger as-child>
+    <button type="button">Actions</button>
+  </dropdown-trigger>
+  <dropdown-content>
+    <dropdown-item
+      hx-post="{% url 'delete_item' item.id %}"
+      hx-confirm="Are you sure?"
+      hx-target="#item-{{ item.id }}"
+      hx-swap="outerHTML"
+    >
+      Delete
+    </dropdown-item>
+  </dropdown-content>
+</dropdown-root>`}
+        lang="html"
+      />
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Template Fragments
+      </h3>
+      <p class="leading-7">
+        Create reusable component fragments:
+      </p>
+      <ConfigFile
+        filename="templates/components/dialog.html"
+        code={`<dialog-root>
+  <dialog-trigger as-child>
+    <button type="button" class="btn btn-primary">{{ trigger_text }}</button>
+  </dialog-trigger>
+
+  <dialog class="rounded-lg p-6 max-w-md">
+    <h2 data-dialog-title class="text-2xl font-bold mb-4">{{ title }}</h2>
+    <div data-dialog-description class="mb-4">
+      {{ content }}
+    </div>
+    <dialog-close as-child>
+      <button type="button" class="btn btn-secondary">Close</button>
+    </dialog-close>
+  </dialog>
+</dialog-root>`}
+        lang="html"
+      />
+      <p class="leading-7 mt-4">
+        Then include it in your templates:
+      </p>
+      <CodeBlock
+        code={`{% include "components/dialog.html" with title="Confirm" content="Are you sure?" trigger_text="Delete" %}`}
+        lang="html"
+      />
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Troubleshooting
+      </h2>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight">
+        Import maps not working
+      </h3>
+      <p class="leading-7">
+        Ensure you're using a modern browser that supports import maps. Check browser compatibility at <a href="https://caniuse.com/import-maps" class="underline" target="_blank" rel="noopener">caniuse.com/import-maps</a>.
+      </p>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Static files not found
+      </h3>
+      <p class="leading-7">
+        Run <code>python manage.py collectstatic</code> and ensure <code>STATICFILES_DIRS</code> is configured correctly in your <code>settings.py</code>.
+      </p>
+
+      <h3 class="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+        Components not registering
+      </h3>
+      <p class="leading-7">
+        Verify that the module scripts are loading correctly in your browser's developer tools Network tab. The components should auto-register when the modules load.
+      </p>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="space-y-4">
+      <h2 class="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight">
+        Next Steps
+      </h2>
+      <p class="leading-7">
+        Explore the component documentation to learn about all available components:
+      </p>
+      <ul class="ml-6 list-disc space-y-2">
+        <li class="leading-7">
+          <a href="/docs/components/dialog" class="font-medium underline underline-offset-4">Dialog</a>
+        </li>
+        <li class="leading-7">
+          <a href="/docs/components/combobox" class="font-medium underline underline-offset-4">Combobox</a>
+        </li>
+        <li class="leading-7">
+          <a href="/docs/components/dropdown" class="font-medium underline underline-offset-4">Dropdown</a>
+        </li>
+        <li class="leading-7">
+          <a href="/docs/components/accordion" class="font-medium underline underline-offset-4">Accordion</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</DocsLayout>
