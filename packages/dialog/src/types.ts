@@ -41,14 +41,10 @@ export interface DialogRootProps {
  * Props for DialogTrigger
  */
 export interface DialogTriggerProps {
-  /** Pass behavior to slotted child instead of rendering wrapper */
-  asChild?: boolean;
 }
 
 /**
  * Props for DialogClose
  */
 export interface DialogCloseProps {
-  /** Pass behavior to slotted child instead of rendering wrapper */
-  asChild?: boolean;
 }

@@ -34,7 +34,7 @@ export const TooltipRoot = createComponent({
   elementClass: tooltip.TooltipRoot,
   react: React,
   events: {
-    onOpenChange: "openChange" as EventName<CustomEvent<{ open: boolean }>>,
+    onOpenChange: "tooltip:open-change" as EventName<CustomEvent<{ open: boolean }>>,
   },
 });
 

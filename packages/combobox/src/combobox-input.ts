@@ -7,14 +7,34 @@ import { comboboxRootContext, ComboboxRoot } from "./combobox-root";
 /**
  * Text input for combobox with keyboard navigation.
  *
- * @element combobox-input
+ * Renders into the **light DOM**, so the `<input>` is styleable with ordinary
+ * CSS and utility classes:
  *
- * @cssprop --combobox-input-border - Input border style
- * @cssprop --combobox-input-border-focus - Input border style when focused
- * @cssprop --combobox-input-padding - Input padding
+ * ```css
+ * combobox-input input { ... }
+ * combobox-input input::placeholder { ... }
+ * ```
+ *
+ * @element combobox-input
  */
 @customElement("combobox-input")
 export class ComboboxInput extends LitElement {
+  /**
+   * Render into the light DOM rather than a shadow root.
+   *
+   * A text input is the most style-critical element in the library, and inside
+   * a shadow root it was unreachable: no `part` was exposed, so consumers could
+   * not style it at all. It also broke `<label for>` - a label outside the
+   * shadow boundary cannot be associated with an input inside it - and forced
+   * `combobox-content` to pierce the shadow root to move focus.
+   *
+   * There is nothing to lose here: this component has no `static styles` and no
+   * `<slot>`, so shadow encapsulation was buying nothing.
+   */
+  protected createRenderRoot() {
+    return this;
+  }
+
   @property({ type: String })
   placeholder = "";
 
@@ -90,7 +110,7 @@ export class ComboboxInput extends LitElement {
   private _handleFocus = () => {
     const { openOnFocus, onOpen, isOpen } = this._context;
     if (openOnFocus && !isOpen) {
-      onOpen();
+      onOpen("focus");
     }
   };
 

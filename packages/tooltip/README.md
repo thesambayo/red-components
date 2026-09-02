@@ -254,7 +254,7 @@ Root container that manages tooltip state.
 - `disable-hoverable-content` (boolean): Disable interactive content
 
 **Events:**
-- `openChange`: Emitted when open state changes. `event.detail = { open: boolean }`
+- `tooltip:open-change`: Emitted when open state changes. `event.detail = { open: boolean }`
 
 ### `<tooltip-trigger>`
 

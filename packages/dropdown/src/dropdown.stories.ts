@@ -204,6 +204,77 @@ export const WithDisabledItems: Story = {
   `,
 };
 
+/**
+ * `width="trigger"` makes the menu exactly as wide as its trigger - useful when
+ * the trigger is a full-width button or a table cell and a narrow menu floating
+ * beside it looks detached.
+ *
+ * It is a shorthand over `--dropdown-trigger-width`, a custom property the
+ * positioning middleware keeps up to date while the menu is open. Use the
+ * property directly for anything the shorthand does not cover:
+ *
+ * ```css
+ * dropdown-content { min-width: var(--dropdown-trigger-width); }
+ * ```
+ */
+export const MatchTriggerWidth: Story = {
+  render: () => {
+    const items = html`
+      <dropdown-item value="edit">Edit</dropdown-item>
+      <dropdown-item value="duplicate">Duplicate</dropdown-item>
+      <dropdown-separator></dropdown-separator>
+      <dropdown-item value="delete">Delete</dropdown-item>
+    `;
+
+    return html`
+      ${styles}
+      <style>
+        .width-demo {
+          display: flex;
+          gap: 64px;
+          padding: 100px;
+          justify-content: center;
+          align-items: flex-start;
+        }
+        /* A trigger deliberately wider than the menu's own min-width, so the
+           difference between the two columns is visible. */
+        .width-demo dropdown-trigger {
+          width: 300px;
+          justify-content: space-between;
+        }
+        .width-demo figcaption {
+          font: 500 13px/1.5 system-ui, sans-serif;
+          color: #64748b;
+          margin-bottom: 8px;
+        }
+        .width-demo code {
+          font: 500 12px/1.5 ui-monospace, monospace;
+          background: #f1f5f9;
+          border-radius: 4px;
+          padding: 1px 5px;
+        }
+      </style>
+      <div class="width-demo">
+        <figure>
+          <figcaption>Default &mdash; sizes to its own content</figcaption>
+          <dropdown-root>
+            <dropdown-trigger>Actions</dropdown-trigger>
+            <dropdown-content>${items}</dropdown-content>
+          </dropdown-root>
+        </figure>
+
+        <figure>
+          <figcaption><code>width="trigger"</code> &mdash; matches the trigger</figcaption>
+          <dropdown-root>
+            <dropdown-trigger>Actions</dropdown-trigger>
+            <dropdown-content width="trigger">${items}</dropdown-content>
+          </dropdown-root>
+        </figure>
+      </div>
+    `;
+  },
+};
+
 export const DifferentPlacements: Story = {
   render: () => html`
     ${styles}
@@ -252,11 +323,11 @@ export const DifferentPlacements: Story = {
   `,
 };
 
-export const AsChild: Story = {
+export const CustomTriggerStyling: Story = {
   render: () => html`
     ${styles}
     <style>
-      .as-child-demo {
+      .custom-button-demo {
         padding: 100px;
         display: flex;
         gap: 24px;
@@ -292,11 +363,9 @@ export const AsChild: Story = {
         background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
       }
     </style>
-    <div class="as-child-demo">
+    <div class="custom-button-demo">
       <dropdown-root>
-        <dropdown-trigger as-child>
-          <button class="custom-button">
-            Custom Button
+        <dropdown-trigger class="custom-button">Custom Button
             <svg
               width="12"
               height="12"
@@ -309,9 +378,7 @@ export const AsChild: Story = {
                 stroke-width="1.5"
                 fill="none"
               />
-            </svg>
-          </button>
-        </dropdown-trigger>
+            </svg></dropdown-trigger>
         <dropdown-content side="bottom" align="start">
           <dropdown-item value="profile">Profile</dropdown-item>
           <dropdown-item value="settings">Settings</dropdown-item>
@@ -320,5 +387,47 @@ export const AsChild: Story = {
         </dropdown-content>
       </dropdown-root>
     </div>
+  `,
+};
+
+/**
+ * Escape hatch: `data-dropdown-trigger` on your own element.
+ */
+export const EscapeHatchTrigger: Story = {
+  render: () => html`
+    <style>
+      .eh-button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: white;
+        cursor: pointer;
+      }
+      dropdown-content {
+        background: white;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        min-width: 180px;
+      }
+      dropdown-item {
+        display: block;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      dropdown-item:hover {
+        background: #f4f4f5;
+      }
+    </style>
+    <dropdown-root>
+      <button class="eh-button" data-dropdown-trigger>Open menu</button>
+      <dropdown-content>
+        <dropdown-item>Profile</dropdown-item>
+        <dropdown-item>Settings</dropdown-item>
+        <dropdown-item>Sign out</dropdown-item>
+      </dropdown-content>
+    </dropdown-root>
   `,
 };

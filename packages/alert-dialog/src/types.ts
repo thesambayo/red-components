@@ -41,22 +41,16 @@ export interface AlertDialogRootProps {
  * Props for AlertDialogTrigger
  */
 export interface AlertDialogTriggerProps {
-  /** Pass behavior to slotted child instead of rendering wrapper */
-  asChild?: boolean;
 }
 
 /**
  * Props for AlertDialogAction
  */
 export interface AlertDialogActionProps {
-  /** Pass behavior to slotted child instead of rendering wrapper */
-  asChild?: boolean;
 }
 
 /**
  * Props for AlertDialogCancel
  */
 export interface AlertDialogCancelProps {
-  /** Pass behavior to slotted child instead of rendering wrapper */
-  asChild?: boolean;
 }

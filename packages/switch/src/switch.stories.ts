@@ -309,7 +309,7 @@ export const WithEvent: Story = {
       style="display: flex; align-items: center; gap: 8px; font-family: system-ui, sans-serif; font-size: 14px; cursor: pointer;"
     >
       <switch-root
-        @checkedChange=${(e: CustomEvent<{ checked: boolean }>) => {
+        @switch:checked-change=${(e: CustomEvent<{ checked: boolean }>) => {
           console.log("Checked changed:", e.detail.checked);
         }}
       >

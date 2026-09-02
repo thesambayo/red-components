@@ -7,11 +7,13 @@ import type { DialogRootContextValue } from "./types";
 export const dialogRootContext =
   createContext<DialogRootContextValue>("dialog-root");
 
+/** Shared across all packages so ids cannot collide. */
+export { generateId } from "@red-elements/core";
+
 /**
- * Generate unique IDs for accessibility attributes
+ * Event names. Namespaced as `{component}:{kebab-event}` so a bubbling
+ * event cannot be mistaken for a native one by an ancestor listener.
  */
-let idCounter = 0;
-export function generateId(prefix: string): string {
-  idCounter += 1;
-  return `${prefix}-${idCounter}`;
-}
+export const DIALOG_EVENTS = {
+  OPEN_CHANGE: "dialog:open-change",
+} as const;

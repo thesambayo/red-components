@@ -1,0 +1,41 @@
+{
+  "name": "@red-elements/core",
+  "version": "0.0.0",
+  "private": false,
+  "type": "module",
+  "description": "Shared primitives for Red Elements components",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thesambayo/red-components.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thesambayo/red-components/issues"
+  },
+  "peerDependencies": {
+    "lit": "^3.3.2",
+    "@floating-ui/dom": "^1.7.4"
+  },
+  "peerDependenciesMeta": {
+    "@floating-ui/dom": {
+      "optional": true
+    }
+  }
+}

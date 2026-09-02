@@ -1,15 +1,9 @@
 import { consume } from "@lit/context";
 import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import {
-  computePosition,
-  flip,
-  shift,
-  offset,
-  size,
-  autoUpdate,
-  Placement,
-} from "@floating-ui/dom";
+import { flip, shift, offset, size, Placement } from "@floating-ui/dom";
+import { FloatingController, attachDismiss } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
 import { ComboboxContextValue } from "./combobox-context";
 import { comboboxRootContext, ComboboxRoot } from "./combobox-root";
 
@@ -22,28 +16,56 @@ type Align = "start" | "center" | "end";
  * @element combobox-content
  * @slot - Combobox items
  *
+ * @attr width - Set to "trigger" to match the anchor's width
  * @cssprop --combobox-input-width - Width of input (set automatically)
  * @cssprop --combobox-available-height - Available height (set automatically)
  */
 @customElement("combobox-content")
 export class ComboboxContent extends LitElement {
   static styles = css`
+    /*
+     * The UA stylesheet gives every [popover] \`margin: auto\`, \`inset: 0\`,
+     * \`border: solid\`, \`padding: .25em\` and \`background-color: Canvas\`, so
+     * some reset is unavoidable. But border, padding and background are
+     * exactly what a consumer most wants to set, and an unlayered :host rule
+     * beats the layered utilities that Tailwind and friends emit - which is
+     * why a styled <select-content> rendered with no background, border or
+     * padding while its <select-item> children styled fine.
+     *
+     * Declaring the reset in a layer fixes that: an author layer still beats
+     * the UA origin, while a consumer rule in another tree wins on context.
+     * Only \`position\` stays unlayered - overriding it breaks positioning
+     * outright, and floating-ui writes left/top inline anyway.
+     */
+    @layer red-popover-reset {
+      :host {
+        margin: 0;
+        inset: auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        outline: none;
+      }
+    }
+
     :host {
       position: fixed;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      outline: none;
     }
 
     :host(:not(:popover-open)) {
       display: none;
     }
 
-    :host([data-state="opening"]) {
-      opacity: 0;
-      pointer-events: none;
+    /* Paired with FloatingController's gate: hides the content until the first
+       position has been computed, so it never paints against the trigger's
+       old coordinates. */
+    :host([data-floating-hidden]) {
+      visibility: hidden;
+    }
+
+    /* Opt-in, so it deliberately sits outside the reset layer. */
+    :host([width="trigger"]) {
+      width: var(--combobox-input-width);
     }
   `;
 
@@ -59,6 +81,20 @@ export class ComboboxContent extends LitElement {
   @property({ type: Number, attribute: "align-offset" })
   alignOffset = 0;
 
+  /**
+   * Set to `"trigger"` to match the anchor's width exactly.
+   *
+   * The underlying `--combobox-input-width` custom property is always set and
+   * stays available for anything this shorthand does not cover - a minimum
+   * rather than an exact width, say:
+   *
+   * ```css
+   * combobox-content { min-width: var(--combobox-input-width); }
+   * ```
+   */
+  @property({ type: String, reflect: true })
+  width?: "trigger";
+
   @property({ type: Number, attribute: "max-height" })
   maxHeight?: number;
 
@@ -68,7 +104,7 @@ export class ComboboxContent extends LitElement {
 
   private _root: ComboboxRoot | null = null;
   private _items: HTMLElement[] = [];
-  private _cleanupAutoUpdate?: () => void;
+  private _disposeDismiss?: BehaviorCleanup;
 
   protected firstUpdated() {
     // Set ID for ARIA once context is available
@@ -81,8 +117,13 @@ export class ComboboxContent extends LitElement {
     // Find root element
     this._root = this.closest("combobox-root") as ComboboxRoot;
 
-    // Set popover attribute for light dismiss
-    this.setAttribute("popover", "auto");
+    // "manual", not "auto". A `popover="auto"` light-dismisses on any pointer
+    // gesture outside itself, and its only exemption is a registered invoker -
+    // which the combobox's text input, sitting outside the listbox, cannot be.
+    // Every click into the input to move the caret therefore dismissed the
+    // list, and the input's own click handler immediately reopened it. The
+    // boundary is declared explicitly in `_startDismiss` instead.
+    this.setAttribute("popover", "manual");
     this.setAttribute("role", "listbox");
     this.setAttribute("data-state", "closed");
 
@@ -91,16 +132,19 @@ export class ComboboxContent extends LitElement {
       this._root.setContentElement(this);
     }
 
-    // Listen for toggle to position content
+    // `beforetoggle` fires synchronously, before the browser paints the
+    // popover; `toggle` is queued as a task and would let one unpositioned
+    // frame through. This replaces the old `data-state="opening"` rule.
+    this.addEventListener("beforetoggle", this._handleBeforeToggle as EventListener);
     this.addEventListener("toggle", this._handleToggle as EventListener);
-    this.addEventListener("keydown", this._handleKeydown);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._stopPositioning();
+    this._stopDismiss();
+    this.removeEventListener("beforetoggle", this._handleBeforeToggle as EventListener);
     this.removeEventListener("toggle", this._handleToggle as EventListener);
-    this.removeEventListener("keydown", this._handleKeydown);
   }
 
   protected updated(changedProperties: Map<string, unknown>) {
@@ -112,8 +156,7 @@ export class ComboboxContent extends LitElement {
       const isPopoverOpen = this.matches(":popover-open");
 
       if (isOpen && !isPopoverOpen) {
-        // Set opening state BEFORE showing popover to prevent flicker
-        this.setAttribute("data-state", "opening");
+        this.setAttribute("data-state", "open");
         this.showPopover();
       } else if (!isOpen && isPopoverOpen) {
         this.hidePopover();
@@ -121,10 +164,15 @@ export class ComboboxContent extends LitElement {
     }
   }
 
+  private _handleBeforeToggle = (event: ToggleEvent) => {
+    if (event.newState === "open") this._floating.gate();
+  };
+
   private _handleToggle = (event: ToggleEvent) => {
     if (event.newState === "open") {
-      // Opening state already set in updated(), just start positioning
+      this.setAttribute("data-state", "open");
       this._startPositioning();
+      this._startDismiss();
       this._updateItems();
       // Highlight initial item (selected or first) after positioning
       requestAnimationFrame(() => {
@@ -139,11 +187,14 @@ export class ComboboxContent extends LitElement {
 
       // Stop auto-updating position
       this._stopPositioning();
+      this._stopDismiss();
 
-      // Return focus to trigger if it exists
-      this._returnFocusToTrigger();
+      // Returning focus is the root's job - it owns the close. This used to
+      // focus the trigger here while the root focused the input a frame later,
+      // so focus visibly hopped, and with `open-on-focus` the second focus
+      // reopened the combobox that had just been closed.
 
-      // Notify root that popover closed (e.g., via Escape or light dismiss)
+      // Notify root that popover closed (e.g., via Escape or outside click)
       if (this._context.isOpen) {
         this._context.onClose();
       }
@@ -179,92 +230,88 @@ export class ComboboxContent extends LitElement {
     const inputComponent = this._root.querySelector("combobox-input");
     if (!inputComponent) return;
 
-    // Focus the actual input element inside the component's shadow DOM
-    // (regardless of whether it's inside content or outside in anchor)
-    const inputElement = inputComponent.shadowRoot?.querySelector("input");
+    // combobox-input renders into the light DOM, so no shadow piercing needed
+    // (works whether it sits inside the content or outside in the anchor).
+    const inputElement = inputComponent.querySelector("input");
     if (inputElement) {
       inputElement.focus();
     }
   }
 
-  private _returnFocusToTrigger() {
-    // Return focus to trigger if it exists
-    const triggerElement = this._context.triggerElement;
-    if (triggerElement && typeof triggerElement.focus === "function") {
-      triggerElement.focus();
-    }
+  /** Anchor tracking, shared with select/dropdown/tooltip via core. */
+  private _floating = new FloatingController(this, {
+    placement: () => this._getPlacement(),
+    middleware: () => [
+      offset({ mainAxis: this.sideOffset, crossAxis: this.alignOffset }),
+      flip({ fallbackAxisSideDirection: "start" }),
+      shift({ padding: 8 }),
+      size({
+        padding: 8,
+        apply: ({ availableHeight, rects }) => {
+          const maxHeight = this.maxHeight || availableHeight;
+          this.style.setProperty(
+            "--combobox-available-height",
+            `${maxHeight}px`
+          );
+          this.style.setProperty(
+            "--combobox-input-width",
+            `${rects.reference.width}px`
+          );
+        },
+      }),
+    ],
+  });
+
+  /** Everything that counts as "inside" for dismissal purposes. */
+  private _boundaryElements(): (Element | null | undefined)[] {
+    return [
+      this._context?.anchorElement,
+      this._context?.inputElement,
+      this._context?.triggerElement,
+    ];
+  }
+
+  private _anchorElement(): Element | null {
+    // `triggerElement` was missing from this chain, so a combobox built from a
+    // <combobox-trigger> with the input *inside* the content - the command
+    // palette shape - had nothing to anchor to. Positioning bailed out, the
+    // reveal that positioning gates never ran, and the popover opened
+    // completely invisible.
+    return (
+      this._context?.anchorElement ??
+      this._context?.inputElement ??
+      this._context?.triggerElement ??
+      null
+    );
   }
 
   private _startPositioning() {
-    // Use anchor element if provided, otherwise fall back to input
-    const anchor = this._context.anchorElement || this._context.inputElement;
-    if (!anchor) return;
-
-    // Start auto-updating position on scroll, resize, etc.
-    this._cleanupAutoUpdate = autoUpdate(anchor, this, () => {
-      this._updatePosition();
-    });
+    const anchor = this._anchorElement();
+    if (!anchor) {
+      // Nothing to anchor to. Show it where it is rather than leaving it
+      // hidden by the gate - an unpositioned menu is recoverable, an
+      // invisible one is not.
+      this.removeAttribute("data-floating-hidden");
+      return;
+    }
+    this._floating.start(anchor);
   }
 
   private _stopPositioning() {
-    if (this._cleanupAutoUpdate) {
-      this._cleanupAutoUpdate();
-      this._cleanupAutoUpdate = undefined;
-    }
+    this._floating.stop();
   }
 
-  private async _updatePosition() {
-    // Use anchor element if provided, otherwise fall back to input
-    const anchor = this._context.anchorElement || this._context.inputElement;
-    if (!anchor) return;
-
-    const placement = this._getPlacement();
-
-    const {
-      x,
-      y,
-      placement: finalPlacement,
-    } = await computePosition(anchor, this, {
-      strategy: "fixed",
-      placement,
-      middleware: [
-        offset({
-          mainAxis: this.sideOffset,
-          crossAxis: this.alignOffset,
-        }),
-        flip({
-          fallbackAxisSideDirection: "start",
-        }),
-        shift({ padding: 8 }),
-        size({
-          padding: 8,
-          apply: ({ availableHeight, rects }) => {
-            const maxHeight = this.maxHeight || availableHeight;
-            this.style.setProperty(
-              "--combobox-available-height",
-              `${maxHeight}px`
-            );
-            this.style.setProperty(
-              "--combobox-input-width",
-              `${rects.reference.width}px`
-            );
-          },
-        }),
-      ],
+  private _startDismiss() {
+    this._stopDismiss();
+    this._disposeDismiss = attachDismiss(this, {
+      boundary: () => this._boundaryElements(),
+      onDismiss: () => this._context?.onClose(),
     });
+  }
 
-    this.style.left = `${x}px`;
-    this.style.top = `${y}px`;
-
-    // Set data attributes for styling
-    const [side, align] = finalPlacement.split("-");
-    this.setAttribute("data-side", side);
-    this.setAttribute("data-align", align || "center");
-
-    // Show content after first positioning is complete
-    if (this.getAttribute("data-state") === "opening") {
-      this.setAttribute("data-state", "open");
-    }
+  private _stopDismiss() {
+    this._disposeDismiss?.();
+    this._disposeDismiss = undefined;
   }
 
   private _getPlacement(): Placement {
@@ -282,12 +329,6 @@ export class ComboboxContent extends LitElement {
       )
     ) as HTMLElement[];
   }
-
-  private _handleKeydown = (event: KeyboardEvent) => {
-    // Note: Keyboard navigation is handled by the input element
-    // This handler is kept for potential future functionality
-    // but should not interfere with input navigation
-  };
 
   protected render() {
     return html`<slot></slot>`;

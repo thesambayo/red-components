@@ -1,7 +1,8 @@
 import { LitElement, html } from "lit";
 import { provide } from "@lit/context";
 import { customElement, property, state } from "lit/decorators.js";
-import { AvatarContext, avatarContext, ImageLoadingStatus } from "./avatar-context";
+import { AvatarContext, avatarContext, ImageLoadingStatus, AVATAR_EVENTS } from "./avatar-context";
+import { dispatch } from "@red-elements/core";
 
 /**
  * Root container for the avatar component.
@@ -67,14 +68,7 @@ export class AvatarRoot extends LitElement {
 
     this._imageLoadingStatus = status;
 
-    // Dispatch loadingStatusChange event
-    this.dispatchEvent(
-      new CustomEvent("loadingStatusChange", {
-        bubbles: true,
-        composed: true,
-        detail: status,
-      })
-    );
+    dispatch(this, AVATAR_EVENTS.LOADING_STATUS_CHANGE, status);
   }
 }
 

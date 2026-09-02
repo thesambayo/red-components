@@ -10,7 +10,7 @@
  * @example
  * ```html
  * <dialog-root modal>
- *   <dialog-trigger as-child>
+ *   <dialog-trigger>
  *     <button>Open Dialog</button>
  *   </dialog-trigger>
  *

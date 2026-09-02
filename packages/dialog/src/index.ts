@@ -18,7 +18,7 @@ export const DialogRoot = createComponent({
   elementClass: dialog.DialogRoot,
   react: React,
   events: {
-    onOpenChange: "openChange" as EventName<CustomEvent<{ open: boolean }>>,
+    onOpenChange: "dialog:open-change" as EventName<CustomEvent<{ open: boolean }>>,
   },
 });
 
@@ -27,7 +27,6 @@ export const DialogRoot = createComponent({
  *
  * Trigger element that opens the dialog on click.
  *
- * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const DialogTrigger = createComponent({
   tagName: "dialog-trigger",
@@ -40,7 +39,6 @@ export const DialogTrigger = createComponent({
  *
  * Close button that closes the dialog when clicked.
  *
- * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const DialogClose = createComponent({
   tagName: "dialog-close",

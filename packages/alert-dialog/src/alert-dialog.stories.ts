@@ -1,4 +1,5 @@
 import { Meta, StoryObj } from "@storybook/web-components-vite";
+import { useArgs } from "storybook/preview-api";
 import { html } from "lit";
 
 await import(/* @vite-ignore */ import.meta.env.VITE_ALERT_DIALOG_URL);
@@ -103,9 +104,7 @@ export const Basic: Story = {
     </style>
 
     <alert-dialog-root>
-      <alert-dialog-trigger as-child>
-        <button class="trigger-button">Delete Item</button>
-      </alert-dialog-trigger>
+      <button class="trigger-button" data-alert-dialog-trigger>Delete Item</button>
 
       <dialog>
         <h2 data-dialog-title>Delete Item</h2>
@@ -114,12 +113,8 @@ export const Basic: Story = {
           undone.
         </p>
         <div class="button-group">
-          <alert-dialog-cancel as-child>
-            <button class="cancel-button">Cancel</button>
-          </alert-dialog-cancel>
-          <alert-dialog-action as-child>
-            <button class="action-button">Delete</button>
-          </alert-dialog-action>
+          <button class="cancel-button" data-alert-dialog-cancel>Cancel</button>
+          <button class="action-button" data-alert-dialog-action>Delete</button>
         </div>
       </dialog>
     </alert-dialog-root>
@@ -216,9 +211,7 @@ export const AccountDeletion: Story = {
     </style>
 
     <alert-dialog-root>
-      <alert-dialog-trigger as-child>
-        <button class="trigger-button">Delete Account</button>
-      </alert-dialog-trigger>
+      <button class="trigger-button" data-alert-dialog-trigger>Delete Account</button>
 
       <dialog>
         <h2 data-dialog-title>⚠️ Delete Account</h2>
@@ -235,12 +228,8 @@ export const AccountDeletion: Story = {
           </ul>
         </div>
         <div class="button-group">
-          <alert-dialog-cancel as-child>
-            <button class="cancel-button">Keep Account</button>
-          </alert-dialog-cancel>
-          <alert-dialog-action as-child>
-            <button class="action-button">Delete Forever</button>
-          </alert-dialog-action>
+          <button class="cancel-button" data-alert-dialog-cancel>Keep Account</button>
+          <button class="action-button" data-alert-dialog-action>Delete Forever</button>
         </div>
       </dialog>
     </alert-dialog-root>
@@ -309,9 +298,7 @@ export const UnsavedChanges: Story = {
     </style>
 
     <alert-dialog-root>
-      <alert-dialog-trigger as-child>
-        <button class="trigger-button">Leave Page</button>
-      </alert-dialog-trigger>
+      <button class="trigger-button" data-alert-dialog-trigger>Leave Page</button>
 
       <dialog>
         <h2 data-dialog-title>Unsaved Changes</h2>
@@ -320,12 +307,8 @@ export const UnsavedChanges: Story = {
           lost. Are you sure you want to continue?
         </p>
         <div class="button-group">
-          <alert-dialog-cancel as-child>
-            <button class="cancel-button">Stay on Page</button>
-          </alert-dialog-cancel>
-          <alert-dialog-action as-child>
-            <button class="action-button">Discard Changes</button>
-          </alert-dialog-action>
+          <button class="cancel-button" data-alert-dialog-cancel>Stay on Page</button>
+          <button class="action-button" data-alert-dialog-action>Discard Changes</button>
         </div>
       </dialog>
     </alert-dialog-root>
@@ -333,10 +316,23 @@ export const UnsavedChanges: Story = {
 };
 
 /**
- * Controlled alert dialog where open state is managed externally.
+ * Controlled alert dialog where the open state is owned by the consumer.
+ *
+ * In controlled mode `alert-dialog-root` deliberately never changes `open`
+ * itself - it reports intent through `alert-dialog:open-change` and waits to
+ * be told. So a controlled story has to close the loop, exactly as a React
+ * `useState` or a Vue `v-model` binding would; without that the trigger fires
+ * the event and nothing happens, which looks like a broken component but is
+ * correct controlled behaviour.
  */
 export const Controlled: Story = {
-  render: (args) => html`
+  render: (args) => {
+    const [, updateArgs] = useArgs();
+    const setOpen = (event: Event) => {
+      updateArgs({ open: (event as CustomEvent<{ open: boolean }>).detail.open });
+    };
+
+    return html`
     <style>
       .trigger-button {
         padding: 8px 16px;
@@ -390,36 +386,33 @@ export const Controlled: Story = {
       }
     </style>
 
-    <alert-dialog-root .open=${args.open}>
-      <alert-dialog-trigger as-child>
-        <button class="trigger-button">Open Alert</button>
-      </alert-dialog-trigger>
+    <alert-dialog-root .open=${args.open} @alert-dialog:open-change=${setOpen}>
+      <button class="trigger-button" data-alert-dialog-trigger>Open Alert</button>
 
       <dialog>
         <h2 data-dialog-title>Controlled Alert Dialog</h2>
         <p class="description" data-dialog-description>
-          This alert dialog's open state is controlled via the "open" prop.
+          This alert dialog's open state is controlled via the "open" prop. The
+          story listens for <code>alert-dialog:open-change</code> and writes the
+          value back, which is what makes the trigger work.
         </p>
         <div class="button-group">
-          <alert-dialog-cancel as-child>
-            <button class="cancel-button">Cancel</button>
-          </alert-dialog-cancel>
-          <alert-dialog-action as-child>
-            <button class="action-button">Confirm</button>
-          </alert-dialog-action>
+          <button class="cancel-button" data-alert-dialog-cancel>Cancel</button>
+          <button class="action-button" data-alert-dialog-action>Confirm</button>
         </div>
       </dialog>
     </alert-dialog-root>
-  `,
+  `;
+  },
   args: {
     open: false,
   },
 };
 
 /**
- * Alert dialog without as-child - components themselves act as the interactive elements.
+ * Alert dialog using the default form, where the components are themselves the controls.
  */
-export const WithoutAsChild: Story = {
+export const HostAsControl: Story = {
   render: () => html`
     <style>
       alert-dialog-trigger {
@@ -490,10 +483,10 @@ export const WithoutAsChild: Story = {
       <alert-dialog-trigger>Delete Item</alert-dialog-trigger>
 
       <dialog>
-        <h2 data-dialog-title>Without as-child</h2>
+        <h2 data-dialog-title>Component as control</h2>
         <p class="description" data-dialog-description>
           This example shows alert-dialog-trigger, alert-dialog-cancel, and
-          alert-dialog-action components used without the as-child attribute.
+          alert-dialog-action components acting as the controls themselves.
           The components themselves act as the interactive elements.
         </p>
         <div class="button-group">

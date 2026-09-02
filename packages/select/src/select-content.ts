@@ -1,14 +1,8 @@
 import { consume } from "@lit/context";
 import { html, LitElement, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
-import {
-  computePosition,
-  flip,
-  shift,
-  offset,
-  size,
-  Placement,
-} from "@floating-ui/dom";
+import { flip, shift, offset, size, Placement } from "@floating-ui/dom";
+import { FloatingController } from "@red-elements/core";
 import { SelectContextValue } from "./select-context";
 import { selectRootContext } from "./select-context";
 
@@ -22,6 +16,7 @@ type Align = "start" | "center" | "end";
  * @element select-content
  * @slot - Contains select-item, select-group, select-label elements
  *
+ * @attr width - Set to "trigger" to match the anchor's width
  * @cssprop --select-trigger-width - Width of trigger (set automatically)
  * @cssprop --select-trigger-height - Height of trigger (set automatically)
  * @cssprop --select-available-width - Available width (set automatically)
@@ -30,17 +25,49 @@ type Align = "start" | "center" | "end";
 @customElement("select-content")
 export class SelectContent extends LitElement {
   static styles = css`
+    /*
+     * The UA stylesheet gives every [popover] \`margin: auto\`, \`inset: 0\`,
+     * \`border: solid\`, \`padding: .25em\` and \`background-color: Canvas\`, so
+     * some reset is unavoidable. But border, padding and background are
+     * exactly what a consumer most wants to set, and an unlayered :host rule
+     * beats the layered utilities that Tailwind and friends emit - which is
+     * why a styled <select-content> rendered with no background, border or
+     * padding while its <select-item> children styled fine.
+     *
+     * Declaring the reset in a layer fixes that: an author layer still beats
+     * the UA origin, while a consumer rule in another tree wins on context.
+     * Only \`position\` stays unlayered - overriding it breaks positioning
+     * outright, and floating-ui writes left/top inline anyway.
+     */
+    @layer red-popover-reset {
+      :host {
+        margin: 0;
+        inset: auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        outline: none;
+      }
+    }
+
     :host {
       position: fixed;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      outline: none;
     }
 
     :host(:not(:popover-open)) {
       display: none;
+    }
+
+    /* Paired with FloatingController's gate: hides the content until the first
+       position has been computed, so it never paints against the trigger's
+       old coordinates. */
+    :host([data-floating-hidden]) {
+      visibility: hidden;
+    }
+
+    /* Opt-in, so it deliberately sits outside the reset layer. */
+    :host([width="trigger"]) {
+      width: var(--select-trigger-width);
     }
   `;
 
@@ -72,6 +99,20 @@ export class SelectContent extends LitElement {
   @property({ type: Number, attribute: "align-offset" })
   alignOffset = 0;
 
+  /**
+   * Set to `"trigger"` to match the anchor's width exactly.
+   *
+   * The underlying `--select-trigger-width` custom property is always set and
+   * stays available for anything this shorthand does not cover - a minimum
+   * rather than an exact width, say:
+   *
+   * ```css
+   * select-content { min-width: var(--select-trigger-width); }
+   * ```
+   */
+  @property({ type: String, reflect: true })
+  width?: "trigger";
+
   private _previousOpen = false;
 
   connectedCallback() {
@@ -83,6 +124,10 @@ export class SelectContent extends LitElement {
     this.setAttribute("tabindex", "-1");
     this.setAttribute("data-state", "closed");
 
+    // `beforetoggle` fires synchronously, before the browser paints the
+    // popover; `toggle` is queued as a task and would let one unpositioned
+    // frame through.
+    this.addEventListener("beforetoggle", this._handleBeforeToggle as EventListener);
     this.addEventListener("toggle", this._handleToggle as EventListener);
     this.addEventListener("keydown", this._handleKeyDown);
   }
@@ -90,6 +135,7 @@ export class SelectContent extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
 
+    this.removeEventListener("beforetoggle", this._handleBeforeToggle as EventListener);
     this.removeEventListener("toggle", this._handleToggle as EventListener);
     this.removeEventListener("keydown", this._handleKeyDown);
   }
@@ -130,15 +176,27 @@ export class SelectContent extends LitElement {
     return html`<slot></slot>`;
   }
 
+  private _handleBeforeToggle = (event: ToggleEvent) => {
+    if (event.newState === "open") this._floating.gate();
+  };
+
   private _handleToggle = (event: ToggleEvent) => {
     if (event.newState === "open") {
       this.setAttribute("data-state", "open");
-      this._positionContent();
+      if (this._context?.triggerElement) {
+        this._floating.start(this._context.triggerElement);
+      } else {
+      // If there is no anchor the gate would never lift and the menu would
+      // open invisible. An unpositioned menu is recoverable; an invisible one
+      // is not.
+        this.removeAttribute("data-floating-hidden");
+      }
       requestAnimationFrame(() => {
         this._focusFirstSelectedOrEnabledItem();
       });
     } else {
       this.setAttribute("data-state", "closed");
+      this._floating.stop();
       this.removeAttribute("data-side");
       this.removeAttribute("data-align");
 
@@ -149,59 +207,40 @@ export class SelectContent extends LitElement {
     }
   };
 
-  private async _positionContent() {
-    if (!this._context?.triggerElement) return;
-
-    const placement = this._getPlacement();
-
-    const { x, y, placement: finalPlacement } = await computePosition(
-      this._context.triggerElement,
-      this,
-      {
-        strategy: "fixed",
-        placement,
-        middleware: [
-          offset({
-            mainAxis: this.sideOffset,
-            crossAxis: this.alignOffset,
-          }),
-          flip({
-            fallbackAxisSideDirection: "start",
-          }),
-          shift({ padding: 8 }),
-          size({
-            padding: 8,
-            apply: ({ availableWidth, availableHeight, rects }) => {
-              this.style.setProperty(
-                "--select-trigger-width",
-                `${rects.reference.width}px`
-              );
-              this.style.setProperty(
-                "--select-trigger-height",
-                `${rects.reference.height}px`
-              );
-              this.style.setProperty(
-                "--select-available-width",
-                `${availableWidth}px`
-              );
-              this.style.setProperty(
-                "--select-available-height",
-                `${availableHeight}px`
-              );
-            },
-          }),
-        ],
-      }
-    );
-
-    this.style.left = `${x}px`;
-    this.style.top = `${y}px`;
-
-    // Set data attributes for styling
-    const [side, align] = finalPlacement.split("-");
-    this.setAttribute("data-side", side);
-    this.setAttribute("data-align", align || "center");
-  }
+  /**
+   * Keeps the listbox anchored to the trigger. Previously this was a single
+   * `computePosition` call on open, so the content detached from the trigger
+   * on any scroll or resize.
+   */
+  private _floating = new FloatingController(this, {
+    placement: () => this._getPlacement(),
+    middleware: () => [
+      offset({ mainAxis: this.sideOffset, crossAxis: this.alignOffset }),
+      flip({ fallbackAxisSideDirection: "start" }),
+      shift({ padding: 8 }),
+      size({
+        padding: 8,
+        apply: ({ availableWidth, availableHeight, rects }) => {
+          this.style.setProperty(
+            "--select-trigger-width",
+            `${rects.reference.width}px`
+          );
+          this.style.setProperty(
+            "--select-trigger-height",
+            `${rects.reference.height}px`
+          );
+          this.style.setProperty(
+            "--select-available-width",
+            `${availableWidth}px`
+          );
+          this.style.setProperty(
+            "--select-available-height",
+            `${availableHeight}px`
+          );
+        },
+      }),
+    ],
+  });
 
   private _getPlacement(): Placement {
     if (this.align === "center") {

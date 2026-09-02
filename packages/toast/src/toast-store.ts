@@ -5,7 +5,20 @@ export type ToastTypes = "success" | "info" | "warning" | "error" | "loading";
 export interface Toast {
   id: string;
   duration: number;
+  /**
+   * Toast text. Rendered as TEXT - markup in here is escaped, not parsed.
+   * This is the safe default: toast content is frequently built from user or
+   * server data, and `red-toast` events can be dispatched by any script on the
+   * page.
+   */
   content: string;
+  /**
+   * Raw HTML, rendered WITHOUT escaping.
+   *
+   * Only pass markup you construct yourself. Never pass user input, API
+   * responses, or anything derived from them - it is an XSS vector.
+   */
+  unsafeHtml?: string;
   type?: ToastTypes;
   // callbacks
   onDismiss?: (toast: Toast) => void;
@@ -45,7 +58,9 @@ class ToastStore {
    * @returns new toast id
    */
   addToast = (newToast: ToastOptions): string => {
-    if (!newToast.content) throw new Error("Toast content is required");
+    if (!newToast.content && !newToast.unsafeHtml) {
+      throw new Error("Toast requires `content` (or `unsafeHtml`)");
+    }
 
     const toast = {
       ...newToast,

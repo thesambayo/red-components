@@ -142,24 +142,24 @@ export const AllFeatures: Story = {
 };
 
 /**
- * Using as-child to pass trigger behavior to custom elements.
+ * Styling the trigger component directly - it is the control.
  * This allows you to style your own buttons while getting tab trigger behavior.
  */
-export const AsChild: Story = {
+export const StyledTriggers: Story = {
   render: () =>
     html`<tabs-root>
       <tabs-list>
-        <tab-trigger value="tab1" as-child>
+        <tab-trigger value="tab1">
           <button style="padding: 8px 16px; margin: 4px;">
             Custom Button 1
           </button>
         </tab-trigger>
-        <tab-trigger value="tab2" as-child>
+        <tab-trigger value="tab2">
           <button style="padding: 8px 16px; margin: 4px;">
             Custom Button 2
           </button>
         </tab-trigger>
-        <tab-trigger value="tab3" as-child>
+        <tab-trigger value="tab3">
           <button style="padding: 8px 16px; margin: 4px;">
             Custom Button 3
           </button>
@@ -167,7 +167,7 @@ export const AsChild: Story = {
       </tabs-list>
       <tab-content value="tab1">
         <p>
-          Content 1 - The tab triggers are using as-child to pass behavior to
+          Content 1 - The tab triggers are styled directly as
           custom buttons
         </p>
       </tab-content>
@@ -181,4 +181,36 @@ export const AsChild: Story = {
         </p>
       </tab-content>
     </tabs-root>`,
+};
+
+/**
+ * Escape hatch: `data-tab-trigger="<value>"` on your own element. These
+ * participate in arrow-key navigation exactly like `<tab-trigger>`.
+ */
+export const EscapeHatchTriggers: Story = {
+  render: () => html`
+    <style>
+      .eh-tab {
+        padding: 8px 16px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+      }
+      .eh-tab[data-state="active"] {
+        border-bottom-color: #3b82f6;
+        font-weight: 600;
+      }
+    </style>
+    <tabs-root default-value="a">
+      <tabs-list>
+        <button class="eh-tab" data-tab-trigger="a">First</button>
+        <button class="eh-tab" data-tab-trigger="b">Second</button>
+        <button class="eh-tab" data-tab-trigger="c">Third</button>
+      </tabs-list>
+      <tab-content value="a">Panel A</tab-content>
+      <tab-content value="b">Panel B</tab-content>
+      <tab-content value="c">Panel C</tab-content>
+    </tabs-root>
+  `,
 };

@@ -1,58 +1,41 @@
-import { LitElement, html } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { LitElement, html, css } from "lit";
+import { customElement } from "lit/decorators.js";
+import { attachPopoverToggle } from "@red-elements/core";
+import type { ActivationSource, BehaviorCleanup } from "@red-elements/core";
 
 /**
  * Trigger button for opening the dropdown.
  *
- * With `as-child`, passes behavior to the slotted child element.
- * Without `as-child`, acts as the trigger itself.
- *
  * @element dropdown-trigger
- * @slot - Button content (or child element when using as-child)
+ * @slot - Button content
  *
  * @example
  * ```html
- * <!-- With as-child: behavior passed to button -->
- * <dropdown-trigger as-child>
- *   <button>Open Menu</button>
- * </dropdown-trigger>
- *
- * <!-- Without as-child: component is the trigger -->
  * <dropdown-trigger>Open Menu</dropdown-trigger>
  * ```
  */
 @customElement("dropdown-trigger")
 export class DropdownTrigger extends LitElement {
-  /**
-   * Pass behavior to slotted child instead of acting as trigger itself
-   */
-  @property({ type: Boolean, attribute: "as-child" })
-  asChild = false;
-
-  /** Reference to the child element when using as-child */
-  private _childElement: HTMLElement | null = null;
+  static styles = css`
+    :host {
+      display: inline-block;
+    }
+  `;
 
   /** Stored handler references for proper cleanup */
-  private _handleClick = this._onClick.bind(this);
   private _handleKeyDown = this._onKeyDown.bind(this);
-  private _handleSlotChange = this._onSlotChange.bind(this);
+  private _disposeToggle?: BehaviorCleanup;
 
   connectedCallback() {
     super.connectedCallback();
 
-    if (!this.asChild) {
-      this._setupSelfAsTrigger();
-    }
+    this._setupTrigger();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    if (this.asChild) {
-      this._cleanupChildTrigger();
-    } else {
-      this._cleanupSelfAsTrigger();
-    }
+    this._cleanupTrigger();
   }
 
   private _getContent(): HTMLElement | null {
@@ -61,8 +44,15 @@ export class DropdownTrigger extends LitElement {
     return document.getElementById(`${dropdownId}-content`);
   }
 
-  private _setupSelfAsTrigger() {
-    this.addEventListener("click", this._handleClick);
+  private _setupTrigger() {
+    // Toggling is delegated so that a click which *began* while the menu was
+    // open closes it, rather than racing the Popover API's light dismiss and
+    // reopening what the browser just closed.
+    this._disposeToggle = attachPopoverToggle(this, {
+      isOpen: () => this._getContent()?.matches(":popover-open") ?? false,
+      open: (source) => this._open(source),
+      close: () => this._getContent()?.hidePopover(),
+    });
     this.addEventListener("keydown", this._handleKeyDown);
 
     // Make focusable if not already
@@ -77,85 +67,65 @@ export class DropdownTrigger extends LitElement {
     this.setAttribute("data-state", "closed");
   }
 
-  private _cleanupSelfAsTrigger() {
-    this.removeEventListener("click", this._handleClick);
+  private _cleanupTrigger() {
+    this._disposeToggle?.();
+    this._disposeToggle = undefined;
     this.removeEventListener("keydown", this._handleKeyDown);
   }
 
-  private _setupChildTrigger(child: HTMLElement) {
-    this._childElement = child;
-
-    // Add event listeners to child
-    child.addEventListener("click", this._handleClick);
-    child.addEventListener("keydown", this._handleKeyDown);
-
-    // Set accessibility attributes on child
-    child.setAttribute("aria-haspopup", "menu");
-    child.setAttribute("aria-expanded", "false");
-    child.setAttribute("data-state", "closed");
-  }
-
-  private _cleanupChildTrigger() {
-    if (this._childElement) {
-      this._childElement.removeEventListener("click", this._handleClick);
-      this._childElement.removeEventListener("keydown", this._handleKeyDown);
-      this._childElement = null;
-    }
-  }
-
-  private _onSlotChange(event: Event) {
-    if (!this.asChild) return;
-
-    const slot = event.target as HTMLSlotElement;
-    const children = slot.assignedElements();
-
-    // Cleanup previous child
-    this._cleanupChildTrigger();
-
-    // Setup new child
-    if (children.length > 0) {
-      const child = children[0] as HTMLElement;
-      this._setupChildTrigger(child);
-    }
-  }
-
-  private _onClick() {
+  /**
+   * Opens the menu, telling the content how it was opened.
+   *
+   * `dropdown-content` focuses its first item only for keyboard opens; on a
+   * mouse open it focuses itself instead, so arrow keys still work but no item
+   * shows a focus ring the user never asked for. The popover `toggle` event
+   * carries no such information, hence the handoff via an attribute.
+   */
+  private _open(source: ActivationSource) {
     const content = this._getContent();
-    if (content && "togglePopover" in content) {
-      content.togglePopover();
-    }
+    if (!content) return;
+    content.setAttribute("data-open-source", source);
+    content.showPopover();
   }
 
   private _onKeyDown(event: KeyboardEvent) {
-    if (event.key === " " || event.key === "Enter" || event.key === "ArrowDown") {
+    const content = this._getContent();
+    if (!content) return;
+
+    if (event.key === " " || event.key === "Enter") {
+      // preventDefault suppresses the synthetic click, so this is the whole
+      // activation path for the keyboard - it has to toggle, not just open,
+      // or Enter on an open menu would do nothing.
       event.preventDefault();
-      const content = this._getContent();
-      if (content && "showPopover" in content) {
-        content.showPopover();
-      }
+      if (content.matches(":popover-open")) content.hidePopover();
+      else this._open("keyboard");
+      return;
+    }
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (!content.matches(":popover-open")) this._open("keyboard");
     }
   }
 
   /**
-   * Update state attributes on the appropriate element (self or child)
+   * Update state attributes on the trigger
    */
   updateState(isOpen: boolean) {
-    const target = this.asChild ? this._childElement : this;
+    const target = this;
     if (target) {
       target.setAttribute("aria-expanded", String(isOpen));
       target.setAttribute("data-state", isOpen ? "open" : "closed");
     }
   }
 
-  /**
-   * Get the actual trigger element (self or child)
-   */
-  getTriggerElement(): HTMLElement | null {
-    return this.asChild ? this._childElement : this;
+  /** The trigger element. The host is the trigger. */
+  getTriggerElement(): HTMLElement {
+    return this;
   }
 
   protected render() {
-    return html`<slot @slotchange=${this._handleSlotChange}></slot>`;
+    return html`<slot></slot>`;
   }
 }
 

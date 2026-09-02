@@ -2,10 +2,10 @@
  * Dropdown context and shared utilities
  */
 
-let idCounter = 0;
+import { generateId } from "@red-elements/core";
 
 export function generateDropdownId(): string {
-  return `dropdown-${++idCounter}`;
+  return generateId("dropdown");
 }
 
 export const DROPDOWN_EVENTS = {

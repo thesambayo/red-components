@@ -1,4 +1,5 @@
 import { Meta, StoryObj } from "@storybook/web-components-vite";
+import { useArgs } from "storybook/preview-api";
 import { html } from "lit";
 
 await import(/* @vite-ignore */ import.meta.env.VITE_DIALOG_URL);
@@ -95,9 +96,7 @@ export const Basic: Story = {
     </style>
 
     <dialog-root>
-      <dialog-trigger as-child>
-        <button class="trigger-button">Open Dialog</button>
-      </dialog-trigger>
+      <button class="trigger-button" data-dialog-trigger>Open Dialog</button>
 
       <dialog>
         <h2 data-dialog-title>Edit Profile</h2>
@@ -112,7 +111,8 @@ export const Basic: Story = {
 };
 
 /**
- * Dialog with as-child trigger and dialog-close component.
+ * Dialog using the `data-dialog-trigger` / `data-dialog-close` escape hatch,
+ * so your own <button> receives the behavior.
  */
 export const WithCloseComponent: Story = {
   render: () => html`
@@ -163,9 +163,7 @@ export const WithCloseComponent: Story = {
     </style>
 
     <dialog-root>
-      <dialog-trigger as-child>
-        <button class="trigger-button">Open Dialog</button>
-      </dialog-trigger>
+      <button class="trigger-button" data-dialog-trigger>Open Dialog</button>
 
       <dialog>
         <h2 data-dialog-title>Edit Profile</h2>
@@ -173,19 +171,30 @@ export const WithCloseComponent: Story = {
           This example uses dialog-close component instead of data-dialog-close
           attribute.
         </p>
-        <dialog-close as-child>
-          <button class="close-button">Close</button>
-        </dialog-close>
+        <button class="close-button" data-dialog-close>Close</button>
       </dialog>
     </dialog-root>
   `,
 };
 
 /**
- * Controlled dialog where open state is managed externally.
+ * Controlled dialog where the open state is owned by the consumer.
+ *
+ * In controlled mode `dialog-root` deliberately never changes `open` itself -
+ * it reports intent through `dialog:open-change` and waits to be told. So a
+ * controlled story has to close the loop, exactly as a React `useState` or a
+ * Vue `v-model` binding would; without that the trigger fires the event and
+ * nothing happens, which looks like a broken component but is correct
+ * controlled behaviour.
  */
 export const Controlled: Story = {
-  render: (args) => html`
+  render: (args) => {
+    const [, updateArgs] = useArgs();
+    const setOpen = (event: Event) => {
+      updateArgs({ open: (event as CustomEvent<{ open: boolean }>).detail.open });
+    };
+
+    return html`
     <style>
       .trigger-button {
         padding: 8px 16px;
@@ -227,20 +236,21 @@ export const Controlled: Story = {
       }
     </style>
 
-    <dialog-root .open=${args.open}>
-      <dialog-trigger as-child>
-        <button class="trigger-button">Open Dialog</button>
-      </dialog-trigger>
+    <dialog-root .open=${args.open} @dialog:open-change=${setOpen}>
+      <button class="trigger-button" data-dialog-trigger>Open Dialog</button>
 
       <dialog>
         <h2 data-dialog-title>Controlled Dialog</h2>
         <p class="description" data-dialog-description>
-          This dialog's open state is controlled via the "open" prop.
+          This dialog's open state is controlled via the "open" prop. The
+          story listens for <code>dialog:open-change</code> and writes the
+          value back, which is what makes the trigger work.
         </p>
         <button class="close-button" data-dialog-close>Close</button>
       </dialog>
     </dialog-root>
-  `,
+  `;
+  },
   args: {
     open: false,
   },
@@ -305,9 +315,7 @@ export const NonModal: Story = {
     </style>
 
     <dialog-root .modal=${false}>
-      <dialog-trigger as-child>
-        <button class="trigger-button">Open Non-Modal Dialog</button>
-      </dialog-trigger>
+      <button class="trigger-button" data-dialog-trigger>Open Non-Modal Dialog</button>
 
       <dialog>
         <h2 data-dialog-title>Notification Panel</h2>
@@ -398,9 +406,7 @@ export const WithForm: Story = {
     </style>
 
     <dialog-root>
-      <dialog-trigger as-child>
-        <button class="trigger-button">Edit Profile</button>
-      </dialog-trigger>
+      <button class="trigger-button" data-dialog-trigger>Edit Profile</button>
 
       <dialog>
         <h2 data-dialog-title>Edit Profile</h2>
@@ -431,9 +437,9 @@ export const WithForm: Story = {
 };
 
 /**
- * Dialog without as-child - the trigger component itself acts as the button.
+ * Dialog using the default form, where <dialog-trigger> is itself the control.
  */
-export const WithoutAsChild: Story = {
+export const HostAsControl: Story = {
   render: () => html`
     <style>
       dialog-trigger {
@@ -487,11 +493,10 @@ export const WithoutAsChild: Story = {
       <dialog-trigger>Open Dialog</dialog-trigger>
 
       <dialog>
-        <h2 data-dialog-title>Without as-child</h2>
+        <h2 data-dialog-title>Component as control</h2>
         <p class="description" data-dialog-description>
-          This example shows dialog-trigger and dialog-close components used
-          without the as-child attribute. The components themselves act as the
-          interactive elements.
+          The dialog-trigger and dialog-close elements are the interactive
+          controls themselves - style them directly.
         </p>
         <dialog-close>Close</dialog-close>
       </dialog>

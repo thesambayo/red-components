@@ -108,7 +108,7 @@ export const Default: Story = {
     <div class="tooltip-demo">
       <tooltip-root
         delay-duration=${args.delayDuration}
-        @openChange=${(e: CustomEvent) => console.log("Tooltip:", e.detail)}
+        @tooltip:open-change=${(e: CustomEvent) => console.log("Tooltip:", e.detail)}
       >
         <tooltip-trigger>
           <button class="trigger-button">Hover me</button>
@@ -553,4 +553,33 @@ export const JavaScriptConfiguration: Story = {
       </div>
     `;
   },
+};
+
+/**
+ * Escape hatch: mark your own element with `data-tooltip-trigger` instead of
+ * using `<tooltip-trigger>`. Keeps native button semantics and adds no wrapper.
+ */
+export const EscapeHatchTrigger: Story = {
+  render: () => html`
+    <style>
+      .eh-button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background: white;
+        cursor: pointer;
+      }
+      tooltip-content {
+        background: #111;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+      }
+    </style>
+    <tooltip-root>
+      <button class="eh-button" data-tooltip-trigger>Hover me</button>
+      <tooltip-content>Wired via data-tooltip-trigger</tooltip-content>
+    </tooltip-root>
+  `,
 };

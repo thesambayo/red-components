@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { LitElement, html, css } from "lit";
+import { customElement } from "lit/decorators.js";
 import { ComboboxRoot } from "./combobox-root";
 
 /**
@@ -12,11 +12,15 @@ import { ComboboxRoot } from "./combobox-root";
 @customElement("combobox-anchor")
 export class ComboboxAnchor extends LitElement {
   /**
-   * Render as child element (delegating to slotted content)
-   * When true, the first child element becomes the anchor
+   * The anchor is a positioning reference, not a visual box.
+   * `display: contents` keeps it out of layout so floating content is
+   * measured against the slotted element rather than a wrapper.
    */
-  @property({ type: Boolean, attribute: "as-child" })
-  asChild = false;
+  static styles = css`
+    :host {
+      display: contents;
+    }
+  `;
 
   private _root: ComboboxRoot | null = null;
 
@@ -28,18 +32,10 @@ export class ComboboxAnchor extends LitElement {
   }
 
   protected firstUpdated() {
-    // Register this element (or first child if asChild) as anchor
+    // The host is the anchor. `display: contents` keeps it out of layout, so
+    // positioning measures the slotted content's box rather than a wrapper.
     if (this._root) {
-      if (this.asChild) {
-        // Use first child as anchor
-        const firstChild = this.querySelector(":scope > *") as HTMLElement;
-        if (firstChild) {
-          this._root.setAnchorElement(firstChild);
-        }
-      } else {
-        // Use this element as anchor
-        this._root.setAnchorElement(this);
-      }
+      this._root.setAnchorElement(this);
     }
   }
 

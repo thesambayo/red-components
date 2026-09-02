@@ -71,22 +71,26 @@ export class ToastRoot extends LitElement {
       this.toasts = toasts;
     });
     window.addEventListener(ToastEvent.eventName, toastStore.handleEvent);
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (event: MediaQueryListEvent) => {
-        this._applyColorScheme(event.matches);
-      });
+
+    // One stored MediaQueryList and one stored handler. Previously this added
+    // an inline arrow and removed a *different* inline arrow, so the listener
+    // survived every disconnect and accumulated.
+    this._colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    this._colorSchemeQuery.addEventListener(
+      "change",
+      this._handleColorSchemeChange
+    );
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.unsubscribe?.();
     window.removeEventListener(ToastEvent.eventName, toastStore.handleEvent);
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .removeEventListener("change", (event: MediaQueryListEvent) => {
-        this._applyColorScheme(event.matches);
-      });
+    this._colorSchemeQuery?.removeEventListener(
+      "change",
+      this._handleColorSchemeChange
+    );
+    this._colorSchemeQuery = undefined;
   }
 
   protected render() {
@@ -100,12 +104,23 @@ export class ToastRoot extends LitElement {
               id="${toast.id}"
               data-type="${toast.type || nothing}"
             >
-              ${unsafeHTML(toast.content)}
+              ${toast.unsafeHtml !== undefined
+                ? unsafeHTML(toast.unsafeHtml)
+                : toast.content}
             </li>
           `
       )}
     `;
   }
+
+  /** Stored so the exact same reference can be removed on disconnect. */
+  private _colorSchemeQuery?: MediaQueryList;
+
+  private _handleColorSchemeChange = (event: MediaQueryListEvent) => {
+    // Only follow the OS when the consumer asked for "system".
+    if (this.theme !== "system") return;
+    this._applyColorScheme(event.matches);
+  };
 
   private _applyColorScheme(isDarkMode: boolean) {
     this.setAttribute("data-red-theme", isDarkMode ? "dark" : "light");

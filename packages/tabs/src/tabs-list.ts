@@ -79,9 +79,12 @@ export class TabsList extends LitElement {
         ? Keys.arrowLeft
         : Keys.arrowRight;
 
-    // Get all tab triggers
+    // Get all tab triggers, including escape-hatch elements. Filtering by tag
+    // name alone would make arrow keys skip over `<button data-tab-trigger>`,
+    // leaving a tab list that is only partly keyboard navigable.
     const tabTriggers = Array.from(this.children).filter(
-      (child) => child.localName === "tab-trigger"
+      (child) =>
+        child.localName === "tab-trigger" || child.hasAttribute("data-tab-trigger")
     ) as HTMLElement[];
 
     if (tabTriggers.length === 0) return;
@@ -114,7 +117,10 @@ export class TabsList extends LitElement {
     if (targetIndex === null) return;
 
     const targetElement = tabTriggers[targetIndex];
-    const value = targetElement?.getAttribute("value");
+    // <tab-trigger value="x"> or <button data-tab-trigger="x">
+    const value =
+      targetElement?.getAttribute("value") ??
+      targetElement?.getAttribute("data-tab-trigger");
 
     if (!value) return;
 
@@ -146,7 +152,9 @@ export class TabsList extends LitElement {
     // Fallback to selected value if no trigger is focused
     const currentValue = this._context.value;
     const index = triggerElements.findIndex(
-      (trigger) => trigger.getAttribute("value") === currentValue
+      (trigger) =>
+        (trigger.getAttribute("value") ??
+          trigger.getAttribute("data-tab-trigger")) === currentValue
     );
 
     return index >= 0 ? index : 0;

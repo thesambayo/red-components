@@ -18,7 +18,7 @@ export const AlertDialogRoot = createComponent({
   elementClass: alertDialog.AlertDialogRoot,
   react: React,
   events: {
-    onOpenChange: "openChange" as EventName<CustomEvent<{ open: boolean }>>,
+    onOpenChange: "alert-dialog:open-change" as EventName<CustomEvent<{ open: boolean }>>,
   },
 });
 
@@ -27,7 +27,6 @@ export const AlertDialogRoot = createComponent({
  *
  * Trigger element that opens the alert dialog on click.
  *
- * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const AlertDialogTrigger = createComponent({
   tagName: "alert-dialog-trigger",
@@ -40,7 +39,6 @@ export const AlertDialogTrigger = createComponent({
  *
  * Action button that confirms and closes the alert dialog.
  *
- * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const AlertDialogAction = createComponent({
   tagName: "alert-dialog-action",
@@ -54,7 +52,6 @@ export const AlertDialogAction = createComponent({
  * Cancel button that dismisses the alert dialog.
  * Receives auto-focus when the dialog opens.
  *
- * @prop {boolean} asChild - Pass behavior to slotted child
  */
 export const AlertDialogCancel = createComponent({
   tagName: "alert-dialog-cancel",
