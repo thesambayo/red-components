@@ -1,4 +1,4 @@
-# @red-elements/toast
+# @red-elements/accordion
 
 ## 0.1.0
 
@@ -49,20 +49,8 @@
   - Tabs and avatar expose their events to React (`onValueChange`,
     `onLoadingStatusChange`) — they previously had no events map at all.
 
-## 0.0.3
-
 ### Patch Changes
 
-- 9b4c7c8: base complete dropdown, update tooltip with transform origin, toast with sample styling
-
-## 0.0.2
-
-### Patch Changes
-
-- 64ce89f: toast default stylings, dropdown prototype
-
-## 0.0.1
-
-### Patch Changes
-
-- 1bd45cd: first implementation of toast
+- Updated dependencies [79b4736]
+- Updated dependencies [79b4736]
+  - @red-elements/core@0.1.0

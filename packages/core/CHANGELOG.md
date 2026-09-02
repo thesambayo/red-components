@@ -1,4 +1,4 @@
-# @red-elements/dialog
+# @red-elements/core
 
 ## 0.1.0
 
@@ -109,27 +109,3 @@
     `FloatingController`, `attachBehavior` and `dispatch`.
   - Tabs and avatar expose their events to React (`onValueChange`,
     `onLoadingStatusChange`) — they previously had no events map at all.
-
-### Patch Changes
-
-- Updated dependencies [79b4736]
-- Updated dependencies [79b4736]
-  - @red-elements/core@0.1.0
-
-## 0.0.3
-
-### Patch Changes
-
-- 1187cce: update dialog portal to move content instead of cloning
-
-## 0.0.2
-
-### Patch Changes
-
-- 7666e0c: use portals for dialog and dropdown
-
-## 0.0.1
-
-### Patch Changes
-
-- e5f0a76: first dialog version
