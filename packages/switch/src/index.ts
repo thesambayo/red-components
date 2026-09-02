@@ -7,7 +7,7 @@ export const SwitchRoot = createComponent({
   elementClass: switchEl.SwitchRoot,
   react: React,
   events: {
-    onCheckedChange: "checkedChange" as EventName<
+    onCheckedChange: "switch:checked-change" as EventName<
       CustomEvent<{ checked: boolean }>
     >,
   },

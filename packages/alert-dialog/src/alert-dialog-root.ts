@@ -1,8 +1,14 @@
 import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { provide } from "@lit/context";
-import { alertDialogRootContext, generateId } from "./context";
+import {
+  alertDialogRootContext,
+  generateId,
+  ALERT_DIALOG_EVENTS,
+} from "./context";
 import type { AlertDialogRootContextValue } from "./types";
+import { ControlledState, attachBehavior, dispatch } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
 
 /**
  * Root component for an alert dialog. Uses native `<dialog>` element under the hood.
@@ -22,7 +28,7 @@ import type { AlertDialogRootContextValue } from "./types";
  * @example
  * ```html
  * <alert-dialog-root>
- *   <alert-dialog-trigger as-child>
+ *   <alert-dialog-trigger>
  *     <button>Delete Item</button>
  *   </alert-dialog-trigger>
  *
@@ -31,10 +37,10 @@ import type { AlertDialogRootContextValue } from "./types";
  *     <p data-dialog-description>This action cannot be undone.</p>
  *
  *     <footer>
- *       <alert-dialog-cancel as-child>
+ *       <alert-dialog-cancel>
  *         <button>Cancel</button>
  *       </alert-dialog-cancel>
- *       <alert-dialog-action as-child>
+ *       <alert-dialog-action>
  *         <button>Delete</button>
  *       </alert-dialog-action>
  *     </footer>
@@ -56,9 +62,16 @@ export class AlertDialogRoot extends LitElement {
   @property({ type: Boolean, attribute: "default-open" })
   defaultOpen = false;
 
-  /** Internal open state for uncontrolled mode */
-  @state()
-  private _internalOpen = false;
+  /**
+   * Controlled/uncontrolled open state. `name` keeps it in
+   * `changedProperties` so the existing `willUpdate` checks still fire.
+   */
+  private _openState = new ControlledState<boolean>(this, {
+    prop: () => this.open,
+    defaultValue: () => this.defaultOpen,
+    fallback: false,
+    name: "_internalOpen",
+  });
 
   /** Reference to trigger element */
   @state()
@@ -83,23 +96,29 @@ export class AlertDialogRoot extends LitElement {
   @property({ attribute: false })
   context: AlertDialogRootContextValue = this._createContext();
 
+  private _disposeBehaviors: BehaviorCleanup[] = [];
+  private _disposeDialogBehavior?: BehaviorCleanup;
+
   /** Bound event handlers */
   private _boundHandleDialogClose = this._handleDialogClose.bind(this);
   private _boundHandleDialogCancel = this._handleDialogCancel.bind(this);
 
   /** Whether controlled mode is active */
   private get _isControlled(): boolean {
-    return this.open !== undefined;
+    return this._openState.isControlled;
   }
 
   /** Current open state (controlled or uncontrolled) */
   private get _isOpen(): boolean {
-    return this._isControlled ? !!this.open : this._internalOpen;
+    return this._openState.value;
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this._internalOpen = this.defaultOpen;
+
+    // Behavior attributes are wired independently of the <dialog> element:
+    // `data-alert-dialog-trigger` lives outside it.
+    this._setupBehaviorAttributes();
 
     // Find the native dialog element
     this._setupDialog();
@@ -129,47 +148,85 @@ export class AlertDialogRoot extends LitElement {
     }
   }
 
+  /**
+   * Discovers and wires the native `<dialog>`.
+   *
+   * Observed rather than read once inside a `requestAnimationFrame`, so a
+   * conditionally rendered dialog is still found and a replaced one does not
+   * leave stale listeners behind.
+   */
   private _setupDialog() {
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(() => {
-      this._dialogElement = this.querySelector("dialog");
+    this._disposeDialogBehavior?.();
+    this._disposeDialogBehavior = attachBehavior(this, "dialog", (element) => {
+      // Ignore dialogs belonging to a nested alert-dialog-root.
+      if (element.closest("alert-dialog-root") !== this) return;
 
-      if (this._dialogElement) {
-        // Set alertdialog role
-        this._dialogElement.setAttribute("role", "alertdialog");
+      const dialog = element as HTMLDialogElement;
+      this._dialogElement = dialog;
 
-        // Setup accessibility attributes
-        this._setupAriaAttributes();
+      dialog.setAttribute("role", "alertdialog");
+      this._setupAriaAttributes();
 
-        // Add event listeners
-        this._dialogElement.addEventListener(
-          "close",
-          this._boundHandleDialogClose
-        );
-        this._dialogElement.addEventListener(
-          "cancel",
-          this._boundHandleDialogCancel
-        );
-        // Note: No backdrop click handler - alert dialogs cannot be dismissed by clicking backdrop
+      dialog.addEventListener("close", this._boundHandleDialogClose);
+      dialog.addEventListener("cancel", this._boundHandleDialogCancel);
+      // No backdrop click handler: an alert dialog must not be dismissed by
+      // clicking outside it.
 
-        // Sync initial state
-        this._syncDialogState();
-        this._updateContext();
-      }
+      this._syncDialogState();
+      this._updateContext();
+
+      return () => {
+        dialog.removeEventListener("close", this._boundHandleDialogClose);
+        dialog.removeEventListener("cancel", this._boundHandleDialogCancel);
+        if (this._dialogElement === dialog) {
+          this._dialogElement = null;
+          this._updateContext();
+        }
+      };
     });
   }
 
+  /**
+   * Escape hatch: bring your own elements instead of the custom elements.
+   *
+   *   <button data-alert-dialog-trigger>Delete</button>
+   *   <button data-alert-dialog-cancel>Cancel</button>
+   *   <button data-alert-dialog-action>Confirm</button>
+   */
+  private _setupBehaviorAttributes() {
+    this._teardownBehaviors();
+
+    const wire = (selector: string, onActivate: () => void) =>
+      attachBehavior(this, selector, (element) => {
+        const onClick = () => onActivate();
+        element.addEventListener("click", onClick);
+        return () => element.removeEventListener("click", onClick);
+      });
+
+    this._disposeBehaviors = [
+      wire("[data-alert-dialog-trigger]", () => this._handleOpenChange(true)),
+      wire("[data-alert-dialog-action]", () => this._handleOpenChange(false)),
+      // Cancel additionally registers itself as the element that receives
+      // initial focus when the dialog opens, matching <alert-dialog-cancel>.
+      attachBehavior(this, "[data-alert-dialog-cancel]", (element) => {
+        const onClick = () => this._handleOpenChange(false);
+        element.addEventListener("click", onClick);
+        this._handleCancelMount(element);
+        return () => element.removeEventListener("click", onClick);
+      }),
+    ];
+  }
+
+  private _teardownBehaviors() {
+    for (const dispose of this._disposeBehaviors) dispose();
+    this._disposeBehaviors = [];
+  }
+
   private _cleanupDialog() {
-    if (this._dialogElement) {
-      this._dialogElement.removeEventListener(
-        "close",
-        this._boundHandleDialogClose
-      );
-      this._dialogElement.removeEventListener(
-        "cancel",
-        this._boundHandleDialogCancel
-      );
-    }
+    this._teardownBehaviors();
+    // Also removes the <dialog> listeners via the behavior's cleanup.
+    this._disposeDialogBehavior?.();
+    this._disposeDialogBehavior = undefined;
   }
 
   private _setupAriaAttributes() {
@@ -252,21 +309,14 @@ export class AlertDialogRoot extends LitElement {
       this._emitOpenChange(value);
     } else {
       // In uncontrolled mode, update internal state
-      if (this._internalOpen !== value) {
-        this._internalOpen = value;
+      if (this._openState.set(value)) {
         this._emitOpenChange(value);
       }
     }
   }
 
   private _emitOpenChange(open: boolean) {
-    this.dispatchEvent(
-      new CustomEvent("openChange", {
-        bubbles: true,
-        composed: true,
-        detail: { open },
-      })
-    );
+    dispatch(this, ALERT_DIALOG_EVENTS.OPEN_CHANGE, { open });
   }
 
   private _handleTriggerMount(el: HTMLElement) {

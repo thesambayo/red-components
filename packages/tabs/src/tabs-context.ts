@@ -52,14 +52,19 @@ export interface TabsContextValue {
 }
 
 // Add ID generation
-let idCounter = 0;
-export function generateId(prefix: string): string {
-    idCounter += 1;
-    return `${prefix}-${idCounter}`;
-}
+/** Shared across all packages so ids cannot collide. */
+export { generateId } from "@red-elements/core";
 
 export const tabsRootContext = createContext<TabsContextValue>("tabs-root");
 
 // Legacy export for backward compatibility
 export type TabContext = TabsContextValue;
 export const tabsContext = tabsRootContext;
+
+/**
+ * Event names. Namespaced as `{component}:{kebab-event}` so a bubbling
+ * event cannot be mistaken for a native one by an ancestor listener.
+ */
+export const TABS_EVENTS = {
+  VALUE_CHANGE: "tabs:value-change",
+} as const;

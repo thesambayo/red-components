@@ -1,20 +1,41 @@
 name: Branch CI
+
 on:
   push:
     branches:
       - "**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# This workflow only reads the repository. `publish.yml` is where write access
+# lives.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  # Superseded runs on a feature branch are pointless - cancel them. Never on
+  # main: publish.yml keys off this workflow's conclusion, and a cancelled run
+  # would silently skip a release.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
+    # A same-repo branch already gets a `push` run, so taking the
+    # `pull_request` event for it too would double every CI run. `push` never
+    # fires for a fork's PR, which is the case this trigger exists to cover.
+    if: >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+        # Version comes from `packageManager` in package.json, so it cannot
+        # drift away from what everyone uses locally.
+        uses: pnpm/action-setup@v4
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -26,4 +47,23 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        run: pnpm run build
+        run: pnpm build
+
+      # `pnpm build` typechecks package source but EXCLUDES *.stories.ts (see
+      # scripts/tsconfig.assert.json). Building Storybook is what actually
+      # compiles the stories, so without this a broken story merges green.
+      - name: Build Storybook
+        run: pnpm story:build
+
+      # Both apps consume the packages built above, so `--filter` directly
+      # rather than the `docs:build` / `showcase:build` scripts, which would
+      # rebuild every package a second time. The showcase's build runs `tsc`,
+      # so this typechecks it too.
+      - name: Build docs site
+        run: pnpm --filter docs build
+
+      - name: Build showcase
+        run: pnpm --filter showcase build
+
+      - name: Lint showcase
+        run: pnpm showcase:lint

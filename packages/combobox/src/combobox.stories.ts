@@ -399,6 +399,77 @@ export const InlineInputAndTrigger: Story = {
   `,
 };
 
+/**
+ * `width="trigger"` makes the listbox exactly as wide as the element it is
+ * anchored to - the `<combobox-anchor>` if there is one, otherwise the input.
+ *
+ * It is a shorthand over `--combobox-input-width`, a custom property the
+ * positioning middleware keeps up to date while the list is open. Use the
+ * property directly for anything the shorthand does not cover:
+ *
+ * ```css
+ * combobox-content { min-width: var(--combobox-input-width); }
+ * ```
+ */
+export const MatchTriggerWidth: Story = {
+  render: () => {
+    const items = html`
+      ${fruits.map(
+        (fruit) => html`
+          <combobox-item value=${fruit.toLowerCase()}>${fruit}</combobox-item>
+        `
+      )}
+      <combobox-empty>No fruits found</combobox-empty>
+    `;
+
+    return html`
+      ${styles}
+      <style>
+        .width-demo {
+          display: flex;
+          gap: 64px;
+          padding: 100px;
+          justify-content: center;
+          align-items: flex-start;
+        }
+        /* An input deliberately wider than the list's own min-width, so the
+           difference between the two columns is visible. */
+        .width-demo combobox-root {
+          width: 420px;
+        }
+        .width-demo figcaption {
+          font: 500 13px/1.5 system-ui, sans-serif;
+          color: #64748b;
+          margin-bottom: 8px;
+        }
+        .width-demo code {
+          font: 500 12px/1.5 ui-monospace, monospace;
+          background: #f1f5f9;
+          border-radius: 4px;
+          padding: 1px 5px;
+        }
+      </style>
+      <div class="width-demo">
+        <figure>
+          <figcaption>Default &mdash; sizes to its own content</figcaption>
+          <combobox-root>
+            <combobox-input placeholder="Search fruits..."></combobox-input>
+            <combobox-content>${items}</combobox-content>
+          </combobox-root>
+        </figure>
+
+        <figure>
+          <figcaption><code>width="trigger"</code> &mdash; matches the input</figcaption>
+          <combobox-root>
+            <combobox-input placeholder="Search fruits..."></combobox-input>
+            <combobox-content width="trigger">${items}</combobox-content>
+          </combobox-root>
+        </figure>
+      </div>
+    `;
+  },
+};
+
 export const MultipleSelect: Story = {
   render: () => html`
     ${styles}

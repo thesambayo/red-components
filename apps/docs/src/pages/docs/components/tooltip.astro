@@ -105,7 +105,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/tooltip';
+            code={`import '@red-elements/tooltip/elements';
 
 // Use directly in your HTML
 <tooltip-root>
@@ -150,7 +150,7 @@ export function TooltipDemo() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/tooltip';
+import '@red-elements/tooltip/elements';
 </script>
 
 <template>
@@ -171,7 +171,7 @@ import '@red-elements/tooltip';
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/tooltip';
+  import '@red-elements/tooltip/elements';
 </script>
 
 <tooltip-root>
@@ -191,7 +191,7 @@ import '@red-elements/tooltip';
           <CodeBlock
             code={`// app.component.ts
 import { Component } from '@angular/core';
-import '@red-elements/tooltip';
+import '@red-elements/tooltip/elements';
 
 @Component({
   selector: 'app-root',

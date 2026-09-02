@@ -1,6 +1,8 @@
 import { consume } from "@lit/context";
 import { html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { attachPopoverToggle } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
 import { SelectContextValue } from "./select-context";
 import { selectRootContext } from "./select-context";
 
@@ -17,6 +19,8 @@ export class SelectTrigger extends LitElement {
   @state()
   private _context!: SelectContextValue;
 
+  private _disposeToggle?: BehaviorCleanup;
+
   connectedCallback() {
     super.connectedCallback();
 
@@ -26,14 +30,27 @@ export class SelectTrigger extends LitElement {
     this.setAttribute("aria-expanded", "false");
     this.setAttribute("tabindex", "0");
 
-    this.addEventListener("click", this._handleClick);
+    // Decides the toggle direction from the state at pointerdown, so a click
+    // on the trigger while open cannot reopen the listbox that the Popover
+    // API's light dismiss just closed.
+    this._disposeToggle = attachPopoverToggle(this, {
+      isOpen: () => this._context?.isOpen ?? false,
+      open: () => this._context?.onOpen(),
+      close: () => this._context?.onClose(),
+      shouldIgnore: (event) => {
+        if (!this._context?.disabled) return false;
+        event.preventDefault();
+        return true;
+      },
+    });
     this.addEventListener("keydown", this._handleKeyDown);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    this.removeEventListener("click", this._handleClick);
+    this._disposeToggle?.();
+    this._disposeToggle = undefined;
     this.removeEventListener("keydown", this._handleKeyDown);
 
     // Unregister from root
@@ -83,15 +100,6 @@ export class SelectTrigger extends LitElement {
   protected render() {
     return html`<slot></slot>`;
   }
-
-  private _handleClick = (e: Event) => {
-    if (this._context?.disabled) {
-      e.preventDefault();
-      return;
-    }
-
-    this._context?.onToggle();
-  };
 
   private _handleKeyDown = (e: KeyboardEvent) => {
     if (this._context?.disabled) return;

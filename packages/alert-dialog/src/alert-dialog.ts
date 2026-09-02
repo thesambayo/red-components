@@ -14,7 +14,7 @@
  * @example
  * ```html
  * <alert-dialog-root>
- *   <alert-dialog-trigger as-child>
+ *   <alert-dialog-trigger>
  *     <button>Delete Item</button>
  *   </alert-dialog-trigger>
  *
@@ -25,10 +25,10 @@
  *     </p>
  *
  *     <footer>
- *       <alert-dialog-cancel as-child>
+ *       <alert-dialog-cancel>
  *         <button>Cancel</button>
  *       </alert-dialog-cancel>
- *       <alert-dialog-action as-child>
+ *       <alert-dialog-action>
  *         <button>Delete</button>
  *       </alert-dialog-action>
  *     </footer>

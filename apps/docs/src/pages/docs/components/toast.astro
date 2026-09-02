@@ -101,7 +101,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/toast';
+            code={`import '@red-elements/toast/elements';
 
 // Add toast container to your HTML
 <toast-root></toast-root>
@@ -164,7 +164,7 @@ export function ToastDemo() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/toast';
+import '@red-elements/toast/elements';
 
 const showToast = () => {
   window.toaster.add({
@@ -192,7 +192,7 @@ const showSuccess = () => {
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/toast';
+  import '@red-elements/toast/elements';
 
   function showToast() {
     window.toaster.add({
@@ -219,7 +219,7 @@ const showSuccess = () => {
           <CodeBlock
             code={`// app.component.ts
 import { Component } from '@angular/core';
-import '@red-elements/toast';
+import '@red-elements/toast/elements';
 
 declare global {
   interface Window {

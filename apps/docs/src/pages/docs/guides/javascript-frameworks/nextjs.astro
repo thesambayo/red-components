@@ -119,16 +119,12 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
         description="Client Component"
         code={`'use client';
 
-import { DialogRoot, DialogTrigger, DialogContent, DialogClose } from '@red-elements/dialog';
+import { DialogRoot } from '@red-elements/dialog';
 
 export function DialogDemo() {
   return (
     <DialogRoot>
-      <DialogTrigger asChild>
-        <button className="px-4 py-2 bg-primary text-primary-foreground rounded">
-          Open Dialog
-        </button>
-      </DialogTrigger>
+      <button className="px-4 py-2 bg-primary text-primary-foreground rounded" data-dialog-trigger>Open Dialog</button>
       <dialog className="rounded-lg p-6 max-w-md">
         <h2 data-dialog-title className="text-2xl font-bold mb-4">
           Welcome
@@ -136,9 +132,7 @@ export function DialogDemo() {
         <p data-dialog-description className="mb-4">
           This is a dialog component from Red Elements.
         </p>
-        <DialogClose asChild>
-          <button className="px-4 py-2 bg-muted rounded">Close</button>
-        </DialogClose>
+        <button className="px-4 py-2 bg-muted rounded" data-dialog-close>Close</button>
       </dialog>
     </DialogRoot>
   );
@@ -175,18 +169,14 @@ export default function Page() {
 
       <ConfigFile
         filename="pages/index.tsx"
-        code={`import { DialogRoot, DialogTrigger, DialogClose } from '@red-elements/dialog';
+        code={`import { DialogRoot } from '@red-elements/dialog';
 
 export default function Home() {
   return (
     <div>
       <h1>My Next.js App</h1>
       <DialogRoot>
-        <DialogTrigger asChild>
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded">
-            Open Dialog
-          </button>
-        </DialogTrigger>
+        <button className="px-4 py-2 bg-primary text-primary-foreground rounded" data-dialog-trigger>Open Dialog</button>
         <dialog className="rounded-lg p-6 max-w-md">
           <h2 data-dialog-title className="text-2xl font-bold mb-4">
             Welcome
@@ -194,9 +184,7 @@ export default function Home() {
           <p data-dialog-description className="mb-4">
             This is a dialog component.
           </p>
-          <DialogClose asChild>
-            <button className="px-4 py-2 bg-muted rounded">Close</button>
-          </DialogClose>
+          <button className="px-4 py-2 bg-muted rounded" data-dialog-close>Close</button>
         </dialog>
       </DialogRoot>
     </div>

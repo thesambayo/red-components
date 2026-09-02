@@ -1,4 +1,12 @@
-# Popover API Migration Summary
+# Popover API Notes
+
+Why these components sit on the native Popover API, and the per-component API
+that came out of it. Corrected to match the code as it stands.
+
+> **Where this is not authoritative.** For the open/close/focus *sequence* read
+> [`COMPONENT_LIFECYCLE.md`](./COMPONENT_LIFECYCLE.md); for the platform
+> behaviours that make it subtle, [`COMPONENT_FIXES.md`](./COMPONENT_FIXES.md).
+> Where this document and those disagree, they win.
 
 ## Overview
 Successfully migrated **dropdown**, **tooltip**, **select**, and **combobox** components to use the native **Popover API**, eliminating custom portal solutions while retaining `@floating-ui/dom` for positioning.
@@ -8,7 +16,9 @@ Successfully migrated **dropdown**, **tooltip**, **select**, and **combobox** co
 ### 1. Popover API Usage
 - **Dropdown**: `popover="auto"` - native light dismiss (click outside, Escape key)
 - **Select**: `popover="auto"` - native light dismiss, fully controlled open/close state
-- **Combobox**: `popover="manual"` - programmatic control for search interactions
+- **Combobox**: `popover="manual"` - the text input sits *outside* the listbox, so
+  `auto`'s light dismiss would close the list on every click into the input.
+  The boundary is declared explicitly via `attachDismiss` instead.
 - **Tooltip**: `popover="manual"` - programmatic control via hover/focus
 - **Toast**: No changes - works well with `position: fixed`
 
@@ -27,7 +37,8 @@ Successfully migrated **dropdown**, **tooltip**, **select**, and **combobox** co
 ### Component Structure
 ```
 dropdown-root          // Coordinates trigger and content
-├── dropdown-trigger   // Opens dropdown (supports as-child)
+├── dropdown-trigger   // Opens dropdown (host is the trigger; or use
+│                      //   data-dropdown-trigger on your own element)
 └── dropdown-content   // Menu container (popover="auto")
     ├── dropdown-item
     ├── dropdown-label
@@ -45,10 +56,12 @@ dropdown-root          // Coordinates trigger and content
 - Keyboard navigation: ArrowUp/Down, Home/End, Escape
 
 #### `dropdown-trigger.ts`
-- **`as-child` attribute**: Pass behavior to slotted child element
-- Without `as-child`: Component acts as trigger itself
-- With `as-child`: Behavior delegated to slotted `<button>` or element
-- Calls `content.togglePopover()` on click
+- The host element **is** the trigger. (`as-child` was removed - it reached
+  through a slot and mutated whatever it found.)
+- To bring your own element, mark it `data-dropdown-trigger`; `attachBehavior`
+  wires it and keeps doing so as the DOM changes.
+- Toggling goes through `attachPopoverToggle`, **never** a bare `click` handler
+  calling `togglePopover()` - see "Why manual toggle calls" below.
 - Data attributes: `data-state="open|closed"`
 - ARIA: `aria-haspopup="menu"`, `aria-expanded`
 
@@ -84,7 +97,7 @@ export function generateDropdownId(): string {
 
 ### Usage Examples
 
-**Basic (without as-child)**
+**Basic**
 ```html
 <dropdown-root>
   <dropdown-trigger>Open Menu</dropdown-trigger>
@@ -95,12 +108,15 @@ export function generateDropdownId(): string {
 </dropdown-root>
 ```
 
-**With as-child**
+**Bring your own trigger element**
+
+Mark any element `data-dropdown-trigger` and the root wires it - including
+elements added later, since `attachBehavior` observes the DOM rather than
+querying once.
+
 ```html
 <dropdown-root>
-  <dropdown-trigger as-child>
-    <button class="custom-button">Open Menu</button>
-  </dropdown-trigger>
+  <button class="custom-button" data-dropdown-trigger>Open Menu</button>
   <dropdown-content side="bottom" align="start">
     <dropdown-item value="edit">Edit</dropdown-item>
   </dropdown-content>
@@ -114,9 +130,11 @@ export function generateDropdownId(): string {
 - `align`: "start" | "center" | "end" (default: "start")
 - `side-offset`: number (default: 4)
 - `align-offset`: number (default: 0)
+- `width`: "trigger" - match the trigger's width exactly
 
 **dropdown-trigger**
-- `as-child`: boolean (default: false)
+- No properties. The host element is the trigger; use
+  `data-dropdown-trigger` on your own element instead if you need a different tag.
 
 **dropdown-item**
 - `value`: string (optional)
@@ -257,6 +275,7 @@ const [open, setOpen] = useState(false);
 - `align`: "start" | "center" | "end" (default: "start")
 - `side-offset`: number (default: 4)
 - `align-offset`: number (default: 0)
+- `width`: "trigger" - match the trigger's width exactly
 
 **select-item**
 - `value`: string (required)
@@ -304,7 +323,9 @@ combobox-root             // State management, filtering, form integration
 - **CRITICAL**: Element setters do NOT call `_updateContext()` (same pattern as select)
 
 #### `combobox-content.ts`
-- Uses `popover="manual"` for programmatic control
+- Uses `popover="manual"`: the input is outside the listbox, so `auto` would
+  dismiss on every click into it. Dismissal is owned via `attachDismiss`, whose
+  boundary covers the anchor, input and trigger.
 - Input field controls when to open (not just click outside to dismiss)
 - Keyboard navigation with filtered results
 - Auto-highlights first filtered result
@@ -362,7 +383,8 @@ combobox-root             // State management, filtering, form integration
 - Standard HTML input attributes (placeholder, disabled, etc.)
 
 **combobox-content**
-- Same positioning properties as select-content
+- Same positioning properties as select-content, including `width="trigger"`
+  (which matches the anchor, or the input when there is no anchor)
 
 ### Events
 - `combobox:value-change` - When selected value changes
@@ -401,7 +423,7 @@ tooltip-provider (optional)
 
 ### Data Attributes & States
 - Content: `data-state="closed|delayed-open|instant-open"`
-- No `as-child` support needed (tooltip trigger doesn't require it)
+- The host element is the trigger; `data-tooltip-trigger` for your own element
 
 ## CSS Pattern
 
@@ -439,7 +461,7 @@ tooltip-provider (optional)
 
 ### Dropdown
 - `dropdown-content.ts` - Complete rewrite with Popover API
-- `dropdown-trigger.ts` - Complete rewrite with as-child support
+- `dropdown-trigger.ts` - Complete rewrite; host element is the trigger
 - `dropdown-root.ts` - Complete rewrite, simplified
 - `dropdown-item.ts` - Added data-disabled, aria-disabled
 - `dropdown-separator.ts` - Added data-orientation, aria-orientation
@@ -482,15 +504,30 @@ tooltip-provider (optional)
 
 ## Implementation Notes
 
-### Why Manual togglePopover() Calls?
-- `popovertarget` attribute only works natively on `<button>` elements
-- Custom elements require manual `togglePopover()` calls
-- `as-child` pattern allows delegation to actual buttons when needed
+### Why manual toggle calls - and why they need a guard
+
+`popoverTargetElement` is defined only on `HTMLButtonElement` and
+`HTMLInputElement`, so a custom-element trigger can never register as a popover
+invoker. Toggling therefore has to be manual.
+
+**This is not free.** Light dismiss exempts the popover and its *registered
+invoker* only, so a gesture on an unregistered trigger closes the popover on
+pointerup, and the `click` that follows reads "closed" and reopens it. The menu
+blinks and can never be closed from its own trigger.
+
+Always wire triggers with `attachPopoverToggle` from core, which decides the
+direction from the state captured at `pointerdown`. Full account in
+`COMPONENT_FIXES.md` §1.
 
 ### Focus Management
-- Dropdown content auto-focuses first item on open
-- On close, focus returns to trigger (or trigger's child element if as-child)
-- Keyboard navigation handled by content component
+- Dropdown content focuses its first item **only on keyboard opens**. A mouse
+  open focuses the content container instead: focus still has to leave the
+  trigger so arrow keys reach the content's keydown handler, but no item paints
+  a focus ring the user did not ask for. The trigger signals which happened via
+  `data-open-source`.
+- On close, focus returns to the trigger - owned by exactly one component, and
+  only when focus would otherwise be stranded.
+- Keyboard navigation handled by the content component.
 
 ### State Synchronization
 - Root listens to content's `toggle` event (from Popover API)
@@ -516,53 +553,43 @@ tooltip-provider (optional)
 
 ### 2. Controlled Open/Close with Popover API
 
-Pattern used in select-content.ts (lines 97-127):
+Your state drives the popover; the `toggle` event syncs user dismissals back.
 
 ```typescript
-private _previousOpen = false;
+protected updated(changed: Map<string, unknown>) {
+  if (!changed.has("_context")) return;
 
-protected updated() {
-  if (!this._context) return;
+  const { isOpen } = this._context;
+  const isPopoverOpen = this.matches(":popover-open");
 
-  // Controlled by your state
-  if (this._context.isOpen && !this._previousOpen) {
-    // Opening
-    try {
-      this.showPopover();
-    } catch (e) {
-      // Popover may already be open
-    }
-  } else if (!this._context.isOpen && this._previousOpen) {
-    // Closing
-    try {
-      this.hidePopover();
-    } catch (e) {
-      // Popover may already be hidden
-    }
-  }
-
-  this._previousOpen = this._context.isOpen;
+  if (isOpen && !isPopoverOpen) this.showPopover();
+  else if (!isOpen && isPopoverOpen) this.hidePopover();
 }
+
+// Gate the paint SYNCHRONOUSLY. `toggle` is queued as a task and arrives too
+// late - a frame can already have painted at stale coordinates.
+private _handleBeforeToggle = (event: ToggleEvent) => {
+  if (event.newState === "open") this._floating.gate();
+};
 
 private _handleToggle = (event: ToggleEvent) => {
   if (event.newState === "open") {
     this.setAttribute("data-state", "open");
-    this._positionContent();
+    this._floating.start(anchor);   // FloatingController: positions AND reveals
   } else {
     this.setAttribute("data-state", "closed");
-    // User dismissed via Escape or click outside
-    // Sync back to your state
-    if (this._context?.isOpen) {
-      this._context.onClose();
-    }
+    this._floating.stop();          // clears left/top and the gate
+    if (this._context?.isOpen) this._context.onClose();
   }
 };
 ```
 
 **Key points:**
-- Your state controls the popover via `showPopover()`/`hidePopover()`
-- The `toggle` event syncs user dismissals back to your state
-- `popover="auto"` gives you both controlled state AND automatic light dismiss
+- Check `:popover-open` rather than tracking a `_previousOpen` field; the
+  element already knows, and a shadow copy can desync.
+- `beforetoggle` gates, `toggle` positions. Never gate from `toggle`.
+- Every path that skips positioning must lift the gate, or the element opens
+  invisible.
 
 ### 3. CRITICAL: Avoiding Infinite Update Loops
 
@@ -646,26 +673,37 @@ private _updateItemContext() {
 
 ### 4. Focus Management Pattern
 
-**Always return focus to trigger/input on close:**
+**One owner.** Return-focus belongs to whichever component owns the close -
+normally the root. Two owners means focus visibly hops between them, and with
+`open-on-focus` the second focus reopens what was just closed.
+
+**Only when focus would be stranded.** If the user closed the overlay by
+clicking something else, focus has already legitimately moved; pulling it back
+steals it from where they aimed.
 
 ```typescript
-private _handleClose() {
-  this._isOpen = false;
-  // ... other close logic ...
+private _restoreFocus() {
+  const target = this._triggerElement ?? this._inputElement;
+  if (!target) return;
 
-  // Return focus - use requestAnimationFrame for reliability
-  if (this._triggerElement) {
-    requestAnimationFrame(() => {
-      this._triggerElement?.focus();
-    });
-  }
+  requestAnimationFrame(() => {
+    const active = document.activeElement;
+    const stranded =
+      !active || active === document.body || active === this || this.contains(active);
+    if (!stranded) return;
+
+    // `focus()` dispatches synchronously, so bracketing the call is enough for
+    // an open-on-focus handler to recognise the focus as self-inflicted.
+    this._restoringFocus = true;
+    target.focus();
+    this._restoringFocus = false;
+  });
 }
 ```
 
-**Why `requestAnimationFrame()`?**
-- Ensures DOM has settled after popover closes
-- Prevents race conditions with browser's focus management
-- More reliable than `setTimeout(0)`
+**Why `requestAnimationFrame`?** It lets focus settle after the popover closes,
+so the `activeElement` check above sees where focus actually landed rather than
+where it was.
 
 ### 5. Host Element as Popover Pattern
 
@@ -697,47 +735,42 @@ protected render() {
 - Easier styling (no wrapper to work around)
 - Direct access to popover methods (`this.showPopover()`)
 
-### 6. Floating UI Positioning Pattern
+### 6. Positioning: use `FloatingController`
 
-Standard middleware configuration for all popover content:
+Do not call `computePosition` directly. A one-shot call detaches the content
+from its trigger on the first scroll or resize, and paints at least one frame in
+the wrong place. `FloatingController` from core owns the whole problem:
+`autoUpdate` tracking, the two settle passes, the paint gate, and clearing stale
+coordinates on close.
 
 ```typescript
-const { x, y, placement: finalPlacement } = await computePosition(
-  triggerElement,
-  contentElement,
-  {
-    strategy: "fixed",
-    placement: this._getPlacement(), // "bottom-start", etc.
-    middleware: [
-      offset({
-        mainAxis: this.sideOffset,      // Distance from trigger
-        crossAxis: this.alignOffset,     // Alignment adjustment
-      }),
-      flip({
-        fallbackAxisSideDirection: "start",
-      }),
-      shift({ padding: 8 }),              // Keep in viewport
-      size({
-        padding: 8,
-        apply: ({ availableWidth, availableHeight, rects }) => {
-          // Expose as CSS variables for responsive sizing
-          this.style.setProperty("--trigger-width", `${rects.reference.width}px`);
-          this.style.setProperty("--available-height", `${availableHeight}px`);
-        },
-      }),
-    ],
-  }
-);
+private _floating = new FloatingController(this, {
+  placement: () => this._getPlacement(),          // "bottom-start", etc.
+  middleware: () => [
+    offset({ mainAxis: this.sideOffset, crossAxis: this.alignOffset }),
+    flip({ fallbackAxisSideDirection: "start" }),
+    shift({ padding: 8 }),
+    size({
+      padding: 8,
+      apply: ({ availableWidth, availableHeight, rects }) => {
+        // Namespace these per component - they are public API for consumers.
+        this.style.setProperty("--select-trigger-width", `${rects.reference.width}px`);
+        this.style.setProperty("--select-available-height", `${availableHeight}px`);
+      },
+    }),
+  ],
+});
 
-// Apply position
-this.style.left = `${x}px`;
-this.style.top = `${y}px`;
-
-// Expose actual placement for styling
-const [side, align] = finalPlacement.split("-");
-this.setAttribute("data-side", side);
-this.setAttribute("data-align", align || "center");
+// open:  this._floating.gate()  from beforetoggle, then .start(anchor) from toggle
+// close: this._floating.stop()
 ```
+
+The controller writes `left`/`top` and sets `data-side` / `data-align` for you.
+
+**Why it settles twice:** `size()`'s `apply` changes the floating element's own
+box, which invalidates the `flip`/`shift` decisions made against the pre-resize
+box and separately trips `autoUpdate`'s `ResizeObserver`. Both passes resolve in
+microtasks, so they land in the same frame.
 
 ### 7. Form Integration with ElementInternals
 
@@ -803,41 +836,28 @@ export class MyFormControl extends LitElement {
 }
 ```
 
-### 8. Late Initialization Pattern (React Compatibility)
+### 8. Late Initialization: use `ControlledState`
 
-React may set properties after component initialization. Handle with late initialization:
+React (and `@lit/react`) assigns properties *after* the element connects, so a
+`default-*` value is usually not readable in `connectedCallback`. Use the
+controller from core rather than hand-rolling a `_hasInitialized` flag:
 
 ```typescript
-private _hasInitialized = false;
+private _valueState = new ControlledState<string | undefined>(this, {
+  prop: () => this.value,                 // undefined ⇒ uncontrolled
+  defaultValue: () => this.defaultValue,
+  fallback: undefined,
+  name: "_value",                         // reported to Lit for changedProperties
+});
 
-connectedCallback() {
-  super.connectedCallback();
-
-  // Initialize with default value if available
-  if (this.defaultValue !== undefined) {
-    this._value = this.defaultValue;
-    this._hasInitialized = true;
-  }
-}
-
-protected willUpdate(changed: Map<string, unknown>) {
-  // Handle late initialization of defaultValue (React)
-  if (
-    changed.has("defaultValue") &&
-    !this._hasInitialized &&
-    this.defaultValue !== undefined &&
-    this._value === undefined
-  ) {
-    this._value = this.defaultValue;
-    this._hasInitialized = true;
-  }
-
-  // Handle controlled value (always takes precedence)
-  if (changed.has("value") && this.value !== undefined) {
-    this._value = this.value;
-  }
-}
+private get _value() { return this._valueState.value; }
 ```
+
+**Do not put this in `willUpdate` yourself.** Lit runs `willUpdate` *before*
+controller hooks, and `update()` then discards the `changedProperties` map, so a
+late latch can never be seen by a `willUpdate` block keyed on it. The failure is
+silent - the value renders correctly and never reaches the form. That is a bug
+this codebase actually shipped; `COMPONENT_FIXES.md` §4 has the details.
 
 ### 9. Keyboard Navigation Pattern
 
@@ -928,7 +948,7 @@ select-item[data-selected] {
 - [x] Keyboard navigation (Arrow keys, Home/End, Enter)
 - [x] Positions correctly relative to trigger
 - [x] Flips when near viewport edge
-- [x] Works with as-child pattern
+- [x] Works with the `data-dropdown-trigger` escape hatch
 - [x] Disabled items cannot be selected
 - [x] Data attributes update correctly
 

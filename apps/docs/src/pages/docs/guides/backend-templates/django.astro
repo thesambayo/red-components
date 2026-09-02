@@ -97,9 +97,9 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
 
     <!-- Load components -->
     <script type="module">
-      import '@red-elements/dialog';
-      import '@red-elements/dropdown';
-      import '@red-elements/combobox';
+      import '@red-elements/dialog/elements';
+      import '@red-elements/dropdown/elements';
+      import '@red-elements/combobox/elements';
     </script>
 
     {% block extra_scripts %}{% endblock %}
@@ -168,9 +168,7 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
     <h1>{{ page_title }}</h1>
 
     <dialog-root>
-      <dialog-trigger as-child>
-        <button type="button" class="btn btn-primary">Open Dialog</button>
-      </dialog-trigger>
+      <button type="button" class="btn btn-primary" data-dialog-trigger>Open Dialog</button>
 
       <dialog class="rounded-lg p-6 max-w-md">
         <h2 data-dialog-title class="text-2xl font-bold mb-4">
@@ -179,9 +177,7 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
         <p data-dialog-description class="mb-4">
           {{ dialog_content }}
         </p>
-        <dialog-close as-child>
-          <button type="button" class="btn btn-secondary">Close</button>
-        </dialog-close>
+        <button type="button" class="btn btn-secondary" data-dialog-close>Close</button>
       </dialog>
     </dialog-root>
 </div>
@@ -265,9 +261,7 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
       </p>
       <CodeBlock
         code={`<dropdown-root>
-  <dropdown-trigger as-child>
-    <button type="button">Actions</button>
-  </dropdown-trigger>
+  <button type="button" data-dropdown-trigger>Actions</button>
   <dropdown-content>
     <dropdown-item
       hx-post="{% url 'delete_item' item.id %}"
@@ -291,18 +285,14 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
       <ConfigFile
         filename="templates/components/dialog.html"
         code={`<dialog-root>
-  <dialog-trigger as-child>
-    <button type="button" class="btn btn-primary">{{ trigger_text }}</button>
-  </dialog-trigger>
+  <button type="button" class="btn btn-primary" data-dialog-trigger>{{ trigger_text }}</button>
 
   <dialog class="rounded-lg p-6 max-w-md">
     <h2 data-dialog-title class="text-2xl font-bold mb-4">{{ title }}</h2>
     <div data-dialog-description class="mb-4">
       {{ content }}
     </div>
-    <dialog-close as-child>
-      <button type="button" class="btn btn-secondary">Close</button>
-    </dialog-close>
+    <button type="button" class="btn btn-secondary" data-dialog-close>Close</button>
   </dialog>
 </dialog-root>`}
         lang="html"

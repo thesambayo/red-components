@@ -114,7 +114,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/dropdown';
+            code={`import '@red-elements/dropdown/elements';
 
 // Use directly in your HTML
 <dropdown-root>
@@ -168,7 +168,7 @@ export function DropdownDemo() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/dropdown';
+import '@red-elements/dropdown/elements';
 </script>
 
 <template>
@@ -189,7 +189,7 @@ import '@red-elements/dropdown';
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/dropdown';
+  import '@red-elements/dropdown/elements';
 </script>
 
 <dropdown-root>
@@ -209,7 +209,7 @@ import '@red-elements/dropdown';
           <CodeBlock
             code={`// app.component.ts
 import { Component } from '@angular/core';
-import '@red-elements/dropdown';
+import '@red-elements/dropdown/elements';
 
 @Component({
   selector: 'app-root',

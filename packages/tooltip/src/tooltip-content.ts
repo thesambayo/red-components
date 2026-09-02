@@ -8,10 +8,10 @@ import {
   size,
   arrow,
   hide,
-  computePosition,
   Middleware,
   Placement,
 } from "@floating-ui/dom";
+import { FloatingController } from "@red-elements/core";
 import { tooltipRootContext } from "./context";
 import type {
   TooltipRootContextValue,
@@ -43,16 +43,44 @@ import type {
 @customElement("tooltip-content")
 export class TooltipContent extends LitElement {
   static styles = css`
+    /*
+     * The UA stylesheet gives every [popover] \`margin: auto\`, \`inset: 0\`,
+     * \`border: solid\`, \`padding: .25em\` and \`background-color: Canvas\`, so
+     * some reset is unavoidable. But border, padding and background are
+     * exactly what a consumer most wants to set, and an unlayered :host rule
+     * beats the layered utilities that Tailwind and friends emit - which is
+     * why a styled <select-content> rendered with no background, border or
+     * padding while its <select-item> children styled fine.
+     *
+     * Declaring the reset in a layer fixes that: an author layer still beats
+     * the UA origin, while a consumer rule in another tree wins on context.
+     * Only \`position\` stays unlayered - overriding it breaks positioning
+     * outright, and floating-ui writes left/top inline anyway.
+     */
+    @layer red-popover-reset {
+      :host {
+        margin: 0;
+        inset: auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        outline: none;
+      }
+    }
+
     :host {
       position: fixed;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
     }
 
     :host(:not(:popover-open)) {
       display: none;
+    }
+
+    /* Paired with FloatingController's gate: hides the content until the first
+       position has been computed, so it never paints against the trigger's
+       old coordinates. */
+    :host([data-floating-hidden]) {
+      visibility: hidden;
     }
   `;
 
@@ -94,12 +122,6 @@ export class TooltipContent extends LitElement {
    */
   @property({ type: Number, attribute: "collision-padding" })
   collisionPadding = 8;
-
-  /**
-   * Custom aria-label (overrides content text)
-   */
-  @property({ type: String, attribute: "aria-label" })
-  ariaLabel?: string;
 
   /** Reference to arrow element if present */
   private _arrowElement: HTMLElement | null = null;
@@ -208,25 +230,46 @@ export class TooltipContent extends LitElement {
     };
   }
 
-  private async _show() {
-    const trigger = this._rootContext?.trigger;
-    if (!trigger) return;
+  /**
+   * Keeps the tooltip anchored to its trigger. Previously a single
+   * `computePosition` on open, so the tooltip detached on scroll or resize -
+   * particularly visible for a tooltip left open while the page moves.
+   */
+  private _floating = new FloatingController(this, {
+    placement: () => this._getPlacement(),
+    middleware: () => this._buildMiddleware(),
+    onPositioned: ({ placement, middlewareData }) => {
+      const [side] = placement.split("-");
 
-    // Set ID for aria-describedby
-    if (this._rootContext?.contentId) {
-      this.setAttribute("id", this._rootContext.contentId);
-    }
+      if (middlewareData.transformOrigin) {
+        this.style.setProperty(
+          "--tooltip-content-transform-origin",
+          `${middlewareData.transformOrigin.x} ${middlewareData.transformOrigin.y}`
+        );
+      }
 
-    // Show popover first (enters top-layer)
-    if (!this._isPopoverOpen) {
-      this.showPopover();
-      this._isPopoverOpen = true;
-    }
+      this.setAttribute(
+        "data-state",
+        this._rootContext?.stateAttribute ?? "instant-open"
+      );
 
-    // Find arrow element if present
-    this._arrowElement = this.querySelector("tooltip-arrow");
+      if (this._arrowElement && middlewareData.arrow) {
+        const { x: arrowX, y: arrowY } = middlewareData.arrow;
+        Object.assign(this._arrowElement.style, {
+          left: arrowX != null ? `${arrowX}px` : "",
+          top: arrowY != null ? `${arrowY}px` : "",
+        });
+        this._arrowElement.setAttribute("data-side", side);
+      }
 
-    // Build middleware stack
+      // Hide when the trigger has been scrolled out of view.
+      this.style.visibility = middlewareData.hide?.referenceHidden
+        ? "hidden"
+        : "";
+    },
+  });
+
+  private _buildMiddleware(): Middleware[] {
     const middleware: Middleware[] = [
       offset({
         mainAxis: this.sideOffset,
@@ -274,55 +317,34 @@ export class TooltipContent extends LitElement {
       this._transformOriginMiddleware()
     );
 
-    // Compute position
-    const result = await computePosition(trigger, this, {
-      strategy: "fixed",
-      placement: this._getPlacement(),
-      middleware,
-    });
+    return middleware;
+  }
 
-    const { x, y, placement, middlewareData } = result;
+  private _show() {
+    const trigger = this._rootContext?.trigger;
+    if (!trigger) return;
 
-    // Apply position
-    this.style.left = `${x}px`;
-    this.style.top = `${y}px`;
-
-    // Set transform origin for animations
-    if (middlewareData.transformOrigin) {
-      this.style.setProperty(
-        "--tooltip-content-transform-origin",
-        `${middlewareData.transformOrigin.x} ${middlewareData.transformOrigin.y}`
-      );
+    // Set ID for aria-describedby
+    if (this._rootContext?.contentId) {
+      this.setAttribute("id", this._rootContext.contentId);
     }
 
-    // Set data attributes for styling
-    const [side, align = "center"] = placement.split("-");
-    this.setAttribute(
-      "data-state",
-      this._rootContext?.stateAttribute ?? "instant-open"
-    );
-    this.setAttribute("data-side", side);
-    this.setAttribute("data-align", align);
-
-    // Handle arrow positioning
-    if (this._arrowElement && middlewareData.arrow) {
-      const { x: arrowX, y: arrowY } = middlewareData.arrow;
-      Object.assign(this._arrowElement.style, {
-        left: arrowX != null ? `${arrowX}px` : "",
-        top: arrowY != null ? `${arrowY}px` : "",
-      });
-      this._arrowElement.setAttribute("data-side", side);
+    // Gate before showing: `showPopover()` reveals the element synchronously,
+    // so the hide has to be in place first or one unpositioned frame paints.
+    if (!this._isPopoverOpen) {
+      this._floating.gate();
+      this.showPopover();
+      this._isPopoverOpen = true;
     }
 
-    // Hide if reference is hidden (scrolled away)
-    if (middlewareData.hide?.referenceHidden) {
-      this.style.visibility = "hidden";
-    } else {
-      this.style.visibility = "";
-    }
+    // Arrow must be resolved before the middleware stack is built.
+    this._arrowElement = this.querySelector("tooltip-arrow");
+
+    this._floating.start(trigger);
   }
 
   private _hide() {
+    this._floating.stop();
     if (this._isPopoverOpen) {
       this.hidePopover();
       this._isPopoverOpen = false;

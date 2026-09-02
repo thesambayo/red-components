@@ -21,11 +21,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
       </h2>
       <div class="relative rounded-xl border border-border bg-background shadow-sm p-6 md:p-8">
         <dialog-root>
-          <dialog-trigger as-child>
-            <button class="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 bg-primary text-primary-foreground hover:opacity-90 cursor-pointer border-none">
-              Open Dialog
-            </button>
-          </dialog-trigger>
+          <button class="inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 bg-primary text-primary-foreground hover:opacity-90 cursor-pointer border-none" data-dialog-trigger>Open Dialog</button>
 
           <dialog class="backdrop:backdrop-blur-sm left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-border bg-background p-6 shadow-lg rounded-lg">
             <h2 data-dialog-title class="text-lg font-semibold mb-2">Edit Profile</h2>
@@ -108,12 +104,10 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/dialog';
+            code={`import '@red-elements/dialog/elements';
 
 <dialog-root>
-  <dialog-trigger as-child>
-    <button>Open Dialog</button>
-  </dialog-trigger>
+  <button data-dialog-trigger>Open Dialog</button>
 
   <dialog>
     <h2 data-dialog-title>Dialog Title</h2>
@@ -128,14 +122,12 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tab-content>
         <tab-content value="react" class="mt-4">
           <CodeBlock
-            code={`import { DialogRoot, DialogTrigger } from '@red-elements/dialog';
+            code={`import { DialogRoot } from '@red-elements/dialog';
 
 export function MyDialog() {
   return (
     <DialogRoot>
-      <DialogTrigger asChild>
-        <button>Open Dialog</button>
-      </DialogTrigger>
+      <button data-dialog-trigger>Open Dialog</button>
 
       <dialog>
         <h2 data-dialog-title>Dialog Title</h2>
@@ -153,14 +145,12 @@ export function MyDialog() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/dialog';
+import '@red-elements/dialog/elements';
 </script>
 
 <template>
   <dialog-root>
-    <dialog-trigger as-child>
-      <button>Open Dialog</button>
-    </dialog-trigger>
+    <button data-dialog-trigger>Open Dialog</button>
 
     <dialog>
       <h2 data-dialog-title>Dialog Title</h2>

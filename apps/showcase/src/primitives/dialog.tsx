@@ -1,15 +1,18 @@
-import { DialogRoot, DialogTrigger } from "@red-elements/dialog";
+import { DialogRoot } from "@red-elements/dialog";
 import { X } from "lucide-react";
 
 export function Dialog() {
   return (
     <div className="max-w-md mx-auto space-x-5">
       <DialogRoot modal onOpenChange={(e) => console.log(e)}>
-        <DialogTrigger as-child>
-          <button className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3.5 py-1.5">
-            Open Dialog
-          </button>
-        </DialogTrigger>
+        {/* Escape hatch: your own <button> receives the behavior, so it keeps
+            native button semantics and there is no wrapper element. */}
+        <button
+          data-dialog-trigger
+          className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground px-3.5 py-1.5"
+        >
+          Open Dialog
+        </button>
         <dialog className="backdrop:bg-fuchsia-100/70 relative w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 open:animate-in animate-out fade-out-0 open:fade-in-0 sm:rounded-lg">
           <h2 data-dialog-title>Edit Profile</h2>
           <p data-dialog-description>Make changes to your profile.</p>

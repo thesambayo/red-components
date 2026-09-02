@@ -1,7 +1,9 @@
 import { LitElement, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { provide } from "@lit/context";
-import { dialogRootContext, generateId } from "./context";
+import { dialogRootContext, generateId, DIALOG_EVENTS } from "./context";
+import { ControlledState, attachBehavior, dispatch } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
 import type { DialogRootContextValue } from "./types";
 
 /**
@@ -21,7 +23,7 @@ import type { DialogRootContextValue } from "./types";
  * @example
  * ```html
  * <dialog-root modal>
- *   <dialog-trigger as-child>
+ *   <dialog-trigger>
  *     <button>Open Dialog</button>
  *   </dialog-trigger>
  *
@@ -55,9 +57,18 @@ export class DialogRoot extends LitElement {
   @property({ type: Boolean })
   modal = true;
 
-  /** Internal open state for uncontrolled mode */
-  @state()
-  private _internalOpen = false;
+  /**
+   * Controlled/uncontrolled open state.
+   *
+   * Also supplies the late-`defaultOpen` initialization that tabs, select, and
+   * switch had but dialog did not - under React, properties are assigned after
+   * the element connects, so `default-open` was previously ignored.
+   */
+  private _openState = new ControlledState<boolean>(this, {
+    prop: () => this.open,
+    defaultValue: () => this.defaultOpen,
+    fallback: false,
+  });
 
   /** Reference to trigger element */
   @state()
@@ -78,6 +89,10 @@ export class DialogRoot extends LitElement {
   @property({ attribute: false })
   context: DialogRootContextValue = this._createContext();
 
+  private _disposeCloseBehavior?: BehaviorCleanup;
+  private _disposeDialogBehavior?: BehaviorCleanup;
+  private _disposeTriggerBehavior?: BehaviorCleanup;
+
   /** Bound event handlers */
   private _boundHandleDialogClose = this._handleDialogClose.bind(this);
   private _boundHandleDialogCancel = this._handleDialogCancel.bind(this);
@@ -85,17 +100,20 @@ export class DialogRoot extends LitElement {
 
   /** Whether controlled mode is active */
   private get _isControlled(): boolean {
-    return this.open !== undefined;
+    return this._openState.isControlled;
   }
 
   /** Current open state (controlled or uncontrolled) */
   private get _isOpen(): boolean {
-    return this._isControlled ? !!this.open : this._internalOpen;
+    return this._openState.value;
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this._internalOpen = this.defaultOpen;
+
+    // Behavior attributes are wired independently of the <dialog> element:
+    // `data-dialog-trigger` lives outside it.
+    this._setupBehaviorAttributes();
 
     // Find the native dialog element
     this._setupDialog();
@@ -108,10 +126,18 @@ export class DialogRoot extends LitElement {
     this._cleanupDialog();
   }
 
+  /** Last open value pushed to the context and the native dialog. */
+  private _lastSyncedOpen?: boolean;
+
   protected willUpdate(changed: Map<string, unknown>) {
+    // Derive from the effective value rather than from a hand-maintained list
+    // of changed keys: internal state now lives in a controller, which requests
+    // a generic update, and a key list silently misses those.
+    const open = this._isOpen;
+    const openChanged = open !== this._lastSyncedOpen;
+
     if (
-      changed.has("open") ||
-      changed.has("_internalOpen") ||
+      openChanged ||
       changed.has("_triggerElement") ||
       changed.has("_dialogElement") ||
       changed.has("modal")
@@ -119,60 +145,59 @@ export class DialogRoot extends LitElement {
       this._updateContext();
     }
 
-    // Handle dialog visibility changes
-    if (changed.has("open") || changed.has("_internalOpen")) {
+    if (openChanged) {
+      this._lastSyncedOpen = open;
       this._syncDialogState();
     }
   }
 
+  /**
+   * Discovers and wires the native `<dialog>`.
+   *
+   * Previously this ran `querySelector("dialog")` once inside a single
+   * `requestAnimationFrame`: a dialog rendered conditionally (the common React
+   * case) was never found, and a dialog that was replaced kept stale
+   * listeners. Observing instead means the element can appear, change, or
+   * disappear at any time.
+   */
   private _setupDialog() {
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(() => {
-      this._dialogElement = this.querySelector("dialog");
+    this._disposeDialogBehavior?.();
+    this._disposeDialogBehavior = attachBehavior(this, "dialog", (element) => {
+      // Ignore dialogs belonging to a nested dialog-root.
+      if (element.closest("dialog-root") !== this) return;
 
-      if (this._dialogElement) {
-        // Setup accessibility attributes
-        this._setupAriaAttributes();
+      const dialog = element as HTMLDialogElement;
+      this._dialogElement = dialog;
 
-        // Setup close button handlers
-        this._setupCloseButtons();
+      this._setupAriaAttributes();
 
-        // Add event listeners
-        this._dialogElement.addEventListener(
-          "close",
-          this._boundHandleDialogClose
-        );
-        this._dialogElement.addEventListener(
-          "cancel",
-          this._boundHandleDialogCancel
-        );
-        this._dialogElement.addEventListener(
-          "click",
-          this._boundHandleBackdropClick
-        );
+      dialog.addEventListener("close", this._boundHandleDialogClose);
+      dialog.addEventListener("cancel", this._boundHandleDialogCancel);
+      dialog.addEventListener("click", this._boundHandleBackdropClick);
 
-        // Sync initial state
-        this._syncDialogState();
-        this._updateContext();
-      }
+      this._syncDialogState();
+      this._updateContext();
+
+      return () => {
+        dialog.removeEventListener("close", this._boundHandleDialogClose);
+        dialog.removeEventListener("cancel", this._boundHandleDialogCancel);
+        dialog.removeEventListener("click", this._boundHandleBackdropClick);
+        if (this._dialogElement === dialog) {
+          this._dialogElement = null;
+          this._updateContext();
+        }
+      };
     });
   }
 
   private _cleanupDialog() {
-    if (this._dialogElement) {
-      this._dialogElement.removeEventListener(
-        "close",
-        this._boundHandleDialogClose
-      );
-      this._dialogElement.removeEventListener(
-        "cancel",
-        this._boundHandleDialogCancel
-      );
-      this._dialogElement.removeEventListener(
-        "click",
-        this._boundHandleBackdropClick
-      );
-    }
+    this._disposeCloseBehavior?.();
+    this._disposeCloseBehavior = undefined;
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = undefined;
+    // Also removes the <dialog> listeners via the behavior's cleanup.
+    this._disposeDialogBehavior?.();
+    this._disposeDialogBehavior = undefined;
   }
 
   private _setupAriaAttributes() {
@@ -199,18 +224,43 @@ export class DialogRoot extends LitElement {
     }
   }
 
-  private _setupCloseButtons() {
-    if (!this._dialogElement) return;
+  /**
+   * Escape hatch: bring your own element instead of `<dialog-trigger>` /
+   * `<dialog-close>`.
+   *
+   *   <button data-dialog-trigger>Open</button>
+   *   <button data-dialog-close>Close</button>
+   *
+   * Explicit about which element receives behavior, works with any tag, and
+   * adds no wrapper. `attachBehavior` observes the subtree, so elements added
+   * later are wired up too and listeners are removed when they go away - the
+   * previous one-shot `querySelectorAll` did neither.
+   */
+  private _setupBehaviorAttributes() {
+    this._disposeCloseBehavior?.();
+    this._disposeTriggerBehavior?.();
 
-    // Find all elements with data-dialog-close attribute
-    const closeButtons = this._dialogElement.querySelectorAll(
-      "[data-dialog-close]"
+    this._disposeCloseBehavior = attachBehavior(
+      this,
+      "[data-dialog-close]",
+      (element) => {
+        const onClick = () => this._handleOpenChange(false);
+        element.addEventListener("click", onClick);
+        return () => element.removeEventListener("click", onClick);
+      }
     );
-    closeButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        this._handleOpenChange(false);
-      });
-    });
+
+    this._disposeTriggerBehavior = attachBehavior(
+      this,
+      "[data-dialog-trigger]",
+      (element) => {
+        const onClick = () => this._handleOpenChange(true);
+        element.addEventListener("click", onClick);
+        element.setAttribute("aria-haspopup", "dialog");
+        this._handleTriggerMount(element);
+        return () => element.removeEventListener("click", onClick);
+      }
+    );
   }
 
   private _syncDialogState() {
@@ -272,25 +322,15 @@ export class DialogRoot extends LitElement {
 
   private _handleOpenChange(value: boolean) {
     if (this._isControlled) {
-      // In controlled mode, just emit event
+      // In controlled mode the consumer owns the value; just notify.
       this._emitOpenChange(value);
-    } else {
-      // In uncontrolled mode, update internal state
-      if (this._internalOpen !== value) {
-        this._internalOpen = value;
-        this._emitOpenChange(value);
-      }
+    } else if (this._openState.set(value)) {
+      this._emitOpenChange(value);
     }
   }
 
   private _emitOpenChange(open: boolean) {
-    this.dispatchEvent(
-      new CustomEvent("openChange", {
-        bubbles: true,
-        composed: true,
-        detail: { open },
-      })
-    );
+    dispatch(this, DIALOG_EVENTS.OPEN_CHANGE, { open });
   }
 
   private _handleTriggerMount(el: HTMLElement) {

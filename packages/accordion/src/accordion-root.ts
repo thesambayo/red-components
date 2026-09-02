@@ -1,7 +1,9 @@
 import { LitElement, html } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 import { provide } from "@lit/context";
-import { accordionRootContext } from "./context";
+import { accordionRootContext, ACCORDION_EVENTS } from "./context";
+import { ControlledState, dispatch, attachBehavior } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
 import type {
   AccordionType,
   Direction,
@@ -79,19 +81,104 @@ export class AccordionRoot extends LitElement {
   @property({ type: Boolean })
   collapsible = false;
 
-  /** Internal state for expanded values */
-  @state()
-  private _expandedValues: string[] = [];
+  /**
+   * Expanded values.
+   *
+   * Accordion exposes no controlled `value` property today, but it still needs
+   * late-`default-value` initialization: previously this was only read in
+   * `connectedCallback`, so under React - which assigns properties after the
+   * element connects - `default-value` was silently ignored.
+   */
+  private _expandedState = new ControlledState<string[]>(this, {
+    defaultValue: () => this.defaultValue,
+    fallback: [],
+    name: "_expandedValues",
+    equals: (a, b) => a.length === b.length && a.every((v, i) => v === b[i]),
+  });
+
+  private get _expandedValues(): string[] {
+    return this._expandedState.value;
+  }
 
   /** Context value provided to children - used by @provide decorator */
   @provide({ context: accordionRootContext })
   @property({ attribute: false })
   context: AccordionContextValue = this.createContext();
 
+  /** Elements wired through the `data-accordion-trigger` escape hatch. */
+  private _escapeHatchTriggers = new Set<HTMLElement>();
+  private _disposeTriggerBehavior?: BehaviorCleanup;
+
+  /**
+   * Escape hatch: bring your own element instead of `<accordion-trigger>`.
+   * The item's value goes in the attribute:
+   *
+   *   <button data-accordion-trigger="item-1">Section 1</button>
+   */
+  private _setupBehaviorAttributes() {
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = attachBehavior(
+      this,
+      "[data-accordion-trigger]",
+      (element) => {
+        const valueOf = () =>
+          element.getAttribute("data-accordion-trigger") ?? "";
+
+        const activate = (event: Event) => {
+          event.preventDefault();
+          if (this.disabled) return;
+          const value = valueOf();
+          if (value) this._toggle(value);
+        };
+        const onKeydown = (event: KeyboardEvent) => {
+          if (event.key !== " " && event.key !== "Enter") return;
+          activate(event);
+        };
+
+        element.addEventListener("click", activate);
+        element.addEventListener("keydown", onKeydown);
+        if (!element.hasAttribute("role")) {
+          element.setAttribute("role", "button");
+        }
+        if (!element.hasAttribute("tabindex") && !(element instanceof HTMLButtonElement)) {
+          element.setAttribute("tabindex", "0");
+        }
+
+        this._escapeHatchTriggers.add(element);
+        this._updateEscapeHatchTriggers();
+
+        return () => {
+          element.removeEventListener("click", activate);
+          element.removeEventListener("keydown", onKeydown);
+          this._escapeHatchTriggers.delete(element);
+        };
+      }
+    );
+  }
+
+  /** <accordion-trigger> reflects state itself; plain elements need the root to. */
+  private _updateEscapeHatchTriggers() {
+    for (const element of this._escapeHatchTriggers) {
+      const value = element.getAttribute("data-accordion-trigger") ?? "";
+      const isExpanded = this._isExpanded(value);
+      element.setAttribute("aria-expanded", String(isExpanded));
+      element.setAttribute("data-state", isExpanded ? "open" : "closed");
+      element.setAttribute("data-orientation", this.orientation);
+      element.toggleAttribute("data-disabled", this.disabled);
+      element.setAttribute("aria-disabled", String(this.disabled));
+    }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = undefined;
+    this._escapeHatchTriggers.clear();
+  }
+
   connectedCallback() {
     super.connectedCallback();
-    // Initialize with default value
-    this._expandedValues = [...this.defaultValue];
+    this._setupBehaviorAttributes();
     // Update context with initial values
     this._updateContext();
   }
@@ -107,6 +194,7 @@ export class AccordionRoot extends LitElement {
       changed.has("_expandedValues")
     ) {
       this._updateContext();
+      this._updateEscapeHatchTriggers();
     }
   }
 
@@ -148,17 +236,9 @@ export class AccordionRoot extends LitElement {
         : [...this._expandedValues, itemValue];
     }
 
-    // Update state (triggers reactive updates via @state)
-    this._expandedValues = newValue;
+    this._expandedState.set(newValue);
 
-    // Dispatch change event
-    this.dispatchEvent(
-      new CustomEvent("change", {
-        bubbles: true,
-        composed: true,
-        detail: newValue,
-      })
-    );
+    dispatch(this, ACCORDION_EVENTS.VALUE_CHANGE, newValue);
   }
 
   private _isExpanded(itemValue: string): boolean {

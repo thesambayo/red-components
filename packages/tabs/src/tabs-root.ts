@@ -1,12 +1,15 @@
 import { provide } from "@lit/context";
 import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { ControlledState, dispatch, attachBehavior } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
 import {
   TabsContextValue,
   tabsRootContext,
   ActivationMode,
   Orientation,
   Direction,
+  TABS_EVENTS,
 } from "./tabs-context";
 
 /**
@@ -71,9 +74,20 @@ export class TabsRoot extends LitElement {
   @property({ type: Boolean, attribute: "unmount-on-hide" })
   unmountOnHide = false;
 
-  /** Internal state for selected tab value */
-  @state()
-  private _value?: string;
+  /**
+   * Selected tab value. Tabs exposes no controlled `value` property today; the
+   * controller supplies the late-`default-value` initialization that was
+   * previously hand-written as a `_hasInitialized` flag.
+   */
+  private _valueState = new ControlledState<string | undefined>(this, {
+    defaultValue: () => this.defaultValue,
+    fallback: undefined,
+    name: "_value",
+  });
+
+  private get _value(): string | undefined {
+    return this._valueState.value;
+  }
 
   /** Internal state for tracking focus behavior */
   @state()
@@ -89,36 +103,89 @@ export class TabsRoot extends LitElement {
   context: TabsContextValue = this._createContext();
 
   /** Track if we've initialized from defaultValue */
-  private _hasInitialized = false;
+
+  /** Elements wired through the `data-tab-trigger` escape hatch. */
+  private _escapeHatchTriggers = new Set<HTMLElement>();
+  private _disposeTriggerBehavior?: BehaviorCleanup;
+
+  /**
+   * Escape hatch: bring your own element instead of `<tab-trigger>`.
+   * The tab's value goes in the attribute:
+   *
+   *   <button data-tab-trigger="tab1">Tab 1</button>
+   */
+  private _setupBehaviorAttributes() {
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = attachBehavior(
+      this,
+      "[data-tab-trigger]",
+      (element) => {
+        const valueOf = () => element.getAttribute("data-tab-trigger") ?? "";
+
+        const onClick = (event: Event) => {
+          event.preventDefault();
+          const value = valueOf();
+          if (value) this._changeValue(value);
+        };
+        const onKeydown = (event: KeyboardEvent) => {
+          if (event.key !== " " && event.key !== "Enter") return;
+          event.preventDefault();
+          const value = valueOf();
+          if (value) this._changeValue(value);
+        };
+        const onFocus = () => {
+          if (this.activationMode !== "automatic") return;
+          const value = valueOf();
+          if (value) this._changeValue(value);
+        };
+
+        element.addEventListener("click", onClick);
+        element.addEventListener("keydown", onKeydown);
+        element.addEventListener("focus", onFocus);
+        if (!element.hasAttribute("role")) element.setAttribute("role", "tab");
+
+        this._escapeHatchTriggers.add(element);
+        this._updateEscapeHatchTriggers();
+
+        return () => {
+          element.removeEventListener("click", onClick);
+          element.removeEventListener("keydown", onKeydown);
+          element.removeEventListener("focus", onFocus);
+          this._escapeHatchTriggers.delete(element);
+        };
+      }
+    );
+  }
+
+  /** <tab-trigger> reflects state itself; plain elements need the root to. */
+  private _updateEscapeHatchTriggers() {
+    for (const element of this._escapeHatchTriggers) {
+      const value = element.getAttribute("data-tab-trigger") ?? "";
+      const isActive = value === this._value;
+      element.setAttribute("id", `tab-trigger-${value}`);
+      element.setAttribute("aria-selected", String(isActive));
+      element.setAttribute("aria-controls", `tab-content-${value}`);
+      element.setAttribute("data-state", isActive ? "active" : "inactive");
+      element.setAttribute("data-orientation", this.orientation);
+      element.setAttribute("tabindex", isActive ? "0" : "-1");
+    }
+  }
 
   connectedCallback() {
     super.connectedCallback();
-    // Initialize with default value if available
-    if (this.defaultValue !== undefined) {
-      this._value = this.defaultValue;
-      this._hasInitialized = true;
-    }
+    this._setupBehaviorAttributes();
     // Update context with initial values
     this._updateContext();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = undefined;
+    this._escapeHatchTriggers.clear();
   }
 
   protected willUpdate(changed: Map<string, unknown>) {
-    // Handle late initialization of defaultValue (for React compatibility)
-    // React often sets properties after the element is connected
-    if (
-      changed.has("defaultValue") &&
-      !this._hasInitialized &&
-      this.defaultValue !== undefined &&
-      this._value === undefined
-    ) {
-      this._value = this.defaultValue;
-      this._hasInitialized = true;
-    }
-
     // Update context when any relevant property changes
     if (
       changed.has("dir") ||
@@ -131,6 +198,7 @@ export class TabsRoot extends LitElement {
       changed.has("_registeredContents")
     ) {
       this._updateContext();
+      this._updateEscapeHatchTriggers();
     }
   }
 
@@ -161,18 +229,10 @@ export class TabsRoot extends LitElement {
   private _changeValue(value: string) {
     if (value === this._value) return;
 
-    this._value = value;
+    this._valueState.set(value);
     this._shouldFocus = true;
 
-    // Dispatch change event
-    this.dispatchEvent(
-      new CustomEvent("change", {
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-        detail: value,
-      })
-    );
+    dispatch(this, TABS_EVENTS.VALUE_CHANGE, value, { cancelable: true });
 
     // Reset shouldFocus after a frame
     requestAnimationFrame(() => {
@@ -186,8 +246,7 @@ export class TabsRoot extends LitElement {
     // Auto-select first tab if no value is set
     // This ensures a tab is always selected even without defaultValue
     if (this._value === undefined && this._registeredContents.size === 1) {
-      this._value = value;
-      this._hasInitialized = true;
+      this._valueState.set(value);
     }
   }
 

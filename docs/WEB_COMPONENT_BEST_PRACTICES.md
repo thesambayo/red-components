@@ -53,222 +53,106 @@ export class MySelect extends LitElement {
 
 ---
 
-## The Solution: Late Initialization Pattern
+## The Solution: `ControlledState` from `@red-elements/core`
 
-### Pattern 1: Track Initialization + willUpdate (Recommended)
+> **Superseded.** Earlier revisions of this document recommended hand-rolling a
+> `_hasInitialized` flag plus a `willUpdate` block, and said that was what our
+> components did. **It no longer is, and you should not write it.** Every root
+> now uses the `ControlledState` reactive controller. The hand-rolled version is
+> preserved further down only as background on *why* the problem exists.
 
-This is the most robust approach used in our components:
-
-```typescript
-@customElement('my-component')
-export class MyComponent extends LitElement {
-  @property({ attribute: 'default-value' })
-  defaultValue?: string;
-
-  @state()
-  private _value?: string;
-
-  /** Track if we've initialized from defaultValue */
-  private _hasInitialized = false;
-
-  connectedCallback() {
-    super.connectedCallback();
-
-    // Initialize with default value if available
-    if (this.defaultValue !== undefined) {
-      this._value = this.defaultValue;
-      this._hasInitialized = true;
-    }
-
-    this._updateContext();
-  }
-
-  protected willUpdate(changed: Map<string, unknown>) {
-    // Handle late initialization of defaultValue (for React compatibility)
-    // React often sets properties after the element is connected
-    if (
-      changed.has('defaultValue') &&
-      !this._hasInitialized &&
-      this.defaultValue !== undefined &&
-      this._value === undefined
-    ) {
-      this._value = this.defaultValue;
-      this._hasInitialized = true;
-    }
-
-    // Update context when relevant properties change
-    if (changed.has('_value') || changed.has('otherProp')) {
-      this._updateContext();
-    }
-  }
-}
-```
-
-### Pattern 2: Auto-Select Fallback
-
-Provide sensible defaults when no value is specified:
+Use the controller. It handles late-arriving defaults, controlled vs
+uncontrolled mode, and form reset/restore in one place:
 
 ```typescript
-private _registerItem(value: string) {
-  this._registeredItems = new Set(this._registeredItems).add(value);
+import { ControlledState } from "@red-elements/core";
 
-  // Auto-select first item if no value is set
-  // This ensures an item is always selected even without defaultValue
-  if (this._value === undefined && this._registeredItems.size === 1) {
-    this._value = value;
-    this._hasInitialized = true;
-  }
+private _valueState = new ControlledState<string | undefined>(this, {
+  prop: () => this.value,              // controlled property; undefined = uncontrolled
+  defaultValue: () => this.defaultValue, // the `default-*` property
+  fallback: undefined,
+  name: "_value",                      // reported to Lit so it lands in changedProperties
+});
+
+private get _value() {
+  return this._valueState.value;       // controlled prop if present, else internal
 }
+
+// writing: a deliberate no-op while controlled - the consumer owns the value,
+// and is expected to react to the change event you dispatch regardless.
+this._valueState.set(next);
 ```
 
-### Pattern 3: Property Setters (Alternative)
+### Why hand-rolling this is a trap
 
-Use custom setters for immediate handling:
+The hand-rolled pattern put the late-init check in `willUpdate` and relied on
+`changedProperties`. That is exactly where it breaks, because Lit 3 runs
+controller hooks **after** `willUpdate`:
 
-```typescript
-private _defaultValue?: string;
-private _value?: string;
-private _hasInitialized = false;
-
-@property({ attribute: 'default-value' })
-set defaultValue(value: string | undefined) {
-  const oldValue = this._defaultValue;
-  this._defaultValue = value;
-
-  // Initialize if not yet done
-  if (!this._hasInitialized && value !== undefined) {
-    this._value = value;
-    this._hasInitialized = true;
-  }
-
-  this.requestUpdate('defaultValue', oldValue);
-}
-
-get defaultValue() {
-  return this._defaultValue;
-}
+```js
+this.willUpdate(changedProperties);                    // ① first
+this.__controllers?.forEach((c) => c.hostUpdate?.());  // ② then
+this.update(changedProperties);                        // ③ discards the map
 ```
 
-### Pattern 4: Microtask Delay (Last Resort)
+A default latched in step ② can never appear in the map step ① already read, and
+`update()` replaces that map before anything else sees it. The failure is
+**silent**: the value latches, renders correctly, and yet every `willUpdate`
+block keyed on `changed.has("_value")` is skipped for it.
 
-For simple cases, defer initialization:
+That is not hypothetical — it is why `default-value` and `default-checked` once
+rendered correctly on screen but never reached `ElementInternals.setFormValue`,
+so forms submitted empty until the user changed something by hand.
+`ControlledState` now latches in `hostUpdate` and *announces* in `hostUpdated`,
+where `requestUpdate` actually schedules a follow-up cycle. See
+`docs/COMPONENT_FIXES.md` §4 for the full account.
 
-```typescript
-connectedCallback() {
-  super.connectedCallback();
-
-  // Wait a microtask for properties to be set
-  queueMicrotask(() => {
-    if (this._value === undefined && this.defaultValue !== undefined) {
-      this._value = this.defaultValue;
-    }
-  });
-}
-```
+**Rule of thumb:** for anything that must not be missed, derive from the
+effective value against a `_lastSynced` field rather than reading
+`changedProperties` — see `dialog-root.willUpdate`.
 
 ---
 
-## Complete Example: Tabs Component
+## Related behaviour: auto-selecting a lone option
 
-Here's how we implemented this in the tabs component:
+Not a late-init concern, but it lives next to one. `combobox-root` selects the
+only option when there is exactly one and nothing else has set a value:
 
 ```typescript
-@customElement('tabs-root')
-export class TabsRoot extends LitElement {
-  @property({ attribute: 'default-value' })
-  defaultValue?: string;
-
-  @state()
-  private _value?: string;
-
-  @state()
-  private _registeredContents = new Set<string>();
-
-  /** Track if we've initialized from defaultValue */
-  private _hasInitialized = false;
-
-  connectedCallback() {
-    super.connectedCallback();
-
-    // Initialize with default value if available
-    if (this.defaultValue !== undefined) {
-      this._value = this.defaultValue;
-      this._hasInitialized = true;
-    }
-
-    this._updateContext();
-  }
-
-  protected willUpdate(changed: Map<string, unknown>) {
-    // Handle late initialization of defaultValue (for React compatibility)
-    if (
-      changed.has('defaultValue') &&
-      !this._hasInitialized &&
-      this.defaultValue !== undefined &&
-      this._value === undefined
-    ) {
-      this._value = this.defaultValue;
-      this._hasInitialized = true;
-    }
-
-    // Update context when any relevant property changes
-    if (
-      changed.has('_value') ||
-      changed.has('orientation') ||
-      changed.has('_registeredContents')
-    ) {
-      this._updateContext();
-    }
-  }
-
-  private _registerContent(value: string) {
-    this._registeredContents = new Set(this._registeredContents).add(value);
-
-    // Auto-select first tab if no value is set
-    if (this._value === undefined && this._registeredContents.size === 1) {
-      this._value = value;
-      this._hasInitialized = true;
-    }
+protected willUpdate() {
+  if (
+    this._value === undefined &&
+    !this._valueState.isInitialized &&   // nothing has set a value yet
+    this._items.size === 1 &&
+    !this.multiple
+  ) {
+    const [firstValue] = this._items.keys();
+    if (!this._items.get(firstValue)?.disabled) this._valueState.set(firstValue);
   }
 }
 ```
 
----
+`ControlledState.isInitialized` is what makes this safe: it is true once a
+default has been applied *or* the value has been set at least once, so this can
+never clobber a real choice.
 
 ## Checklist for New Components
 
 When creating any new component with state initialization:
 
-- [ ] **Never rely solely on `connectedCallback`** for property initialization
-- [ ] **Use `willUpdate`** to catch late property setting from React
-- [ ] **Track initialization state** with `_hasInitialized` flag
+- [ ] **Use `ControlledState`** for anything with a `default-*` / controlled pair.
+      Never rely solely on `connectedCallback`, and never track initialization
+      with your own flag.
+- [ ] **Do not key must-not-miss logic on `changedProperties.has(...)`** for
+      state a controller owns. Compare against a `_lastSynced` field instead.
 - [ ] **Provide sensible defaults** when properties are undefined
-- [ ] **Test in React** to verify initialization works correctly
+- [ ] **Test in React** — that is where late property assignment shows up
 - [ ] **Use `@state()` for internal state** that triggers reactive updates
-- [ ] **Use `willUpdate` for derived state** instead of computed properties
-- [ ] **Never update context from within context change handlers** - avoid infinite loops
-- [ ] **Use `firstUpdated` for one-time context registration** - not `willUpdate`
-- [ ] **Watch for Lit update warnings** in console during development
-
----
-
-## Components Status
-
-### ✅ Implemented Correctly:
-- **Accordion** - Uses proper initialization pattern
-- **Tabs** - Fixed with late initialization handling
-- **Avatar** - Simple component, no initialization issues
-- **Dialog** - Handles initialization correctly
-- **Dropdown** - Handles initialization correctly
-- **Combobox** - Fixed infinite loop issues, proper disabled item handling
-
-### 🔜 Apply to Future Components:
-- Select
-- Radio Group
-- Checkbox Group
-- Toggle Group
-- Slider
-- Any component with `defaultValue`, `defaultChecked`, `defaultOpen`, etc.
+- [ ] **Never update context from within context change handlers** — avoid infinite loops
+- [ ] **Use `firstUpdated` for one-time context registration** — not `willUpdate`
+- [ ] **Coalesce per-item state writes.** A `@state` write per registering child
+      rebuilds the context every child consumes; that is O(N²) on mount.
+- [ ] **Watch for Lit update warnings** in the console during development
 
 ---
 

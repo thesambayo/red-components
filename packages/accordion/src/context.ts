@@ -13,11 +13,13 @@ export const accordionRootContext =
 export const accordionItemContext =
   createContext<AccordionItemContextValue>("accordion-item");
 
+/** Shared across all packages so ids cannot collide. */
+export { generateId } from "@red-elements/core";
+
 /**
- * Generate unique IDs for accessibility attributes
+ * Event names. Namespaced as `{component}:{kebab-event}` so a bubbling
+ * event cannot be mistaken for a native one by an ancestor listener.
  */
-let idCounter = 0;
-export function generateId(prefix: string) {
-  idCounter += 1;
-  return `${prefix}-${idCounter}`;
-}
+export const ACCORDION_EVENTS = {
+  VALUE_CHANGE: "accordion:value-change",
+} as const;

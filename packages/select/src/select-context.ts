@@ -60,10 +60,5 @@ export const SELECT_EVENTS = {
   CLOSE: "select:close",
 } as const;
 
-/**
- * Generate unique ID
- */
-let nextId = 0;
-export function generateId(prefix: string): string {
-  return `${prefix}-${++nextId}`;
-}
+/** Shared across all packages so ids cannot collide. */
+export { generateId } from "@red-elements/core";

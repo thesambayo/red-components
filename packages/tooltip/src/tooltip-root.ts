@@ -6,12 +6,19 @@ import {
   tooltipRootContext,
   defaultProviderContext,
   generateId,
+  TOOLTIP_EVENTS,
 } from "./context";
 import type {
   TooltipProviderContextValue,
   TooltipRootContextValue,
   TooltipState,
 } from "./types";
+import { ControlledState, dispatch, attachBehavior } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
+import {
+  attachTooltipTriggerBehavior,
+  updateTooltipTriggerAttributes,
+} from "./trigger-behavior";
 
 /**
  * Root component for a tooltip. Manages open/close state and timing.
@@ -58,9 +65,16 @@ export class TooltipRoot extends LitElement {
   @property({ type: Boolean, attribute: "disable-hoverable-content" })
   disableHoverableContent = false;
 
-  /** Internal open state for uncontrolled mode */
-  @state()
-  private _internalOpen = false;
+  /**
+   * Controlled/uncontrolled open state. `name` keeps it in
+   * `changedProperties` so the existing `willUpdate` checks still fire.
+   */
+  private _openState = new ControlledState<boolean>(this, {
+    prop: () => this.open,
+    defaultValue: () => this.defaultOpen,
+    fallback: false,
+    name: "_internalOpen",
+  });
 
   /** Tracks if current open was instant (no delay) */
   @state()
@@ -90,12 +104,12 @@ export class TooltipRoot extends LitElement {
 
   /** Whether controlled mode is active */
   private get _isControlled(): boolean {
-    return this.open !== undefined;
+    return this._openState.isControlled;
   }
 
   /** Current open state (controlled or uncontrolled) */
   private get _isOpen(): boolean {
-    return this._isControlled ? !!this.open : this._internalOpen;
+    return this._openState.value;
   }
 
   /** Effective delay duration */
@@ -113,9 +127,13 @@ export class TooltipRoot extends LitElement {
     return this._wasInstantOpen ? "instant-open" : "delayed-open";
   }
 
+  /** Elements wired through the `data-tooltip-trigger` escape hatch. */
+  private _escapeHatchTriggers = new Set<HTMLElement>();
+  private _disposeTriggerBehavior?: BehaviorCleanup;
+
   connectedCallback() {
     super.connectedCallback();
-    this._internalOpen = this.defaultOpen;
+    this._setupBehaviorAttributes();
     this._updateContext();
   }
 
@@ -123,6 +141,38 @@ export class TooltipRoot extends LitElement {
     super.disconnectedCallback();
     this._clearOpenTimer();
     this._clearCloseTimer();
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = undefined;
+    this._escapeHatchTriggers.clear();
+  }
+
+  /**
+   * Escape hatch: bring your own element instead of `<tooltip-trigger>`.
+   *
+   *   <button data-tooltip-trigger>Hover me</button>
+   *
+   * Uses the same behavior module as the custom element, so hover delay,
+   * focus-visible handling and hoverable content all match exactly.
+   */
+  private _setupBehaviorAttributes() {
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = attachBehavior(
+      this,
+      "[data-tooltip-trigger]",
+      (element) => {
+        const dispose = attachTooltipTriggerBehavior(
+          element,
+          () => this.context
+        );
+        this._escapeHatchTriggers.add(element);
+        this._handleTriggerMount(element);
+        updateTooltipTriggerAttributes(element, this.context);
+        return () => {
+          dispose();
+          this._escapeHatchTriggers.delete(element);
+        };
+      }
+    );
   }
 
   protected willUpdate(changed: Map<string, unknown>) {
@@ -135,6 +185,12 @@ export class TooltipRoot extends LitElement {
       changed.has("disableHoverableContent")
     ) {
       this._updateContext();
+
+      // <tooltip-trigger> reflects state via its own willUpdate; escape-hatch
+      // elements are plain DOM, so the root updates them.
+      for (const element of this._escapeHatchTriggers) {
+        updateTooltipTriggerAttributes(element, this.context);
+      }
     }
   }
 
@@ -220,8 +276,7 @@ export class TooltipRoot extends LitElement {
       this._emitOpenChange(value);
     } else {
       // In uncontrolled mode, update internal state
-      if (this._internalOpen !== value) {
-        this._internalOpen = value;
+      if (this._openState.set(value)) {
         this._emitOpenChange(value);
       }
     }
@@ -238,13 +293,7 @@ export class TooltipRoot extends LitElement {
   }
 
   private _emitOpenChange(open: boolean) {
-    this.dispatchEvent(
-      new CustomEvent("openChange", {
-        bubbles: true,
-        composed: true,
-        detail: { open },
-      })
-    );
+    dispatch(this, TOOLTIP_EVENTS.OPEN_CHANGE, { open });
   }
 
   private _handleTriggerMount(el: HTMLElement) {

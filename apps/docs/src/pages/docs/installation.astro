@@ -90,7 +90,7 @@ import CodeBlock from '../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/combobox';
+            code={`import '@red-elements/combobox/elements';
 
 // Use the web components directly in your HTML
 const html = \`
@@ -136,7 +136,7 @@ export function MyCombobox() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/combobox';
+import '@red-elements/combobox/elements';
 </script>
 
 <template>
@@ -156,7 +156,7 @@ import '@red-elements/combobox';
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/combobox';
+  import '@red-elements/combobox/elements';
 </script>
 
 <combobox-root>

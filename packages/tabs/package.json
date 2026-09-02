@@ -7,7 +7,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./elements": {
+      "types": "./dist/tabs.d.ts",
+      "default": "./dist/tabs.js"
+    },
+    "./package.json": "./package.json"
   },
   "source": "./src/index.ts",
   "main": "./dist/index.js",
@@ -18,16 +23,33 @@
     "README.md",
     "LICENSE"
   ],
-  "dependencies": {
-    "@lit/react": "^1.0.8"
-  },
   "license": "MIT",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/tabs.js",
+    "./dist/chunks/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thesambayo/red-components.git"
   },
   "bugs": {
     "url": "https://github.com/thesambayo/red-components/issues"
+  },
+  "peerDependencies": {
+    "lit": "^3.3.2",
+    "@lit/context": "^1.1.6",
+    "@lit/react": "^1.0.8",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@lit/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@red-elements/core": "workspace:^"
   }
 }

@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "types": [],
+    /**
+     * Resolve the workspace core package to its SOURCE, not its build output.
+     * Typechecking must not depend on a prior build - `pnpm build` runs
+     * `typecheck` first, so resolving to `dist` would make the two circular and
+     * silently check against stale declarations.
+     */
+    "paths": {
+      "@red-elements/core": ["../packages/core/src/index.ts"]
+    }
+  },
+  "include": ["element-types.assert.ts", "../packages/*/src/**/*.ts"],
+  "exclude": ["../packages/*/src/**/*.stories.ts"]
+}

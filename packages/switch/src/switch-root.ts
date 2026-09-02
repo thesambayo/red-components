@@ -1,14 +1,14 @@
 import { provide } from "@lit/context";
 import { html, LitElement } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
-import { SwitchContext, switchContext } from "./switch-context";
+import { customElement, property } from "lit/decorators.js";
+import { SwitchContext, switchContext, SWITCH_EVENTS } from "./switch-context";
+import { ControlledState, dispatch } from "@red-elements/core";
 
 @customElement("switch-root")
 export class SwitchRoot extends LitElement {
   static formAssociated = true;
 
   private _internals: ElementInternals;
-  private _hasInitialized = false;
 
   @property({ type: String })
   name?: string;
@@ -19,6 +19,16 @@ export class SwitchRoot extends LitElement {
   @property({ type: Boolean, attribute: "default-checked" })
   defaultChecked = false;
 
+  /**
+   * Controlled checked state. **JS-only** - this has no HTML attribute.
+   *
+   * An absent boolean/string attribute is indistinguishable from one set to a
+   * falsy value, so there would be no way to tell "not controlled" from
+   * "controlled and currently false". Setting the property to `undefined`
+   * means uncontrolled; any other value means the consumer owns it.
+   *
+   * From plain HTML use `default-checked` and listen for the change event.
+   */
   @property({ type: Boolean, attribute: false })
   checked?: boolean;
 
@@ -31,8 +41,17 @@ export class SwitchRoot extends LitElement {
   @property({ type: Boolean })
   required = false;
 
-  @state()
-  private _checked = false;
+  /**
+   * Controlled/uncontrolled checked state, including the late-`defaultChecked`
+   * initialization React needs. `name` keeps it visible in `changedProperties`
+   * so the `willUpdate` block below is unaffected.
+   */
+  private _checkedState = new ControlledState<boolean>(this, {
+    prop: () => this.checked,
+    defaultValue: () => this.defaultChecked,
+    fallback: false,
+    name: "_checked",
+  });
 
   @provide({ context: switchContext })
   @property({ attribute: false })
@@ -53,11 +72,6 @@ export class SwitchRoot extends LitElement {
       this.setAttribute("tabindex", "0");
     }
 
-    if (!this._hasInitialized && this.defaultChecked) {
-      this._checked = true;
-      this._hasInitialized = true;
-    }
-
     this._updateFormValue();
     this._updateAriaAttributes();
     this._updateDataAttributes();
@@ -74,21 +88,6 @@ export class SwitchRoot extends LitElement {
   }
 
   protected willUpdate(changed: Map<string, unknown>) {
-    // Late initialization of defaultChecked (React compat)
-    if (
-      changed.has("defaultChecked") &&
-      !this._hasInitialized &&
-      this.defaultChecked
-    ) {
-      this._checked = true;
-      this._hasInitialized = true;
-    }
-
-    // Controlled mode: sync external checked prop
-    if (changed.has("checked") && this.checked !== undefined) {
-      this._checked = this.checked;
-    }
-
     if (
       changed.has("_checked") ||
       changed.has("checked") ||
@@ -110,12 +109,8 @@ export class SwitchRoot extends LitElement {
 
   // -- Controlled / Uncontrolled --
 
-  private get _isControlled(): boolean {
-    return this.checked !== undefined;
-  }
-
   private get _effectiveChecked(): boolean {
-    return this._isControlled ? !!this.checked : this._checked;
+    return this._checkedState.value;
   }
 
   // -- Toggle --
@@ -125,17 +120,9 @@ export class SwitchRoot extends LitElement {
 
     const newChecked = !this._effectiveChecked;
 
-    if (!this._isControlled) {
-      this._checked = newChecked;
-    }
+    this._checkedState.set(newChecked);
 
-    this.dispatchEvent(
-      new CustomEvent("checkedChange", {
-        bubbles: true,
-        composed: true,
-        detail: { checked: newChecked },
-      })
-    );
+    dispatch(this, SWITCH_EVENTS.CHECKED_CHANGE, { checked: newChecked });
   }
 
   // -- Event handlers --
@@ -233,19 +220,13 @@ export class SwitchRoot extends LitElement {
   }
 
   formResetCallback() {
-    this._checked = this.defaultChecked;
+    const restored = this._checkedState.reset();
     this._updateFormValue();
     this._updateAriaAttributes();
     this._updateDataAttributes();
     this._updateContext();
 
-    this.dispatchEvent(
-      new CustomEvent("checkedChange", {
-        bubbles: true,
-        composed: true,
-        detail: { checked: this._checked },
-      })
-    );
+    dispatch(this, SWITCH_EVENTS.CHECKED_CHANGE, { checked: restored });
   }
 
   formDisabledCallback(disabled: boolean) {
@@ -257,9 +238,9 @@ export class SwitchRoot extends LitElement {
     _mode: "restore" | "autocomplete"
   ) {
     if (typeof state === "string") {
-      this._checked = state === this.value;
+      this._checkedState.restore(state === this.value);
     } else {
-      this._checked = false;
+      this._checkedState.restore(false);
     }
     this._updateFormValue();
     this._updateAriaAttributes();

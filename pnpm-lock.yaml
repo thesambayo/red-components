@@ -14,9 +14,6 @@ importers:
       '@floating-ui/dom':
         specifier: ^1.7.4
         version: 1.7.4
-      '@lit-labs/signals':
-        specifier: ^0.2.0
-        version: 0.2.0
       '@lit/context':
         specifier: ^1.1.6
         version: 1.1.6
@@ -75,12 +72,54 @@ importers:
 
   apps/docs:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.7.4
+        version: 1.7.4
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
+      '@red-elements/accordion':
+        specifier: workspace:*
+        version: link:../../packages/accordion
+      '@red-elements/alert-dialog':
+        specifier: workspace:*
+        version: link:../../packages/alert-dialog
+      '@red-elements/avatar':
+        specifier: workspace:*
+        version: link:../../packages/avatar
+      '@red-elements/combobox':
+        specifier: workspace:*
+        version: link:../../packages/combobox
+      '@red-elements/dialog':
+        specifier: workspace:*
+        version: link:../../packages/dialog
+      '@red-elements/dropdown':
+        specifier: workspace:*
+        version: link:../../packages/dropdown
+      '@red-elements/select':
+        specifier: workspace:*
+        version: link:../../packages/select
+      '@red-elements/switch':
+        specifier: workspace:*
+        version: link:../../packages/switch
+      '@red-elements/tabs':
+        specifier: workspace:*
+        version: link:../../packages/tabs
+      '@red-elements/toast':
+        specifier: workspace:*
+        version: link:../../packages/toast
+      '@red-elements/tooltip':
+        specifier: workspace:*
+        version: link:../../packages/tooltip
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@6.4.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.46.0))
       astro:
         specifier: ^5.16.15
         version: 5.16.15(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.56.0)(terser@5.46.0)(typescript@5.9.3)
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
       tailwindcss:
         specifier: ^4.1.18
         version: 4.1.18
@@ -179,63 +218,213 @@ importers:
 
   packages/accordion:
     dependencies:
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/alert-dialog:
     dependencies:
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/avatar:
     dependencies:
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/combobox:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.7.4
+        version: 1.7.4
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
+
+  packages/core:
+    dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.7.4
+        version: 1.7.4
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
 
   packages/dialog:
     dependencies:
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/dropdown:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.7.4
+        version: 1.7.4
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/select:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.7.4
+        version: 1.7.4
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
+
+  packages/switch:
+    dependencies:
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
+      '@lit/react':
+        specifier: ^1.0.8
+        version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/tabs:
     dependencies:
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/toast:
     dependencies:
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
   packages/tooltip:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.7.4
+        version: 1.7.4
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@lit/react':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@19.2.9)
+      '@red-elements/core':
+        specifier: workspace:^
+        version: link:../core
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
+      react:
+        specifier: '>=18'
+        version: 19.2.3
 
 packages:
 
@@ -808,9 +997,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@lit-labs/signals@0.2.0':
-    resolution: {integrity: sha512-68plyIbciumbwKaiilhLNyhz4Vg6/+nJwDufG2xxWA9r/fUw58jxLHCAlKs+q1CE5Lmh3cZ3ShyYKnOCebEpVA==}
 
   '@lit-labs/ssr-dom-shim@1.5.1':
     resolution: {integrity: sha512-Aou5UdlSpr5whQe8AA/bZG0jMj96CoJIWbGfZ91qieWu5AWUMKw8VR/pAkQkJYvBNhmCcWnZlyyk5oze8JIqYA==}
@@ -3349,9 +3535,6 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  signal-polyfill@0.2.2:
-    resolution: {integrity: sha512-p63Y4Er5/eMQ9RHg0M0Y64NlsQKpiu6MDdhBXpyywRuWiPywhJTpKJ1iB5K2hJEbFZ0BnDS7ZkJ+0AfTuL37Rg==}
-
   sigstore@1.9.0:
     resolution: {integrity: sha512-0Zjz0oe37d08VeOtBIuB6cRriqXse2e8w+7yIy2XSXjshRKxbc2KkhXjL229jXSxEm7UbcjS76wcJDGQddVI9A==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
@@ -4554,11 +4737,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@lit-labs/signals@0.2.0':
-    dependencies:
-      lit: 3.3.2
-      signal-polyfill: 0.2.2
 
   '@lit-labs/ssr-dom-shim@1.5.1': {}
 
@@ -7545,8 +7723,6 @@ snapshots:
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
-
-  signal-polyfill@0.2.2: {}
 
   sigstore@1.9.0:
     dependencies:

@@ -7,7 +7,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./elements": {
+      "types": "./dist/combobox.d.ts",
+      "default": "./dist/combobox.js"
+    },
+    "./package.json": "./package.json"
   },
   "source": "./src/index.ts",
   "main": "./dist/index.js",
@@ -18,16 +23,34 @@
     "README.md",
     "LICENSE"
   ],
-  "dependencies": {
-    "@lit/react": "^1.0.8"
-  },
   "license": "MIT",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/combobox.js",
+    "./dist/chunks/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thesambayo/red-components.git"
   },
   "bugs": {
     "url": "https://github.com/thesambayo/red-components/issues"
+  },
+  "peerDependencies": {
+    "lit": "^3.3.2",
+    "@lit/context": "^1.1.6",
+    "@floating-ui/dom": "^1.7.4",
+    "@lit/react": "^1.0.8",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@lit/react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@red-elements/core": "workspace:^"
   }
 }

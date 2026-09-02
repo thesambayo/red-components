@@ -91,11 +91,12 @@ Put both input and trigger inside the anchor for a compact inline layout:
 
 ### Custom Anchor Element
 
-Use `combobox-anchor` with `as-child` to delegate to a custom element:
+Wrap the anchor target in `combobox-anchor`; it uses `display: contents`
+so it does not affect layout:
 
 ```html
 <combobox-root>
-  <combobox-anchor as-child>
+  <combobox-anchor>
     <div class="custom-wrapper">
       <combobox-input placeholder="Search..."></combobox-input>
     </div>

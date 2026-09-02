@@ -1,5 +1,5 @@
 import { consume } from "@lit/context";
-import { LitElement, html } from "lit";
+import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { ComboboxContextValue } from "./combobox-context";
 import { comboboxRootContext, ComboboxRoot } from "./combobox-root";
@@ -8,30 +8,21 @@ import { comboboxRootContext, ComboboxRoot } from "./combobox-root";
  * Trigger button for opening the combobox.
  * Shows the selected value and opens the combobox content on click.
  *
- * With `as-child`, passes behavior to the slotted child element.
- * Without `as-child`, acts as the trigger itself.
- *
  * @element combobox-trigger
- * @slot - Button content (or child element when using as-child)
+ * @slot - Button content
  *
  * @example
  * ```html
- * <!-- With as-child: behavior passed to button -->
- * <combobox-trigger as-child>
- *   <button>Select framework...</button>
- * </combobox-trigger>
- *
- * <!-- Without as-child: component is the trigger -->
  * <combobox-trigger>Select framework...</combobox-trigger>
  * ```
  */
 @customElement("combobox-trigger")
 export class ComboboxTrigger extends LitElement {
-  /**
-   * Pass behavior to slotted child instead of acting as trigger itself
-   */
-  @property({ type: Boolean, attribute: "as-child" })
-  asChild = false;
+  static styles = css`
+    :host {
+      display: inline-block;
+    }
+  `;
 
   @consume({ context: comboboxRootContext, subscribe: true })
   @property({ attribute: false })
@@ -43,7 +34,6 @@ export class ComboboxTrigger extends LitElement {
   /** Stored handler references for proper cleanup */
   private _handleClick = this._onClick.bind(this);
   private _handleKeyDown = this._onKeyDown.bind(this);
-  private _handleSlotChange = this._onSlotChange.bind(this);
 
   connectedCallback() {
     super.connectedCallback();
@@ -51,29 +41,20 @@ export class ComboboxTrigger extends LitElement {
     // Find root element
     this._root = this.closest("combobox-root") as ComboboxRoot;
 
-    if (!this.asChild) {
-      this._setupSelfAsTrigger();
-    }
+    this._setupTrigger();
   }
 
   protected firstUpdated() {
     // Register trigger element with root
     if (this._root) {
-      const triggerElement = this.asChild ? this._childElement : this;
-      if (triggerElement) {
-        this._root.setTriggerElement(triggerElement);
-      }
+      this._root.setTriggerElement(this);
     }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    if (this.asChild) {
-      this._cleanupChildTrigger();
-    } else {
-      this._cleanupSelfAsTrigger();
-    }
+    this._cleanupTrigger();
 
     // Unregister trigger
     if (this._root) {
@@ -89,7 +70,7 @@ export class ComboboxTrigger extends LitElement {
     }
   }
 
-  private _setupSelfAsTrigger() {
+  private _setupTrigger() {
     this.addEventListener("click", this._handleClick);
     this.addEventListener("keydown", this._handleKeyDown);
 
@@ -105,51 +86,9 @@ export class ComboboxTrigger extends LitElement {
     this.setAttribute("data-state", "closed");
   }
 
-  private _cleanupSelfAsTrigger() {
+  private _cleanupTrigger() {
     this.removeEventListener("click", this._handleClick);
     this.removeEventListener("keydown", this._handleKeyDown);
-  }
-
-  private _setupChildTrigger(child: HTMLElement) {
-    this._childElement = child;
-
-    // Add event listeners to child
-    child.addEventListener("click", this._handleClick);
-    child.addEventListener("keydown", this._handleKeyDown);
-
-    // Set accessibility attributes on child
-    child.setAttribute("aria-haspopup", "listbox");
-    child.setAttribute("aria-expanded", "false");
-    child.setAttribute("data-state", "closed");
-
-    // Register child as trigger
-    if (this._root) {
-      this._root.setTriggerElement(child);
-    }
-  }
-
-  private _cleanupChildTrigger() {
-    if (this._childElement) {
-      this._childElement.removeEventListener("click", this._handleClick);
-      this._childElement.removeEventListener("keydown", this._handleKeyDown);
-      this._childElement = null;
-    }
-  }
-
-  private _onSlotChange(event: Event) {
-    if (!this.asChild) return;
-
-    const slot = event.target as HTMLSlotElement;
-    const children = slot.assignedElements();
-
-    // Cleanup previous child
-    this._cleanupChildTrigger();
-
-    // Setup new child
-    if (children.length > 0) {
-      const child = children[0] as HTMLElement;
-      this._setupChildTrigger(child);
-    }
   }
 
   private _onClick() {
@@ -180,7 +119,7 @@ export class ComboboxTrigger extends LitElement {
 
   private _updateState() {
     const { isOpen } = this._context;
-    const target = this.asChild ? this._childElement : this;
+    const target = this;
 
     if (target) {
       target.setAttribute("aria-expanded", String(isOpen));
@@ -189,15 +128,13 @@ export class ComboboxTrigger extends LitElement {
     }
   }
 
-  /**
-   * Get the actual trigger element (self or child)
-   */
-  getTriggerElement(): HTMLElement | null {
-    return this.asChild ? this._childElement : this;
+  /** The trigger element. The host is the trigger. */
+  getTriggerElement(): HTMLElement {
+    return this;
   }
 
   protected render() {
-    return html`<slot @slotchange=${this._handleSlotChange}></slot>`;
+    return html`<slot></slot>`;
   }
 }
 

@@ -95,8 +95,6 @@ export interface TooltipContentProps {
   avoidCollisions?: boolean;
   /** Padding from viewport edges */
   collisionPadding?: number;
-  /** Custom aria-label (overrides content text) */
-  ariaLabel?: string;
 }
 
 /**

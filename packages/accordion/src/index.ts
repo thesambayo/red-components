@@ -19,7 +19,7 @@ export const AccordionRoot = createComponent({
   elementClass: accordion.AccordionRoot,
   react: React,
   events: {
-    onChange: "change" as EventName<CustomEvent<string[]>>,
+    onChange: "accordion:value-change" as EventName<CustomEvent<string[]>>,
   },
 });
 

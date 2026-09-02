@@ -86,7 +86,12 @@ const styles = html`
       transform: rotate(180deg);
     }
 
-    select-content [popover] {
+    /*
+     * select-content IS the popover, so the descendant combinator that used to
+     * be here - "select-content [popover]" - matched nothing at all, which is
+     * why this menu rendered completely unstyled. Compare dropdown.stories.ts.
+     */
+    select-content {
       min-width: 200px;
       max-height: 300px;
       background: white;
@@ -260,6 +265,104 @@ export const WithDefaultValue: Story = {
       </select-root>
     </div>
   `,
+};
+
+/**
+ * `width="trigger"` makes the listbox exactly as wide as its trigger, which is
+ * what a native `<select>` does and what most designs expect.
+ *
+ * It is a shorthand over `--select-trigger-width`, a custom property the
+ * positioning middleware keeps up to date while the content is open. Reach for
+ * the property directly when you want something the shorthand does not cover -
+ * a *minimum* width that is still free to grow, for instance:
+ *
+ * ```css
+ * select-content { min-width: var(--select-trigger-width); }
+ * ```
+ */
+export const MatchTriggerWidth: Story = {
+  render: () => {
+    const icon = html`
+      <svg
+        class="trigger-icon"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="currentColor"
+      >
+        <path
+          d="M4 6l4 4 4-4"
+          stroke="currentColor"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    `;
+    const items = countries
+      .slice(0, 5)
+      .map(
+        (country) => html`
+          <select-item value=${country.toLowerCase().replace(/ /g, "-")}>
+            <select-item-indicator>✓</select-item-indicator>
+            <select-item-text>${country}</select-item-text>
+          </select-item>
+        `
+      );
+
+    return html`
+      ${styles}
+      <style>
+        .width-demo {
+          display: flex;
+          gap: 64px;
+          padding: 100px;
+          justify-content: center;
+          align-items: flex-start;
+        }
+        /* A trigger deliberately wider than the content's own min-width, so
+           the difference between the two columns is visible. */
+        .width-demo select-root {
+          min-width: 320px;
+        }
+        .width-demo figcaption {
+          font: 500 13px/1.5 system-ui, sans-serif;
+          color: #64748b;
+          margin-bottom: 8px;
+        }
+        .width-demo code {
+          font: 500 12px/1.5 ui-monospace, monospace;
+          background: #f1f5f9;
+          border-radius: 4px;
+          padding: 1px 5px;
+        }
+      </style>
+      <div class="width-demo">
+        <figure>
+          <figcaption>Default &mdash; sizes to its own content</figcaption>
+          <select-root>
+            <select-trigger>
+              <select-value placeholder="Select country..."></select-value>
+              ${icon}
+            </select-trigger>
+            <select-content>${items}</select-content>
+          </select-root>
+        </figure>
+
+        <figure>
+          <figcaption><code>width="trigger"</code> &mdash; matches the trigger</figcaption>
+          <select-root>
+            <select-trigger>
+              <select-value placeholder="Select country..."></select-value>
+              ${icon}
+            </select-trigger>
+            <select-content width="trigger">${items}</select-content>
+          </select-root>
+        </figure>
+      </div>
+    `;
+  },
 };
 
 export const MultipleSelection: Story = {

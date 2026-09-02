@@ -17,14 +17,8 @@ export const tooltipProviderContext =
 export const tooltipRootContext =
   createContext<TooltipRootContextValue>("tooltip-root");
 
-/**
- * Generate unique IDs for accessibility attributes
- */
-let idCounter = 0;
-export function generateId(prefix: string): string {
-  idCounter += 1;
-  return `${prefix}-${idCounter}`;
-}
+/** Shared across all packages so ids cannot collide. */
+export { generateId } from "@red-elements/core";
 
 /**
  * Global tooltip configuration
@@ -89,3 +83,11 @@ export const defaultProviderContext: TooltipProviderContextValue = {
   onOpen: () => {},
   onClose: () => {},
 };
+
+/**
+ * Event names. Namespaced as `{component}:{kebab-event}` so a bubbling
+ * event cannot be mistaken for a native one by an ancestor listener.
+ */
+export const TOOLTIP_EVENTS = {
+  OPEN_CHANGE: "tooltip:open-change",
+} as const;

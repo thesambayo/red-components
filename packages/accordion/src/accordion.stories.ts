@@ -123,7 +123,7 @@ export const Default: Story = {
       ?disabled=${args.disabled}
       orientation=${args.orientation}
       dir=${args.dir}
-      @change=${(e: CustomEvent) => console.log("Accordion changed:", e.detail)}
+      @accordion:value-change=${(e: CustomEvent) => console.log("Accordion changed:", e.detail)}
     >
       <accordion-item value="item-1">
         <accordion-header>
@@ -176,7 +176,7 @@ export const MultipleOpen: Story = {
     ${accordionStyles}
     <accordion-root
       type=${args.type}
-      @change=${(e: CustomEvent) => console.log("Accordion changed:", e.detail)}
+      @accordion:value-change=${(e: CustomEvent) => console.log("Accordion changed:", e.detail)}
     >
       <accordion-item value="item-1">
         <accordion-header>
@@ -320,5 +320,47 @@ export const CompareWithOld: Story = {
         </accordion-root>
       </div>
     </div>
+  `,
+};
+
+/**
+ * Escape hatch: `data-accordion-trigger="<item value>"` on your own element.
+ */
+export const EscapeHatchTriggers: Story = {
+  render: () => html`
+    <style>
+      .eh-trigger {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 12px;
+        border: none;
+        border-bottom: 1px solid #e5e5e5;
+        background: transparent;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .eh-trigger[data-state="open"] {
+        color: #3b82f6;
+      }
+    </style>
+    <accordion-root type="single" collapsible default-value="one">
+      <accordion-item value="one">
+        <accordion-header>
+          <button class="eh-trigger" data-accordion-trigger="one">
+            First section
+          </button>
+        </accordion-header>
+        <accordion-content>Content for the first section.</accordion-content>
+      </accordion-item>
+      <accordion-item value="two">
+        <accordion-header>
+          <button class="eh-trigger" data-accordion-trigger="two">
+            Second section
+          </button>
+        </accordion-header>
+        <accordion-content>Content for the second section.</accordion-content>
+      </accordion-item>
+    </accordion-root>
   `,
 };

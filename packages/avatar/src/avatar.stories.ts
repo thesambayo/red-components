@@ -81,7 +81,7 @@ export const WithCORS: Story = {
 export const WithLoadingStatusEvent: Story = {
   render: () => html`
     <avatar-root
-      @loadingStatusChange=${(e: CustomEvent) => {
+      @avatar:loading-status-change=${(e: CustomEvent) => {
         console.log("Loading status changed:", e.detail);
       }}
     >

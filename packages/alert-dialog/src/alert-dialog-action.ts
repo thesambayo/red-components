@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit";
+import { LitElement, html, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { consume } from "@lit/context";
 import { alertDialogRootContext } from "./context";
@@ -7,104 +7,57 @@ import type { AlertDialogRootContextValue } from "./types";
 /**
  * Action button that confirms and closes the alert dialog.
  *
- * With `as-child`, passes behavior to the slotted child element.
- * Without `as-child`, acts as the action button itself.
- *
  * @element alert-dialog-action
  *
  * @example
  * ```html
- * <!-- With as-child: behavior passed to button -->
- * <alert-dialog-action as-child>
- *   <button>Delete</button>
- * </alert-dialog-action>
- *
- * <!-- Without as-child: component is the button -->
  * <alert-dialog-action>Delete</alert-dialog-action>
  * ```
  */
 @customElement("alert-dialog-action")
 export class AlertDialogAction extends LitElement {
-  /**
-   * Pass behavior to slotted child instead of rendering wrapper
-   */
-  @property({ type: Boolean, attribute: "as-child" })
-  asChild = false;
+  static styles = css`
+    :host {
+      display: inline-block;
+    }
+  `;
 
   @consume({ context: alertDialogRootContext, subscribe: true })
   private _rootContext?: AlertDialogRootContextValue;
 
-  /** Reference to the child element when using as-child */
-  private _childElement: HTMLElement | null = null;
-
   /** Stored handler references for proper cleanup */
   private _handleClick = this._onClick.bind(this);
   private _handleKeyDown = this._onKeyDown.bind(this);
-  private _handleSlotChange = this._onSlotChange.bind(this);
 
   connectedCallback() {
     super.connectedCallback();
 
-    if (!this.asChild) {
-      this._setupSelfAsAction();
-    }
+    this._setupAction();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
 
-    if (this.asChild) {
-      this._cleanupChildAction();
-    } else {
-      this._cleanupSelfAsAction();
-    }
+    this._cleanupAction();
   }
 
-  private _setupSelfAsAction() {
+  private _setupAction() {
     this.addEventListener("click", this._handleClick);
     this.addEventListener("keydown", this._handleKeyDown);
 
-    // Make focusable if not already
+    // The host is the control itself, so it must carry button semantics -
+    // tabindex alone leaves screen readers announcing a generic element.
+    if (!this.hasAttribute("role")) {
+      this.setAttribute("role", "button");
+    }
     if (!this.hasAttribute("tabindex")) {
       this.setAttribute("tabindex", "0");
     }
   }
 
-  private _cleanupSelfAsAction() {
+  private _cleanupAction() {
     this.removeEventListener("click", this._handleClick);
     this.removeEventListener("keydown", this._handleKeyDown);
-  }
-
-  private _setupChildAction(child: HTMLElement) {
-    this._childElement = child;
-
-    // Add event listeners to child
-    child.addEventListener("click", this._handleClick);
-    child.addEventListener("keydown", this._handleKeyDown);
-  }
-
-  private _cleanupChildAction() {
-    if (this._childElement) {
-      this._childElement.removeEventListener("click", this._handleClick);
-      this._childElement.removeEventListener("keydown", this._handleKeyDown);
-      this._childElement = null;
-    }
-  }
-
-  private _onSlotChange(event: Event) {
-    if (!this.asChild) return;
-
-    const slot = event.target as HTMLSlotElement;
-    const children = slot.assignedElements();
-
-    // Cleanup previous child
-    this._cleanupChildAction();
-
-    // Setup new child
-    if (children.length > 0) {
-      const child = children[0] as HTMLElement;
-      this._setupChildAction(child);
-    }
   }
 
   private _onClick() {
@@ -119,7 +72,7 @@ export class AlertDialogAction extends LitElement {
   }
 
   protected render() {
-    return html`<slot @slotchange=${this._handleSlotChange}></slot>`;
+    return html`<slot></slot>`;
   }
 }
 

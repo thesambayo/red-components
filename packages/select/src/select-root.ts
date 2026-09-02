@@ -8,6 +8,8 @@ import {
   generateId,
   selectRootContext,
 } from "./select-context";
+import { ControlledState, attachBehavior } from "@red-elements/core";
+import type { BehaviorCleanup } from "@red-elements/core";
 
 /**
  * Root container for select component.
@@ -31,10 +33,30 @@ export class SelectRoot extends LitElement {
   @property({ type: String })
   name?: string;
 
+  /**
+   * Controlled selected value. **JS-only** - this has no HTML attribute.
+   *
+   * An absent boolean/string attribute is indistinguishable from one set to a
+   * falsy value, so there would be no way to tell "not controlled" from
+   * "controlled and currently empty". Setting the property to `undefined`
+   * means uncontrolled; any other value means the consumer owns it.
+   *
+   * From plain HTML use `default-value` and listen for the change event.
+   */
   // Controlled mode
   @property({ type: String, attribute: false })
   value?: string | string[];
 
+  /**
+   * Controlled open state. **JS-only** - this has no HTML attribute.
+   *
+   * An absent boolean/string attribute is indistinguishable from one set to a
+   * falsy value, so there would be no way to tell "not controlled" from
+   * "controlled and currently false". Setting the property to `undefined`
+   * means uncontrolled; any other value means the consumer owns it.
+   *
+   * From plain HTML use `default-open` and listen for the change event.
+   */
   @property({ type: Boolean, attribute: false })
   open?: boolean;
 
@@ -71,12 +93,36 @@ export class SelectRoot extends LitElement {
   @property({ type: Boolean })
   required = false;
 
-  // Internal state
-  @state()
-  private _value?: string | string[];
+  /** Controlled/uncontrolled selected value. */
+  private _valueState = new ControlledState<string | string[] | undefined>(
+    this,
+    {
+      prop: () => this.value,
+      defaultValue: () => this.defaultValue,
+      fallback: undefined,
+      name: "_value",
+      equals: (a, b) =>
+        Array.isArray(a) && Array.isArray(b)
+          ? a.length === b.length && a.every((v, i) => v === b[i])
+          : Object.is(a, b),
+    }
+  );
 
-  @state()
-  private _isOpen = false;
+  /** Controlled/uncontrolled open state. */
+  private _openState = new ControlledState<boolean>(this, {
+    prop: () => this.open,
+    defaultValue: () => this.defaultOpen,
+    fallback: false,
+    name: "_isOpen",
+  });
+
+  private get _value(): string | string[] | undefined {
+    return this._valueState.value;
+  }
+
+  private get _isOpen(): boolean {
+    return this._openState.value;
+  }
 
   @state()
   private _highlightedValue?: string;
@@ -94,10 +140,6 @@ export class SelectRoot extends LitElement {
   private _contentElement: HTMLElement | null = null;
   private _valueElement: HTMLElement | null = null;
 
-  // Initialization tracking
-  private _hasInitialized = false;
-  private _hasInitializedOpen = false;
-
   // Context provided to children
   @provide({ context: selectRootContext })
   @property({ attribute: false })
@@ -108,62 +150,105 @@ export class SelectRoot extends LitElement {
     this._internals = this.attachInternals();
   }
 
+  /** Elements wired through the `data-select-trigger` escape hatch. */
+  private _escapeHatchTriggers = new Set<HTMLElement>();
+  private _disposeTriggerBehavior?: BehaviorCleanup;
+
+  /**
+   * Escape hatch: bring your own element instead of `<select-trigger>`.
+   *
+   *   <button data-select-trigger>Choose...</button>
+   *
+   * Mirrors <select-trigger>: click toggles, Space/Enter/ArrowDown/ArrowUp
+   * open, Escape closes, and the element is registered as the positioning
+   * anchor for the listbox.
+   */
+  private _setupBehaviorAttributes() {
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = attachBehavior(
+      this,
+      "[data-select-trigger]",
+      (element) => {
+        const onClick = (event: Event) => {
+          if (this.disabled) {
+            event.preventDefault();
+            return;
+          }
+          this._handleToggle();
+        };
+        const onKeyDown = (event: KeyboardEvent) => {
+          if (this.disabled) return;
+          const { key } = event;
+          if (key === " " || key === "Enter" || key === "ArrowDown" || key === "ArrowUp") {
+            event.preventDefault();
+            if (!this._isOpen) this._handleOpen();
+          }
+          if (key === "Escape" && this._isOpen) {
+            event.preventDefault();
+            this._handleClose();
+          }
+        };
+
+        element.addEventListener("click", onClick);
+        element.addEventListener("keydown", onKeyDown);
+        if (!element.hasAttribute("role")) {
+          element.setAttribute("role", "combobox");
+        }
+        element.setAttribute("aria-haspopup", "listbox");
+        if (!element.hasAttribute("tabindex") && !(element instanceof HTMLButtonElement)) {
+          element.setAttribute("tabindex", "0");
+        }
+
+        this._escapeHatchTriggers.add(element);
+        this.setTriggerElement(element);
+        this._updateEscapeHatchTriggers();
+
+        return () => {
+          element.removeEventListener("click", onClick);
+          element.removeEventListener("keydown", onKeyDown);
+          this._escapeHatchTriggers.delete(element);
+        };
+      }
+    );
+  }
+
+  /** <select-trigger> reflects state itself; plain elements need the root to. */
+  private _updateEscapeHatchTriggers() {
+    for (const element of this._escapeHatchTriggers) {
+      element.setAttribute("aria-expanded", String(this._isOpen));
+      element.setAttribute("aria-controls", this._contentId);
+      element.setAttribute("data-state", this._isOpen ? "open" : "closed");
+      if (this.disabled) {
+        element.setAttribute("aria-disabled", "true");
+      } else {
+        element.removeAttribute("aria-disabled");
+      }
+    }
+  }
+
   connectedCallback() {
     super.connectedCallback();
+    this._setupBehaviorAttributes();
 
-    // Initialize with default value if available
-    if (this.defaultValue !== undefined) {
-      this._value = Array.isArray(this.defaultValue)
-        ? [...this.defaultValue]
-        : this.defaultValue;
-      this._hasInitialized = true;
-      this._updateFormValue();
-    }
-
-    // Initialize with default open state
-    if (this.defaultOpen !== undefined) {
-      this._isOpen = this.defaultOpen;
-      this._hasInitializedOpen = true;
-    }
+    // Default value/open initialization is handled by the controllers, which
+    // also cover the React case where properties arrive after connection.
+    this._updateFormValue();
 
     // Update context with initial values
     this._updateContext();
   }
 
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._disposeTriggerBehavior?.();
+    this._disposeTriggerBehavior = undefined;
+    this._escapeHatchTriggers.clear();
+  }
+
   protected willUpdate(changed: Map<string, unknown>) {
-    // Handle late initialization of defaultValue
-    if (
-      changed.has("defaultValue") &&
-      !this._hasInitialized &&
-      this.defaultValue !== undefined &&
-      this._value === undefined
-    ) {
-      this._value = Array.isArray(this.defaultValue)
-        ? [...this.defaultValue]
-        : this.defaultValue;
-      this._hasInitialized = true;
+    // The form value mirrors the effective value, controlled or not.
+    if (changed.has("_value") || changed.has("value")) {
       this._updateFormValue();
-    }
-
-    // Handle late initialization of defaultOpen
-    if (
-      changed.has("defaultOpen") &&
-      !this._hasInitializedOpen &&
-      this.defaultOpen !== undefined
-    ) {
-      this._isOpen = this.defaultOpen;
-      this._hasInitializedOpen = true;
-    }
-
-    // Handle controlled value
-    if (changed.has("value") && this.value !== undefined) {
-      this._value = Array.isArray(this.value) ? [...this.value] : this.value;
-      this._updateFormValue();
-    }
-
-    // Handle controlled open
-    if (changed.has("open") && this.open !== undefined) {
-      this._isOpen = this.open;
     }
 
     // Update context when state changes
@@ -176,6 +261,7 @@ export class SelectRoot extends LitElement {
       changed.has("disabled")
     ) {
       this._updateContext();
+      this._updateEscapeHatchTriggers();
     }
   }
 
@@ -227,12 +313,12 @@ export class SelectRoot extends LitElement {
     if (this.multiple) {
       const currentValue = Array.isArray(this._value) ? this._value : [];
       if (!currentValue.includes(value)) {
-        this._value = [...currentValue, value];
+        this._valueState.set([...currentValue, value]);
         this._updateFormValue();
         this._dispatchValueChange();
       }
     } else {
-      this._value = value;
+      this._valueState.set(value);
       this._updateFormValue();
       this._dispatchValueChange();
 
@@ -245,7 +331,7 @@ export class SelectRoot extends LitElement {
     if (this.disabled) return;
 
     if (this.multiple && Array.isArray(this._value)) {
-      this._value = this._value.filter((v) => v !== value);
+      this._valueState.set(this._value.filter((v) => v !== value));
       this._updateFormValue();
       this._dispatchValueChange();
     }
@@ -261,13 +347,13 @@ export class SelectRoot extends LitElement {
 
   private _handleOpen() {
     if (this.disabled) return;
-    this._isOpen = true;
+    this._openState.set(true);
     this._dispatchOpen();
     this._dispatchOpenChange();
   }
 
   private _handleClose() {
-    this._isOpen = false;
+    this._openState.set(false);
     this._highlightedValue = undefined;
     this._dispatchClose();
     this._dispatchOpenChange();
@@ -284,14 +370,45 @@ export class SelectRoot extends LitElement {
     this._highlightedValue = value;
   }
 
+  /**
+   * Pending item mutations, flushed once per microtask.
+   *
+   * Items register from their own `firstUpdated`, one at a time. Writing
+   * `_items` per registration meant N root updates for N items, and each of
+   * those rebuilt the context object that every item subscribes to - so
+   * mounting a list cost O(N^2) update cycles and a long option list visibly
+   * hitched on first open. Coalescing makes it one. Mirrors
+   * `combobox-root._queueItemMutation`.
+   */
+  private _pendingItems: Map<string, SelectItemData> | null = null;
+  private _itemFlushScheduled = false;
+
   private _registerItem(value: string, data: SelectItemData) {
-    this._items = new Map(this._items).set(value, data);
+    this._queueItemMutation((items) => items.set(value, data));
   }
 
   private _unregisterItem(value: string) {
-    const newItems = new Map(this._items);
-    newItems.delete(value);
-    this._items = newItems;
+    this._queueItemMutation((items) => items.delete(value));
+  }
+
+  private _queueItemMutation(
+    mutate: (items: Map<string, SelectItemData>) => void
+  ) {
+    // Insertion order is the navigation order, and it follows DOM order
+    // because items register in DOM order. Mutating a single pending copy
+    // preserves that.
+    this._pendingItems ??= new Map(this._items);
+    mutate(this._pendingItems);
+
+    if (this._itemFlushScheduled) return;
+    this._itemFlushScheduled = true;
+
+    queueMicrotask(() => {
+      this._itemFlushScheduled = false;
+      const next = this._pendingItems;
+      this._pendingItems = null;
+      if (next) this._items = next;
+    });
   }
 
   // Public API for setting references
@@ -335,13 +452,7 @@ export class SelectRoot extends LitElement {
   }
 
   formResetCallback() {
-    if (this.defaultValue !== undefined) {
-      this._value = Array.isArray(this.defaultValue)
-        ? [...this.defaultValue]
-        : this.defaultValue;
-    } else {
-      this._value = undefined;
-    }
+    this._valueState.reset();
     this._updateFormValue();
     this._dispatchValueChange();
   }
@@ -356,11 +467,11 @@ export class SelectRoot extends LitElement {
   ) {
     if (state instanceof FormData) {
       const values = state.getAll(this.name!);
-      this._value = values.map(String);
+      this._valueState.restore(values.map(String));
     } else if (typeof state === "string") {
-      this._value = state;
+      this._valueState.restore(state);
     } else {
-      this._value = undefined;
+      this._valueState.restore(undefined);
     }
     this._updateFormValue();
   }
