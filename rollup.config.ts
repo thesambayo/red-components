@@ -1,5 +1,4 @@
-import { readdirSync, statSync } from "node:fs";
-import { exec } from "node:child_process";
+import { readdirSync, statSync, rmSync, existsSync } from "node:fs";
 import { cwd } from "node:process";
 import { join } from "node:path";
 
@@ -12,12 +11,21 @@ import typescript from "@rollup/plugin-typescript";
 const PACKAGE_ROOT_PATH = cwd();
 const PACKAGES_DIR_PATH = `${PACKAGE_ROOT_PATH}/packages`;
 
-/** @param {string} command - execute Bash command */
-function execute(command: string) {
-  exec(command, (err, stdout, stderr) => {
-    process.stdout.write(stdout);
-  });
-}
+/**
+ * Dependencies that must never be inlined into a package bundle.
+ *
+ * Bundling `lit` would ship a private copy of ReactiveElement per package,
+ * triggering "Multiple versions of Lit loaded" and breaking cross-package
+ * context. These are declared as peerDependencies by each package instead.
+ */
+const EXTERNAL = [
+  /^lit($|\/)/,
+  "@lit/context",
+  "@floating-ui/dom",
+  "@red-elements/core",
+  "react",
+  "@lit/react",
+];
 
 let configs: RollupOptions[] = [];
 
@@ -34,47 +42,51 @@ readdirSync(PACKAGES_DIR_PATH).forEach((dirName) => {
     return;
   }
 
-  execute(`rm -rf ${packageFullPath}/dist`);
+  rmSync(join(packageFullPath, "dist"), { recursive: true, force: true });
 
-  const webComponentConfig: RollupOptions = {
-    input: `${packageFullPath}/src/${dirName}.ts`,
+  /**
+   * Entry points, if present. `@red-elements/core` ships neither custom
+   * elements nor React wrappers, so it only has an `index.ts`.
+   */
+  const input: Record<string, string> = {};
+  const elementEntry = join(packageFullPath, "src", `${dirName}.ts`);
+  const reactEntry = join(packageFullPath, "src", "index.ts");
+  if (existsSync(elementEntry)) input[dirName] = elementEntry;
+  if (existsSync(reactEntry)) input.index = reactEntry;
+  if (Object.keys(input).length === 0) {
+    return;
+  }
+
+  /**
+   * A single multi-input build per package.
+   *
+   * The element entry (`{name}.ts`) and the React entry (`index.ts`) share the
+   * component classes, so they MUST be built together. Built separately, each
+   * output carries its own copy of every class and calls `customElements.define`
+   * for the same tag names - importing both entries in one app then throws
+   * `NotSupportedError: the name "x-root" has already been used`.
+   *
+   * With both as inputs of one build, Rollup hoists the shared classes into a
+   * single chunk that both entries import, so each tag is defined exactly once.
+   */
+  configs.push({
+    input,
     output: [
       {
-        file: `${packageFullPath}/dist/${dirName}.js`,
+        dir: `${packageFullPath}/dist`,
         format: "es",
+        entryFileNames: "[name].js",
+        chunkFileNames: "chunks/[name]-[hash].js",
       },
     ],
+    external: EXTERNAL,
     plugins: [
       typescript({ tsconfig: `${packageFullPath}/tsconfig.json` }),
       resolve(),
       terser(),
       filesize(),
     ],
-  };
-
-  const reactComponentConfig: RollupOptions = {
-    input: `${packageFullPath}/src/index.ts`,
-    output: [
-      {
-        file: `${packageFullPath}/dist/index.js`,
-        format: "es",
-      },
-    ],
-    external: ["react", "@lit/react"],
-    plugins: [
-      typescript({ tsconfig: `${packageFullPath}/tsconfig.json` }),
-      resolve(),
-      terser(),
-      filesize(),
-    ],
-  };
-
-  configs.push(webComponentConfig, reactComponentConfig);
+  });
 });
-
-// export default (commandLineArgs) => {
-//     console.log(commandLineArgs);
-//     return configs;
-// };
 
 export default configs;

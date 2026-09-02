@@ -10,11 +10,18 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  # changesets/action writes ~/.npmrc from this itself; no registry-url or
+  # explicit .npmrc step is needed.
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  # Signed build attestation on npm, shown as a "Provenance" section on each
+  # package page. Requires `id-token: write` below, a public repository, and a
+  # `repository` field matching this repo - every package has one.
+  NPM_CONFIG_PROVENANCE: true
 
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   publish:
@@ -22,12 +29,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          # The exact commit that passed CI, not whatever is at the head of
+          # main by now. Two merges landing close together would otherwise
+          # publish a tree that was never verified. If a later commit is
+          # waiting, its own CI run triggers this workflow again and the
+          # release branch is brought forward then.
+          ref: ${{ github.event.workflow_run.head_sha }}
+          # Changesets reads git history to build changelogs and manage the
+          # release branch; a shallow clone gives it an incomplete view.
+          fetch-depth: 0
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+        uses: pnpm/action-setup@v4
 
       - name: Install Node.js
         uses: actions/setup-node@v4

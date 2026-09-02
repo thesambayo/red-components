@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@11.22.0",
   "description": "Accessible unstyled web components",
   "author": "Samuel Adebayo <sambayo28@gmail.com>",
   "license": "MIT",
@@ -22,19 +22,19 @@
     "changeset": "changeset",
     "publish:packages": "changeset publish",
     "version:packages": "changeset version",
-    "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript --silent",
+    "build": "pnpm typecheck && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript --silent && node scripts/check-dist.mjs",
     "story:dev": "storybook dev -p 6006 --no-open",
     "story:build": "storybook build",
     "showcase:dev": "pnpm build && pnpm --filter showcase dev",
     "showcase:build": "pnpm build && pnpm --filter showcase build",
     "showcase:lint": "pnpm --filter showcase lint",
     "docs:dev": "pnpm --filter docs dev",
-    "docs:build": "pnpm build && pnpm --filter docs build"
+    "docs:build": "pnpm build && pnpm --filter docs build",
+    "typecheck": "tsc -p scripts/tsconfig.assert.json"
   },
   "dependencies": {
     "@changesets/cli": "^2.29.8",
     "@floating-ui/dom": "^1.7.4",
-    "@lit-labs/signals": "^0.2.0",
     "@lit/context": "^1.1.6",
     "@lit/react": "^1.0.8",
     "lit": "^3.3.2"
@@ -58,6 +58,6 @@
   },
   "engines": {
     "node": ">=22",
-    "pnpm": ">=9"
+    "pnpm": ">=11"
   }
 }
