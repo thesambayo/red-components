@@ -108,7 +108,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/combobox';
+            code={`import '@red-elements/combobox/elements';
 
 // Add to your HTML
 document.body.innerHTML = \`
@@ -174,7 +174,7 @@ export function FruitCombobox() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/combobox';
+import '@red-elements/combobox/elements';
 import { ref } from 'vue';
 
 const value = ref('');
@@ -206,7 +206,7 @@ const handleValueChange = (e) => {
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/combobox';
+  import '@red-elements/combobox/elements';
   let value = '';
 
   function handleValueChange(e) {
@@ -235,7 +235,7 @@ const handleValueChange = (e) => {
           <CodeBlock
             code={`// app.component.ts
 import { Component } from '@angular/core';
-import '@red-elements/combobox';
+import '@red-elements/combobox/elements';
 
 @Component({
   selector: 'app-root',
@@ -331,7 +331,7 @@ export default function Page() {
         <tab-content value="remix" class="mt-4">
           <CodeBlock
             code={`// app/routes/index.tsx
-import '@red-elements/combobox';
+import '@red-elements/combobox/elements';
 
 export default function Index() {
   return (
@@ -358,7 +358,7 @@ export default function Index() {
 // src/pages/index.astro
 ---
 <script>
-  import '@red-elements/combobox';
+  import '@red-elements/combobox/elements';
 </script>
 
 <combobox-root>
@@ -380,7 +380,7 @@ export default function Index() {
           <CodeBlock
             code={`<!-- src/routes/+page.svelte -->
 <script>
-  import '@red-elements/combobox';
+  import '@red-elements/combobox/elements';
 </script>
 
 <combobox-root>
@@ -405,7 +405,7 @@ export default function Index() {
 <html>
 <head>
   <script type="module">
-    import '@red-elements/combobox';
+    import '@red-elements/combobox/elements';
   </script>
 </head>
 <body>

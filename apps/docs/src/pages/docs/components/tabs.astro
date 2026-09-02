@@ -131,7 +131,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/tabs';
+            code={`import '@red-elements/tabs/elements';
 
 // Use directly in your HTML
 <tabs-root default-value="tab1">
@@ -178,7 +178,7 @@ export function TabsDemo() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/tabs';
+import '@red-elements/tabs/elements';
 </script>
 
 <template>
@@ -200,7 +200,7 @@ import '@red-elements/tabs';
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/tabs';
+  import '@red-elements/tabs/elements';
 </script>
 
 <tabs-root default-value="tab1">
@@ -221,7 +221,7 @@ import '@red-elements/tabs';
           <CodeBlock
             code={`// app.component.ts
 import { Component } from '@angular/core';
-import '@red-elements/tabs';
+import '@red-elements/tabs/elements';
 
 @Component({
   selector: 'app-root',

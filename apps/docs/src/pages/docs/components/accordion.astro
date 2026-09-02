@@ -152,7 +152,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/accordion';
+            code={`import '@red-elements/accordion/elements';
 
 // Use directly in your HTML
 <accordion-root>
@@ -222,7 +222,7 @@ export function AccordionDemo() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/accordion';
+import '@red-elements/accordion/elements';
 </script>
 
 <template>
@@ -253,7 +253,7 @@ import '@red-elements/accordion';
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/accordion';
+  import '@red-elements/accordion/elements';
 </script>
 
 <accordion-root>
@@ -283,7 +283,7 @@ import '@red-elements/accordion';
           <CodeBlock
             code={`// app.component.ts
 import { Component } from '@angular/core';
-import '@red-elements/accordion';
+import '@red-elements/accordion/elements';
 
 @Component({
   selector: 'app-root',

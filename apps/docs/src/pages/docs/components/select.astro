@@ -25,7 +25,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
             <select-value placeholder="Select country..."></select-value>
             <span>▼</span>
           </select-trigger>
-          <select-content class="min-w-[200px] bg-background border border-border rounded-lg shadow-lg p-1">
+          <select-content width="trigger" class="bg-background border border-border rounded-lg shadow-lg p-1">
             <select-item value="us" class="flex items-center px-3 py-2 text-sm rounded cursor-pointer hover:bg-accent data-[selected]:bg-[#dbeafe] data-[selected]:text-[#1e40af] outline-none">
               <select-item-indicator class="mr-2">✓</select-item-indicator>
               <select-item-text>United States</select-item-text>
@@ -114,7 +114,7 @@ import CodeBlock from '../../../components/CodeBlock.astro';
         </tabs-list>
         <tab-content value="html" class="mt-4">
           <CodeBlock
-            code={`import '@red-elements/select';
+            code={`import '@red-elements/select/elements';
 
 // Use directly in your HTML
 <select-root name="country" default-value="us">
@@ -184,7 +184,7 @@ export function SelectDemo() {
         <tab-content value="vue" class="mt-4">
           <CodeBlock
             code={`<script setup>
-import '@red-elements/select';
+import '@red-elements/select/elements';
 </script>
 
 <template>
@@ -216,7 +216,7 @@ import '@red-elements/select';
         <tab-content value="svelte" class="mt-4">
           <CodeBlock
             code={`<script>
-  import '@red-elements/select';
+  import '@red-elements/select/elements';
 </script>
 
 <select-root name="country" default-value="us">
@@ -247,7 +247,7 @@ import '@red-elements/select';
           <CodeBlock
             code={`// app.component.ts
 import { Component } from '@angular/core';
-import '@red-elements/select';
+import '@red-elements/select/elements';
 
 @Component({
   selector: 'app-root',
@@ -364,6 +364,112 @@ export class AppComponent {}`}
               <tr>
                 <td class="border border-border px-4 py-2"><code>select:close</code></td>
                 <td class="border border-border px-4 py-2">Fires when select closes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h3 class="scroll-m-20 text-2xl font-semibold tracking-tight">
+          SelectContent
+        </h3>
+        <p class="leading-7">
+          The dropdown surface. Rendered in the top layer via the Popover API and
+          anchored to the trigger, so it is never clipped by an
+          <code>overflow: hidden</code> ancestor.
+        </p>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-border">
+            <thead>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Prop</th>
+                <th class="border border-border px-4 py-2 text-left">Type</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>width</code></td>
+                <td class="border border-border px-4 py-2">"trigger"</td>
+                <td class="border border-border px-4 py-2">Match the trigger's width exactly</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>side</code></td>
+                <td class="border border-border px-4 py-2">top | right | bottom | left</td>
+                <td class="border border-border px-4 py-2">Preferred side. Flips automatically on collision. Default <code>bottom</code></td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>align</code></td>
+                <td class="border border-border px-4 py-2">start | center | end</td>
+                <td class="border border-border px-4 py-2">Alignment along the chosen side. Default <code>start</code></td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>side-offset</code></td>
+                <td class="border border-border px-4 py-2">number</td>
+                <td class="border border-border px-4 py-2">Distance from the trigger in pixels. Default <code>4</code></td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>align-offset</code></td>
+                <td class="border border-border px-4 py-2">number</td>
+                <td class="border border-border px-4 py-2">Offset along the alignment axis in pixels. Default <code>0</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 class="scroll-m-20 text-xl font-semibold tracking-tight mt-4">
+          Sizing
+        </h4>
+        <p class="leading-7">
+          <code>width="trigger"</code> is the shorthand for the common case:
+        </p>
+        <CodeBlock
+          code={`<select-content width="trigger">
+  <!-- items -->
+</select-content>`}
+          lang="html"
+        />
+        <p class="leading-7">
+          It is built on custom properties that are always set while the content
+          is open, so anything the shorthand does not cover is still reachable
+          with plain CSS &mdash; a minimum rather than an exact width, for example:
+        </p>
+        <CodeBlock
+          code={`select-content {
+  /* never narrower than the trigger, but free to grow */
+  min-width: var(--select-trigger-width);
+
+  /* never taller than the space actually available */
+  max-height: var(--select-available-height);
+  overflow-y: auto;
+}`}
+          lang="css"
+        />
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-border">
+            <thead>
+              <tr class="bg-muted">
+                <th class="border border-border px-4 py-2 text-left">Custom property</th>
+                <th class="border border-border px-4 py-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>--select-trigger-width</code></td>
+                <td class="border border-border px-4 py-2">Current width of the trigger</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>--select-trigger-height</code></td>
+                <td class="border border-border px-4 py-2">Current height of the trigger</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>--select-available-width</code></td>
+                <td class="border border-border px-4 py-2">Horizontal space available before colliding with the viewport</td>
+              </tr>
+              <tr>
+                <td class="border border-border px-4 py-2"><code>--select-available-height</code></td>
+                <td class="border border-border px-4 py-2">Vertical space available before colliding with the viewport</td>
               </tr>
             </tbody>
           </table>

@@ -60,8 +60,8 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
     {{template "content" .}}
 
     <script type="module">
-      import '@red-elements/dialog';
-      import '@red-elements/dropdown';
+      import '@red-elements/dialog/elements';
+      import '@red-elements/dropdown/elements';
     </script>
 </body>
 </html>`}
@@ -79,16 +79,12 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
     <h1>{{.PageTitle}}</h1>
 
     <dialog-root>
-      <dialog-trigger as-child>
-        <button type="button">Open Dialog</button>
-      </dialog-trigger>
+      <button type="button" data-dialog-trigger>Open Dialog</button>
 
       <dialog class="rounded-lg p-6 max-w-md">
         <h2 data-dialog-title>{{.DialogTitle}}</h2>
         <p data-dialog-description>{{.DialogContent}}</p>
-        <dialog-close as-child>
-          <button type="button">Close</button>
-        </dialog-close>
+        <button type="button" data-dialog-close>Close</button>
       </dialog>
     </dialog-root>
 </div>

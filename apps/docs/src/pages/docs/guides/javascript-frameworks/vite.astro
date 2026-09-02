@@ -141,7 +141,7 @@ export default defineConfig({
 
           <ConfigFile
             filename="src/main.ts"
-            code={`import '@red-elements/dialog';
+            code={`import '@red-elements/dialog/elements';
 import './style.css';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = \`
@@ -149,9 +149,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = \`
     <h1>Vite + Red Elements</h1>
 
     <dialog-root>
-      <dialog-trigger as-child>
-        <button type="button">Open Dialog</button>
-      </dialog-trigger>
+      <button type="button" data-dialog-trigger>Open Dialog</button>
 
       <dialog class="rounded-lg p-6 max-w-md">
         <h2 data-dialog-title class="text-2xl font-bold mb-4">
@@ -160,9 +158,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = \`
         <p data-dialog-description class="mb-4">
           This is a dialog component.
         </p>
-        <dialog-close as-child>
-          <button type="button">Close</button>
-        </dialog-close>
+        <button type="button" data-dialog-close>Close</button>
       </dialog>
     </dialog-root>
   </div>
@@ -193,7 +189,7 @@ export default defineConfig({
 
           <ConfigFile
             filename="src/App.tsx"
-            code={`import { DialogRoot, DialogTrigger, DialogClose } from '@red-elements/dialog';
+            code={`import { DialogRoot } from '@red-elements/dialog';
 import './App.css';
 
 function App() {
@@ -202,11 +198,7 @@ function App() {
       <h1>Vite + React + Red Elements</h1>
 
       <DialogRoot>
-        <DialogTrigger asChild>
-          <button type="button" className="btn-primary">
-            Open Dialog
-          </button>
-        </DialogTrigger>
+        <button type="button" className="btn-primary" data-dialog-trigger>Open Dialog</button>
 
         <dialog className="rounded-lg p-6 max-w-md">
           <h2 data-dialog-title className="text-2xl font-bold mb-4">
@@ -215,11 +207,7 @@ function App() {
           <p data-dialog-description className="mb-4">
             This is a dialog component.
           </p>
-          <DialogClose asChild>
-            <button type="button" className="btn-secondary">
-              Close
-            </button>
-          </DialogClose>
+          <button type="button" className="btn-secondary" data-dialog-close>Close</button>
         </dialog>
       </DialogRoot>
     </div>
@@ -265,7 +253,7 @@ export default App;`}
           <ConfigFile
             filename="src/App.vue"
             code={`<script setup lang="ts">
-import '@red-elements/dialog';
+import '@red-elements/dialog/elements';
 </script>
 
 <template>
@@ -273,9 +261,7 @@ import '@red-elements/dialog';
     <h1>Vite + Vue + Red Elements</h1>
 
     <dialog-root>
-      <dialog-trigger as-child>
-        <button type="button" class="btn-primary">Open Dialog</button>
-      </dialog-trigger>
+      <button type="button" class="btn-primary" data-dialog-trigger>Open Dialog</button>
 
       <dialog class="rounded-lg p-6 max-w-md">
         <h2 data-dialog-title class="text-2xl font-bold mb-4">
@@ -284,9 +270,7 @@ import '@red-elements/dialog';
         <p data-dialog-description class="mb-4">
           This is a dialog component.
         </p>
-        <dialog-close as-child>
-          <button type="button" class="btn-secondary">Close</button>
-        </dialog-close>
+        <button type="button" class="btn-secondary" data-dialog-close>Close</button>
       </dialog>
     </dialog-root>
   </div>
@@ -322,16 +306,14 @@ export default defineConfig({
           <ConfigFile
             filename="src/App.svelte"
             code={`<script lang="ts">
-  import '@red-elements/dialog';
+  import '@red-elements/dialog/elements';
 </script>
 
 <main>
   <h1>Vite + Svelte + Red Elements</h1>
 
   <dialog-root>
-    <dialog-trigger as-child>
-      <button type="button" class="btn-primary">Open Dialog</button>
-    </dialog-trigger>
+    <button type="button" class="btn-primary" data-dialog-trigger>Open Dialog</button>
 
     <dialog class="rounded-lg p-6 max-w-md">
       <h2 data-dialog-title class="text-2xl font-bold mb-4">
@@ -340,9 +322,7 @@ export default defineConfig({
       <p data-dialog-description class="mb-4">
         This is a dialog component.
       </p>
-      <dialog-close as-child>
-        <button type="button" class="btn-secondary">Close</button>
-      </dialog-close>
+      <button type="button" class="btn-secondary" data-dialog-close>Close</button>
     </dialog>
   </dialog-root>
 </main>

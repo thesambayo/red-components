@@ -1,5 +1,6 @@
 {
   "name": "docs",
+  "private": true,
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -9,8 +10,22 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.4",
+    "@lit/context": "^1.1.6",
+    "@red-elements/accordion": "workspace:*",
+    "@red-elements/alert-dialog": "workspace:*",
+    "@red-elements/avatar": "workspace:*",
+    "@red-elements/combobox": "workspace:*",
+    "@red-elements/dialog": "workspace:*",
+    "@red-elements/dropdown": "workspace:*",
+    "@red-elements/select": "workspace:*",
+    "@red-elements/switch": "workspace:*",
+    "@red-elements/tabs": "workspace:*",
+    "@red-elements/toast": "workspace:*",
+    "@red-elements/tooltip": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.15",
+    "lit": "^3.3.2",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

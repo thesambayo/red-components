@@ -66,7 +66,7 @@ const Layout = ({ children }: { children: any }) ${'='}> html\`
   \${children}
 
   <script type="module">
-    import '@red-elements/dialog';
+    import '@red-elements/dialog/elements';
   </script>
 </body>
 </html>
@@ -78,16 +78,12 @@ app.get('/', (c) ${'='}> {
       <h1>Hono + Red Elements</h1>
 
       <dialog-root>
-        <dialog-trigger as-child>
-          <button>Open Dialog</button>
-        </dialog-trigger>
+        <button data-dialog-trigger>Open Dialog</button>
 
         <dialog class="rounded-lg p-6 max-w-md">
           <h2 data-dialog-title>Welcome</h2>
           <p data-dialog-description>This is a dialog component.</p>
-          <dialog-close as-child>
-            <button>Close</button>
-          </dialog-close>
+          <button data-dialog-close>Close</button>
         </dialog>
       </dialog-root>
     </Layout>
@@ -125,20 +121,16 @@ app.get('/', (c) ${'='}> {
       <h1>Hono + Red Elements</h1>
 
       <dialog-root>
-        <dialog-trigger as-child>
-          <button>Open Dialog</button>
-        </dialog-trigger>
+        <button data-dialog-trigger>Open Dialog</button>
         <dialog>
           <h2 data-dialog-title>Welcome</h2>
           <p data-dialog-description>This is a dialog.</p>
-          <dialog-close as-child>
-            <button>Close</button>
-          </dialog-close>
+          <button data-dialog-close>Close</button>
         </dialog>
       </dialog-root>
 
       <script type="module">
-        import '@red-elements/dialog';
+        import '@red-elements/dialog/elements';
       </script>
     </body>
     </html>

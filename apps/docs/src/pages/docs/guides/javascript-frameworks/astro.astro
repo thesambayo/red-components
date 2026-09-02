@@ -44,7 +44,7 @@ import ConfigFile from '../../../../components/ConfigFile.astro';
         filename="src/pages/index.astro"
         code={`---
 // Import in frontmatter to register components
-import '@red-elements/dialog';
+import '@red-elements/dialog/elements';
 ---
 
 <html lang="en">
@@ -52,16 +52,12 @@ import '@red-elements/dialog';
   <h1>Astro + Red Elements</h1>
 
   <dialog-root>
-    <dialog-trigger as-child>
-      <button class="btn-primary">Open Dialog</button>
-    </dialog-trigger>
+    <button class="btn-primary" data-dialog-trigger>Open Dialog</button>
 
     <dialog class="rounded-lg p-6 max-w-md">
       <h2 data-dialog-title class="text-2xl font-bold mb-4">Welcome</h2>
       <p data-dialog-description class="mb-4">This is a dialog component.</p>
-      <dialog-close as-child>
-        <button class="btn-secondary">Close</button>
-      </dialog-close>
+      <button class="btn-secondary" data-dialog-close>Close</button>
     </dialog>
   </dialog-root>
 </body>
@@ -75,13 +71,11 @@ import '@red-elements/dialog';
       <p class="leading-7">Web components work seamlessly with Astro's island architecture:</p>
       <CodeBlock
         code={`---
-import '@red-elements/dropdown';
+import '@red-elements/dropdown/elements';
 ---
 
 <dropdown-root client:load>
-  <dropdown-trigger as-child>
-    <button>Menu</button>
-  </dropdown-trigger>
+  <button data-dropdown-trigger>Menu</button>
   <dropdown-content>
     <dropdown-item>Profile</dropdown-item>
     <dropdown-item>Settings</dropdown-item>

@@ -77,22 +77,18 @@ pin "@red-elements/dropdown", to: "https://cdn.jsdelivr.net/npm/@red-elements/dr
         code={`<% content_for :title, "My Rails App" %>
 
 <script type="module">
-  import '@red-elements/dialog';
+  import '@red-elements/dialog/elements';
 </script>
 
 <h1>Rails + Red Elements</h1>
 
 <dialog-root>
-  <dialog-trigger as-child>
-    <button type="button" class="btn btn-primary">Open Dialog</button>
-  </dialog-trigger>
+  <button type="button" class="btn btn-primary" data-dialog-trigger>Open Dialog</button>
 
   <dialog class="rounded p-6 max-w-md">
     <h2 data-dialog-title><%= @dialog_title %></h2>
     <p data-dialog-description><%= @dialog_content %></p>
-    <dialog-close as-child>
-      <button type="button">Close</button>
-    </dialog-close>
+    <button type="button" data-dialog-close>Close</button>
   </dialog>
 </dialog-root>`}
         lang="erb"
@@ -105,7 +101,7 @@ pin "@red-elements/dropdown", to: "https://cdn.jsdelivr.net/npm/@red-elements/dr
       <CodeBlock
         code={`<%= form_with url: submit_path, method: :post do |form| %>
   <script type="module">
-    import '@red-elements/combobox';
+    import '@red-elements/combobox/elements';
   </script>
 
   <combobox-root default-value="<%= @selected_category %>">
